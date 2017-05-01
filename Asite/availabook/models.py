@@ -24,7 +24,7 @@ user_table = dynamodb.Table("User")
 event_table = dynamodb.Table("Event")
 # Create your models here.
 class User():
-	def __init__(self, id, passwd, passwd_again, firstname, lastname, age, city, zipcode):
+    def __init__(self, id, passwd, passwd_again, firstname, lastname, age, city, zipcode):
         self.id = id
         self.passwd = passwd
         self.passwd_again = passwd_again
@@ -65,28 +65,28 @@ class User():
 	    )
 	    return response
 
-	def authen_user(self):
-		return self.verify_email() and self.verify_passwd()
+    def authen_user(self):
+	    return self.verify_email() and self.verify_passwd()
 
-	def verify_email(self):
-		response = self.get_response_by_id(self.id)
-		if 'Item' in response:
-			return True
-		else:
-			return False
+    def verify_email(self):
+        response = self.get_response_by_id(self.id)
+        if 'Item' in response:
+            return True
+        else:
+            return False
 
-	def verify_passwd(self, response):
-		response = self.get_response_by_id(self.id)
-		item = response['Item']
-		pwd = item['password']
-		if pwd == self.passwd:
-			return True
-		else:
-			return False
-		return False
+    def verify_passwd(self, response):
+        response = self.get_response_by_id(self.id)
+        item = response['Item']
+        pwd = item['password']
+        if pwd == self.passwd:
+            return True
+        else:
+            return False
+        return False
 
-	def authorize(self):
-		self.verified = True
+    def authorize(self):
+        self.verified = True
 
 
 class Event():
