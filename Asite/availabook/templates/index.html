@@ -9,18 +9,23 @@
     <title>Availabook Social Network</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="css/bootstrap.css" rel="stylesheet">
+    {% load static %}
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+   <!--  <link href="css/bootstrap.css" rel="stylesheet"> -->
 
     <!-- Custom styles for this template -->
-    <link href="css/style.css" rel="stylesheet">
-    <link href="css/font-awesome.css" rel="stylesheet">
+    {% load static %}
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    {% load static %}
+    <link href="{% static 'css/font-awesome.css' %" rel="stylesheet">
   </head>
 
   <body>
 
   <header>
     <div class="container">
-      <img src="img/logo.png" class="logo" alt="">
+    {% load static %}
+      <img src="{% static 'img/logo.png' %}" class="logo" alt="">
       <form class="form-inline">
       <a href="signup.html" style="color:white">Sign up</a>
         <div class="form-group">
@@ -95,7 +100,8 @@
               <div class="panel-body">
                  <div class="row">
                    <div class="col-sm-2">
-                     <a href="profile.html" class="post-avatar thumbnail"><img src="img/user.png" alt=""><div class="text-center">DevUser1</div></a>
+                   {% load static %}
+                     <a href="profile.html" class="post-avatar thumbnail"><img src="{% static 'img/user.png' %}" alt=""><div class="text-center">DevUser1</div></a>
                      <div class="likes text-center">7 Likes</div>
                    </div>
                    <div class="col-sm-10">
@@ -118,7 +124,8 @@
 
                      <div class="comments">
                        <div class="comment">
-                         <a href="#" class="comment-avatar pull-left"><img src="img/user.png" alt=""></a>
+                       {% load static %}
+                         <a href="#" class="comment-avatar pull-left"><img src="{% static 'img/user.png' %}" alt=""></a>
                          <div class="comment-text">
                            <p>I am just going to paste in a paragraph, then we will add another clearfix.</p>
                          </div>
@@ -289,6 +296,7 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="js/bootstrap.js"></script>
+    {% load static %}
+    <script src= "{% static 'js/bootstrap.js' %}"></script>
   </body>
 </html>
