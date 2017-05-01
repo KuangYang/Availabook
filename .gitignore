@@ -1,1 +1,8 @@
-*.pyc*.sqlite3
+# ignore file created by mac osx
+.DS_Store
+# ignore all credential files
+*.json
+#*.txt
+*.crc
+*.pyc
+*.sqlite3
