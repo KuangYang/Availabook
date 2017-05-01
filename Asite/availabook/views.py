@@ -10,7 +10,7 @@ def index(request):
     print "reder index"
     return render(request, 'index.html')
 
-def login(request, onsuccess='/availabook', onfail='/availabook/login'):
+def login(request):
  	user_id = request.POST.get("id")
  	pwd = request.POST.get("psw")
 

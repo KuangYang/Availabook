@@ -53,7 +53,7 @@
   </header>
 
   <div id="signup" class="modal">
-    <form class="modal-content animate" action="/signup">
+    <form class="modal-content animate" action="/signup"> {% csrf_token %}
     <div class="imgcontainer">
       <span onclick="document.getElementById('signup').style.display='none'" class="close" title="Close Modal">&times;</span>
        <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
@@ -103,7 +103,7 @@
 
 
   <div id="signin" class="modal">
-    <form class="modal-content animate" action = "/login">
+    <form method = "POST" class="modal-content animate" action = "{% url 'availabook:login' %}"> {% csrf_token %}
     <div class="imgcontainer">
       <span onclick="document.getElementById('signin').style.display='none'" class="close" title="Close Modal">&times;</span>
        <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
@@ -117,7 +117,7 @@
         <br>
         <input type="password" placeholder="Password" name="psw" required>
         <br>
-        <button type="submit" style="margin-right:137px" class="subbtn">Login in</button>
+        <button type="submit" style="margin-right:137px" class="subbtn">Login</button>
         <button type="button" onclick="document.getElementById('signin').style.display='none'" class="cancelbtn">Cancel</button>
       </div>
 
@@ -159,7 +159,7 @@
                 <h3 class="panel-title">Wall</h3>
               </div>
               <div class="panel-body">
-                <form>
+                <form> {% csrf_token %}
                   <div class="form-group">
                     <textarea class="form-control" placeholder="Write on the wall"></textarea>
                   </div>
@@ -193,7 +193,7 @@
                      </div>
                      <p class="post-actions"><a href="#">Comment</a> - <a href="#">Like</a> - <a href="#">Follow</a> - <a href="#">Share</a></p>
                      <div class="comment-form">
-                       <form class="form-inline">
+                       <form class="form-inline"> {% csrf_token %}
                         <div class="form-group">
                           <input type="text" class="form-control" placeholder="enter comment">
                         </div>
@@ -238,7 +238,7 @@
                        <div class="pointer-border"></div>
                      </div>
                      <p class="post-actions"><a href="#">Comment</a> - <a href="#">Like</a> - <a href="#">Follow</a> - <a href="#">Share</a></p>
-                     <div class="comment-form">
+                     <div class="comment-form"> {% csrf_token %}
                        <form class="form-inline">
                         <div class="form-group">
                           <input type="text" class="form-control" placeholder="enter comment">
@@ -284,7 +284,7 @@
                      </div>
                      <p class="post-actions"><a href="#">Comment</a> - <a href="#">Like</a> - <a href="#">Follow</a> - <a href="#">Share</a></p>
                      <div class="comment-form">
-                       <form class="form-inline">
+                       <form class="form-inline"> {% csrf_token %}
                         <div class="form-group">
                           <input type="text" class="form-control" placeholder="enter comment">
                         </div>
