@@ -14,7 +14,7 @@ def login(request):
  	user_id = request.POST.get("id")
  	pwd = request.POST.get("psw")
 
- 	user = User(user_id, psw)
+ 	user = User(user_id, pwd)
  	if user.authen_user():
  		user.authorize()
  		return render(request, 'index.html')
