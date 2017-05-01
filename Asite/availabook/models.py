@@ -20,8 +20,8 @@ dynamodb_session = Session(aws_access_key_id=awsconf["aws_access_key_id"],
 
 dynamodb = dynamodb_session.resource('dynamodb')
 
-table = dynamodb.Table("User")
-
+user_table = dynamodb.Table("User")
+event_table = dynamodb.Table("Event")
 # Create your models here.
 class User():
 	def __init__(self, id, passwd):
@@ -31,7 +31,7 @@ class User():
 
 
 	def get_response_by_id(id):
-	    response = table.get_item(
+	    response = user_table.get_item(
 	    	Key={
 	            'email': id
 	        }
@@ -60,6 +60,60 @@ class User():
 
 	def authorize(self):
 		self.verified = True
+
+
+class Event():
+	def __init__(self,EId,content,date,time,label,place):
+		self.EId = EId  ### use hadhid, to be modify
+		self.content = content
+		self.date = date
+		self.time = time
+		self.label = label
+		self.like = []
+		self.place = place
+	### put function
+	def put_into_db(self,EId,content,date,label,like,place,time):
+    	event_table.put_item(
+        Item={
+            'EId': EId,
+            'content': content,
+            'date': date,
+            'time': time,
+            'label': label,
+            'like': like,
+            'place': place,
+        }
+    )
+    ### get function, get_response first then use responce to get items
+	def get_response_by_EId(EId):
+		response = event_table.get_item(
+			Key = {
+				'EId':EId
+			}
+		)
+		return response
+	def get_content(response):
+		return response['content']
+	def get_date(response):
+		return response['date']
+	def get_time(response):
+		return response['time']
+	def get_label(response):
+		return response['label']
+	def get_like(response):
+		return response['like']
+	def get_place(response):
+		return response['place']
+	### delete function
+	def delete(EId):
+		event_table.delete_item(
+        Key={
+            'EId': EId
+        }
+    )
+	### auxiliary function
+	def get_like_num(response):
+		return len(response['like'])
 
 
 
