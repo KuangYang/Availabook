@@ -29,12 +29,15 @@ class User():
 
 
 	def get_response_by_id(id):
-    response = table.get_item(
-        Key={
-            'email': id
-        }
-    )
-    return respoonse
+	    response = table.get_item(
+	    	Key={
+	            'email': id
+	        }
+	    )
+	    return response
+
+	def authen_user(self):
+		return self.verify_email() and self.verify_passwd()
 
 	def verify_email(self):
 		response = self.get_response_by_id(self.id)
@@ -48,10 +51,13 @@ class User():
 		item = response['Item']
 		pwd = item['password']
 		if pwd == self.passwd:
-			self.verified = True
 			return True
 		else:
 			return False
+		return False
+
+	def authorize(self):
+		self.verified = True
 
 
 

@@ -53,7 +53,7 @@
   </header>
 
   <div id="signup" class="modal">
-    <form class="modal-content animate" action="/action_page.php">
+    <form class="modal-content animate" action="/signup">
     <div class="imgcontainer">
       <span onclick="document.getElementById('signup').style.display='none'" class="close" title="Close Modal">&times;</span>
        <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
@@ -103,7 +103,7 @@
 
 
   <div id="signin" class="modal">
-    <form class="modal-content animate" action="/action_page.php">
+    <form class="modal-content animate" action = "/login">
     <div class="imgcontainer">
       <span onclick="document.getElementById('signin').style.display='none'" class="close" title="Close Modal">&times;</span>
        <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
@@ -111,13 +111,13 @@
       <div class="container">
         <label><b>Email Address</b></label>
         <br>
-        <input type="text" placeholder="Email Address" name="uname" required>
+        <input type="text" placeholder="Email Address" name="id" required>
         <br>
         <label><b>Password</b></label>
         <br>
         <input type="password" placeholder="Password" name="psw" required>
         <br>
-        <button type="submit" style="margin-right:137px" class="subbtn">Sign in</button>
+        <button type="submit" style="margin-right:137px" class="subbtn">Login in</button>
         <button type="button" onclick="document.getElementById('signin').style.display='none'" class="cancelbtn">Cancel</button>
       </div>
 
