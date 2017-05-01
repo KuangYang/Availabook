@@ -3,6 +3,10 @@ import os
 import sys
 import json
 
+"""reload intepretor, add credential path"""
+reload(sys)
+sys.setdefaultencoding('UTF8')
+
 """import credentials from root/AppCreds"""
 with open(os.path.dirname(sys.path[0])+'/AppCreds/AWSAcct.json','r') as AWSAcct:
     awsconf = json.loads(AWSAcct.read())
