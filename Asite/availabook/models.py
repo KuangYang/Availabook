@@ -57,13 +57,13 @@ class User():
                     }
                 )
 
-	def get_response_by_id(id):
-	    response = user_table.get_item(
-	    	Key={
-	            'email': id
-	        }
-	    )
-	    return response
+    def get_response_by_id(id):
+        response = user_table.get_item(
+            Key={
+                'email': id
+            }
+        )
+        return response
 
     def authen_user(self):
 	    return self.verify_email() and self.verify_passwd()
@@ -90,17 +90,17 @@ class User():
 
 
 class Event():
-	def __init__(self,EId,content,date,time,label,place):
-		self.EId = EId  ### use hadhid, to be modify
-		self.content = content
-		self.date = date
-		self.time = time
-		self.label = label
-		self.like = []
-		self.place = place
-	### put function
-	def put_into_db(self,EId,content,date,label,like,place,time):
-		event_table.put_item(
+    def __init__(self,EId,content,date,time,label,place):
+        self.EId = EId  ### use hadhid, to be modify
+        self.content = content
+        self.date = date
+        self.time = time
+        self.label = label
+        self.like = []
+        self.place = place
+    ### put function
+    def put_into_db(self,EId,content,date,label,like,place,time):
+        event_table.put_item(
         Item={
             'EId': EId,
             'content': content,
@@ -112,35 +112,36 @@ class Event():
         }
     )
     ### get function, get_response first then use responce to get items
-	def get_response_by_EId(EId):
-		response = event_table.get_item(
-			Key = {
-				'EId':EId
-			}
-		)
-		return response
-	def get_content(response):
-		return response['content']
-	def get_date(response):
-		return response['date']
-	def get_time(response):
-		return response['time']
-	def get_label(response):
-		return response['label']
-	def get_like(response):
-		return response['like']
-	def get_place(response):
-		return response['place']
-	### delete function
-	def delete(EId):
-		event_table.delete_item(
-        Key={
-            'EId': EId
-        }
-    )
-	### auxiliary function
-	def get_like_num(response):
-		return len(response['like'])
+    def get_response_by_EId(EId):
+        response = event_table.get_item(
+            Key = {
+                'EId':EId
+            }
+        )
+        return response
+
+    def get_content(response):
+        return response['content']
+    def get_date(response):
+        return response['date']
+    def get_time(response):
+        return response['time']
+    def get_label(response):
+        return response['label']
+    def get_like(response):
+        return response['like']
+    def get_place(response):
+        return response['place']
+    ### delete function
+    def delete(EId):
+        event_table.delete_item(
+            Key={
+                'EId': EId
+            }
+        )
+    ### auxiliary function
+    def get_like_num(response):
+        return len(response['like'])
 
 
 
