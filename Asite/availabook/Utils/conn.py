@@ -4,9 +4,20 @@
 # id | first_name | last_name
 
 from boto3.session import Session
+import os
+import sys
+import json
 
-dynamodb_session = Session(aws_access_key_id="ACCESS_KEY",
-              aws_secret_access_key="SECRET_ACCESS_KEY",
+"""reload intepretor, add credential path"""
+reload(sys)
+sys.setdefaultencoding('UTF8')
+
+"""import credentials from root/AppCreds"""
+with open(os.path.dirname(sys.path[0])+'/AppCreds/AWSAcct.json','r') as AWSAcct:
+    awsconf = json.loads(AWSAcct.read())
+
+dynamodb_session = Session(aws_access_key_id=awsconf["aws_access_key_id"],
+              aws_secret_access_key=awsconf["aws_secret_access_key"],
               region_name="us-east-1")
 dynamodb = dynamodb_session.resource('dynamodb')
 
@@ -16,27 +27,27 @@ table = dynamodb.Table("User")
 def get():
     response = table.get_item(
         Key={
-            'id': 1
+            'email': "xx@gmail.com"
         }
     )
     item = response['Item']
     print(item)
 
 # put function
-def put(id, first_name, last_name):
+def put(email, first_name, last_name):
     table.put_item(
         Item={
-            'id': id,
+            'email': email,
             'first_name': first_name,
             'last_name': last_name
         }
     )
 
 # update function
-def update(id, first_name, last_name):
+def update(email, first_name, last_name):
     table.update_item(
         Key={
-            'id': id
+            'email': email
         },
         UpdateExpression='SET first_name = :val1, last_name = :val2',
         ExpressionAttributeValues={
@@ -46,12 +57,12 @@ def update(id, first_name, last_name):
     )
 
 # delete function
-def delete(id):
+def delete(email):
     table.delete_item(
         Key={
-            'id': id
+            'email': email
         }
     )
 
 if __name__ == '__main__':
-    delete()
+    get()
