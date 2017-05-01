@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -24,6 +23,7 @@
 
   <header>
     <div class="container">
+<<<<<<< HEAD
     {% load static %}
       <img src="{% static 'img/logo.png' %}" class="logo" alt="">
       <form class="form-inline">
@@ -44,8 +44,88 @@
         </div>
         <br>
       </form>
+=======
+      <img src="img/logo.png" class="logo" alt="">
+      <button onclick="document.getElementById('signin').style.display='block'" style="width:auto;margin-left:600px" class="btn btn-default">Sign in</button>
+      <button onclick="document.getElementById('signup').style.display='block'" style="width:auto;margin-left:30px" class="btn btn-default">Sign up</button>
+>>>>>>> 5b3c7bf46385e3e5887beb9b014d9a0656dc7b40
     </div>
   </header>
+
+  <div id="signup" class="modal">
+    <form class="modal-content animate" action="/action_page.php">
+    <div class="imgcontainer">
+      <span onclick="document.getElementById('signup').style.display='none'" class="close" title="Close Modal">&times;</span>
+       <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
+    </div>
+      <div class="container">
+        <label><b>Email Address</b></label>
+        <br>
+        <input type="text" placeholder="Email Address" name="uname" required>
+        <br>
+        <label><b>Password</b></label>
+        <br>
+        <input type="password" placeholder="Password" name="psw" required>
+        <br>
+        <label><b>Verify Password</b></label>
+        <br>
+        <input type="password" placeholder="Password" name="psw" required>
+        <br>
+        <label><b>First Name</b></label>
+        <br>
+        <input type="text" placeholder="First Name" name="fn" required>
+        <br>
+        <label><b>Last Name</b></label>
+        <br>
+        <input type="text" placeholder="Last Name" name="ln" required>
+        <br>
+        <label><b>Date of Birth</b></label>
+        <br>
+        <input type="text" placeholder="mm/dd/yyyy" name="dob" required>
+        <br>
+        <label><b>City</b></label>
+        <br>
+        <input type="text" placeholder="City" name="city" required>
+        <br>
+        <label><b>Zipcode</b></label>
+        <br>
+        <input type="text" placeholder="Zipcode" name="zipcode" required>
+        <br>
+        <button type="submit" style="margin-right:133px" class="subbtn">Sign up</button>
+        <button type="button" onclick="document.getElementById('signup').style.display='none'" class="cancelbtn">Cancel</button>
+      </div>
+
+      <!-- <div class="container" style="background-color:#f1f1f1">
+        <button type="button" onclick="document.getElementById('signup').style.display='none'" class="cancelbtn">Cancel</button>
+      </div> -->
+    </form>
+  </div>
+
+
+  <div id="signin" class="modal">
+    <form class="modal-content animate" action="/action_page.php">
+    <div class="imgcontainer">
+      <span onclick="document.getElementById('signin').style.display='none'" class="close" title="Close Modal">&times;</span>
+       <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
+    </div>
+      <div class="container">
+        <label><b>Email Address</b></label>
+        <br>
+        <input type="text" placeholder="Email Address" name="uname" required>
+        <br>
+        <label><b>Password</b></label>
+        <br>
+        <input type="password" placeholder="Password" name="psw" required>
+        <br>
+        <button type="submit" style="margin-right:137px" class="subbtn">Sign in</button>
+        <button type="button" onclick="document.getElementById('signin').style.display='none'" class="cancelbtn">Cancel</button>
+      </div>
+
+      <!-- <div class="container" style="background-color:#f1f1f1">
+        <button type="button" onclick="document.getElementById('signin').style.display='none'" class="cancelbtn">Cancel</button>
+      </div> -->
+    </form>
+  </div>
 
     <nav class="navbar navbar-default">
       <div class="container">
@@ -296,7 +376,13 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<<<<<<< HEAD
     {% load static %}
     <script src= "{% static 'js/bootstrap.js' %}"></script>
+=======
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script type="text/javascript" src="js/availabook.js"></script>
+>>>>>>> 5b3c7bf46385e3e5887beb9b014d9a0656dc7b40
   </body>
 </html>
