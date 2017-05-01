@@ -24,15 +24,16 @@ user_table = dynamodb.Table("User")
 event_table = dynamodb.Table("Event")
 # Create your models here.
 class User():
-    def __init__(self, id, passwd, passwd_again, firstname, lastname, age, city, zipcode):
+    #def __init__(self, id, passwd, passwd_again, firstname, lastname, age, city, zipcode):
+    def __init__(self, id, passwd):
         self.id = id
         self.passwd = passwd
-        self.passwd_again = passwd_again
-        self.firstname = firstname
-        self.lastname = lastname
-        self.age = age
-        self.city = city
-        self.zipcode = zipcode
+        #self.passwd_again = passwd_again
+        #self.firstname = firstname
+        #self.lastname = lastname
+        #self.age = age
+        #self.city = city
+        #self.zipcode = zipcode
         self.verified = False
 
 
