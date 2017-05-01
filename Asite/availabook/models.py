@@ -73,7 +73,7 @@ class Event():
 		self.place = place
 	### put function
 	def put_into_db(self,EId,content,date,label,like,place,time):
-    	event_table.put_item(
+		event_table.put_item(
         Item={
             'EId': EId,
             'content': content,
