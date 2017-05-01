@@ -9,7 +9,9 @@ reload(sys)
 sys.setdefaultencoding('UTF8')
 
 """import credentials from root/AppCreds"""
-with open(os.path.dirname(sys.path[0])+'/AppCreds/AWSAcct.json','r') as AWSAcct:
+
+print "path: " + os.path.dirname(sys.path[0])
+with open(os.path.dirname(sys.path[0])+ '/Asite' + '/availabook/AppCreds/AWSAcct.json','r') as AWSAcct:
     awsconf = json.loads(AWSAcct.read())
 
 dynamodb_session = Session(aws_access_key_id=awsconf["aws_access_key_id"],
