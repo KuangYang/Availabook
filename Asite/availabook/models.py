@@ -22,6 +22,7 @@ dynamodb = dynamodb_session.resource('dynamodb')
 
 user_table = dynamodb.Table("User")
 event_table = dynamodb.Table("Event")
+post_table = dynamodb.Table("Post")
 # Create your models here.
 class Users():
     #def __init__(self, id, passwd, passwd_again, firstname, lastname, age, city, zipcode):
@@ -91,7 +92,7 @@ class Users():
 
 
 class Event():
-    def __init__(self,EId,content,date,time,label,place):
+    def __init__(self,EId,content,date,time,label,place,):
         self.EId = EId  ### use hadhid, to be modify
         self.content = content
         self.date = date
@@ -100,16 +101,23 @@ class Event():
         self.like = []
         self.place = place
     ### put function
-    def put_into_db(self,EId,content,date,label,like,place,time):
+    def put_into_db(self,timestamp,user_email):
         event_table.put_item(
         Item={
-            'EId': EId,
-            'content': content,
-            'date': date,
-            'time': time,
-            'label': label,
-            'like': like,
-            'place': place,
+            'EId': self.EId,
+            'content': self.content,
+            'date': self.date,
+            'time': self.time,
+            'label': self.label,
+            'like': self.like,
+            'place': self.place,
+        }
+    )
+        post_table.put_item(
+        Item={
+            'EId': self.EId,
+            'email': user_email,
+            'post_time': timestamp
         }
     )
     ### get function, get_response first then use responce to get items
@@ -119,7 +127,7 @@ class Event():
                 'EId':EId
             }
         )
-        return response
+        return response['Item']
 
     def get_content(response):
         return response['content']
@@ -143,6 +151,25 @@ class Event():
     ### auxiliary function
     def get_like_num(response):
         return len(response['like'])
+
+def get_event_list():
+    ######## here need a iterator of dynamodb event table,then put them into event_list#######
+    event001 = event_table.get_item(
+            Key = {
+                'EId':'001'
+            }
+    )
+    event002 = event_table.get_item(
+            Key = {
+                'EId':'002'
+            }
+    )
+    tmplist = [event001['Item'],event002['Item']]
+    event_list = []
+    for e in tmplist:
+        event = Event(EId=e['EId'],content=e['content'],date=e['date'],time=e['time'],label=e['label'],place=e['place'],)
+        event_list.append(event)
+    return event_list
 
 
 
