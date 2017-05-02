@@ -3,7 +3,7 @@ from boto3.session import Session
 import os
 import sys
 import json
-
+from availabook.recommendation import recommend
 """reload intepretor, add credential path"""
 reload(sys)
 sys.setdefaultencoding('UTF8')
@@ -167,6 +167,16 @@ def get_event_list():
     for e in tmp_list:
         event = Event(e)
         event_list.append(event)
+    return event_list
+
+def get_recommended_event_list(email):
+    tmp_list = recommend(email)
+    print(tmp_list)
+    event_list = []
+    if tmp_list:
+        for e in tmp_list:
+            event = Event(e)
+            event_list.append(event)
     return event_list
 
 

@@ -7,10 +7,9 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
-from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list,put_event_into_db
+from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list,put_event_into_db,get_recommended_event_list
 import time
 import uuid
-
 
 
 # Create your views here.
@@ -18,13 +17,13 @@ def index(request):
     ''' render homepage'''
     auth_logout(request)
     return render(request, 'homepage.html')
-    event_list = get_event_list()
-    return render(request, 'index.html',{'event_list':event_list})
+    # event_list = get_event_list()
+    # return render(request, 'index.html',{'event_list':event_list})
 
 def home(request):
-    event_list = get_event_list()
     if request.user.username:
-		return render(request, 'index.html',{'event_list':event_list})
+        event_list = get_recommended_event_list(request.user.username)
+        return render(request, 'index.html',{'event_list':event_list})
     print request.user.is_authenticated()
     print request.user.username
     return redirect('/availabook/')
@@ -63,7 +62,7 @@ def signup(request):
     zipcode = request.POST.get("zipcode")
 
     signup_handler = Signup(user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode)
-    event_list = get_event_list()
+    event_list = get_recommended_event_list(request.user.username)
     user_db = Users(user_id, pwd)
 
     if user_db.verify_email() == False:
