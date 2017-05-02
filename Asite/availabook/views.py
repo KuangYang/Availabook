@@ -5,17 +5,15 @@ from django.contrib import messages
 from django.core import serializers
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
-
-from django.contrib.auth.models import User
-
 from django.contrib.auth import logout as auth_logout
-from availabook.models import Users,Event,get_event_list
+from django.contrib.auth.models import User
+from availabook.models import Users, Signup, Event, get_event_list
 import time
 
 
 # Create your views here.
 def index(request):
-    ''' render homepage''' 
+    ''' render homepage'''
     auth_logout(request)
     return render(request, 'homepage.html')
     event_list = get_event_list()
@@ -62,21 +60,26 @@ def signup(request):
     city = request.POST.get("city")
     zipcode = request.POST.get("zipcode")
 
+    signup_handler = Signup(user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode)
+
     if pwd == pwd_a:
-	    if not user_exists(user_id):
-	        user = User(username=user_id, email=user_id)
-	        user.set_password(pwd)
-	        user.save()
-	        authenticate(username=user_id, password=pwd)
-	        user.backend = 'django.contrib.auth.backends.ModelBackend'
-	        auth_login(request, user)
-	    else:
-	        messages.add_message(request, messages.INFO, 'User exists. Try again', 'signup', True)
+        if not user_exists(user_id):
+            signup_handler.push_to_dynamodb()
+            user = User(username=user_id, email=user_id)
+            user.set_password(pwd)
+            user.save()
+            authenticate(username=user_id, password=pwd)
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            auth_login(request, user)
+        else:
+            messages.add_message(request, messages.INFO, 'User exists. Try again', 'signup', True)
+    else:
+        messages.add_message(request, messages.INFO, 'Input passwprds inconsistent! Try again', 'signup', True)
 
     user = Users(user_id, pwd)
     event_list = get_event_list()
     if user.verify_email() == False:
-        if user.check_input_passwd(pwd, pwd_a) == True:
+        if pwd == pwd_a:
             Item={
                 'email': user_id,
                 'age': age,
@@ -120,7 +123,7 @@ def post_event(request):
     event_date, event_time = request.POST.get("meeting").split("T")
     print(event_date,event_time)
     event = Event(EId='2',content=content,date=event_date,time=event_time,label='movie',place='beijing',)
-    timestamp = time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time()))  
+    timestamp = time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time()))
     event.put_into_db(timestamp =timestamp,user_email='xx@aa.com')
     event_list = get_event_list()
     return render(request,'index.html',{'event_list':event_list})

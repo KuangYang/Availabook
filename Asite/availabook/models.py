@@ -38,25 +38,6 @@ class Users():
         self.verified = False
 
 
-    def check_input_passwd(self, passwd, passwd_again):
-        if passwd == passwd_again:
-            return True
-        else:
-            return False
-
-    def push_to_dynamodb(self, item):
-        user_table.put_item(
-            Item={
-                'email': item['email'],
-                'age': item['age'],
-                'city':item['city'],
-                'first_name': item['first_name'],
-                'last_name': item['last_name'],
-                'password': item['password'],
-                'zipcode': item['zipcode'],
-            }
-        )
-
     def get_response_by_id(self, id):
         response = user_table.get_item(
             Key={
@@ -89,6 +70,32 @@ class Users():
 
     def authorize(self):
         self.verified = True
+
+
+class Signup():
+    def __init__(self, user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode):
+        self.id = user_id
+        self.pwd = pwd
+        self.pwd_a = pwd_a
+        self.firstname = firstname
+        self.lastname = lastname
+        self.age = age
+        self.city = city
+        self.zipcode = zipcode
+
+
+    def push_to_dynamodb(self):
+        user_table.put_item(
+            Item={
+                'email': self.id,
+                'age': self.age,
+                'city': self.city,
+                'first_name': self.firstname,
+                'last_name': self.lastname,
+                'password': self.pwd,
+                'zipcode': self.zipcode,
+            }
+        )
 
 
 class Event():
