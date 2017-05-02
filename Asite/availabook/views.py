@@ -22,11 +22,12 @@ def index(request):
     return render(request, 'index.html',{'event_list':event_list})
 
 def home(request):
-	if request.user.username:
-		return render(request, 'index.html')
-	print request.user.is_authenticated()
-	print request.user.username
-	return redirect('/availabook/')
+    event_list = get_event_list()
+    if request.user.username:
+		return render(request, 'index.html',{'event_list':event_list})
+    print request.user.is_authenticated()
+    print request.user.username
+    return redirect('/availabook/')
 
 def login(request, onsuccss = '/availabook/home', onfail = '/availabook/'):
  	user_id = request.POST.get("id")
@@ -73,7 +74,7 @@ def signup(request):
 	        messages.add_message(request, messages.INFO, 'User exists. Try again', 'signup', True)
 
     user = Users(user_id, pwd)
-
+    event_list = get_event_list()
     if user.verify_email() == False:
         if user.check_input_passwd(pwd, pwd_a) == True:
             Item={
@@ -89,7 +90,7 @@ def signup(request):
                 user.push_to_dynamodb(Item)
             except Exception as e:
                 print e
-            return render(request, 'index.html')
+            return render(request, 'index.html',{'event_list':event_list})
         else:
             return render(request, 'index.html')
     else:
