@@ -63,43 +63,29 @@ def signup(request):
     zipcode = request.POST.get("zipcode")
 
     signup_handler = Signup(user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode)
-
-    if pwd == pwd_a:
-        if not user_exists(user_id):
-            signup_handler.push_to_dynamodb()
-            user = User(username=user_id, email=user_id)
-            user.set_password(pwd)
-            user.save()
-            authenticate(username=user_id, password=pwd)
-            user.backend = 'django.contrib.auth.backends.ModelBackend'
-            auth_login(request, user)
-        else:
-            messages.add_message(request, messages.INFO, 'User exists. Try again', 'signup', True)
-    else:
-        messages.add_message(request, messages.INFO, 'Input passwprds inconsistent! Try again', 'signup', True)
-
-    user = Users(user_id, pwd)
     event_list = get_event_list()
-    if user.verify_email() == False:
+    user_db = Users(user_id, pwd)
+
+    if user_db.verify_email() == False:
         if pwd == pwd_a:
-            Item={
-                'email': user_id,
-                'age': age,
-                'city': city,
-                'first_name': firstname,
-                'last_name': lastname,
-                'password': pwd,
-                'zipcode': zipcode,
-            }
-            try:
-                user.push_to_dynamodb(Item)
-            except Exception as e:
-                print e
-            return render(request, 'index.html',{'event_list':event_list})
+            if not user_exists(user_id):
+                signup_handler.push_to_dynamodb()
+                user = User(username=user_id, email=user_id)
+                user.set_password(pwd)
+                user.save()
+                authenticate(username=user_id, password=pwd)
+                user.backend = 'django.contrib.auth.backends.ModelBackend'
+                auth_login(request, user)
+                return render(request, 'index.html',{'event_list':event_list})
+            else:
+                messages.add_message(request, messages.INFO, 'User exists. Try again', 'signup', True)
+                return render(request, 'index.html')
         else:
+            messages.add_message(request, messages.INFO, 'Input passwprds inconsistent! Try again', 'signup', True)
             return render(request, 'index.html')
     else:
         return render(request, 'index.html')
+
 
 def user_exists(username):
     ''' check if user exists'''
@@ -127,7 +113,6 @@ def post_event(request):
     ###### EId to be modify
     event = Event(EId=str(uuid.uuid4()),content=content,date=event_date,time=event_time,label='movie',like=[],place='beijing',)
     timestamp = time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time()))  
-
     event.put_into_db(timestamp =timestamp,user_email='xx@aa.com')
     event_list = get_event_list()
     return render(request,'index.html',{'event_list':event_list})
