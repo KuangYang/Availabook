@@ -19,6 +19,6 @@ def login(request):
  		user.authorize()
  		return render(request, 'index.html')
  	else:
- 		alert("User Information Not exists")
+ 		#alert("User Information Not exists")
  		return render(request, 'index.html')
 

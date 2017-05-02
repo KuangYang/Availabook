@@ -58,7 +58,7 @@ class User():
                     }
                 )
 
-    def get_response_by_id(id):
+    def get_response_by_id(self, id):
         response = user_table.get_item(
             Key={
                 'email': id
@@ -70,13 +70,15 @@ class User():
 	    return self.verify_email() and self.verify_passwd()
 
     def verify_email(self):
+    	#user_id = self.id
         response = self.get_response_by_id(self.id)
         if 'Item' in response:
             return True
         else:
             return False
 
-    def verify_passwd(self, response):
+    def verify_passwd(self):
+    	#user_id = self.id
         response = self.get_response_by_id(self.id)
         item = response['Item']
         pwd = item['password']
