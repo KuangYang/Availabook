@@ -11,13 +11,19 @@ from django.contrib.auth.models import User
 from django.contrib.auth import logout as auth_logout
 from availabook.models import Users
 
+
 # Create your views here.
 def index(request):
     ''' render homepage'''
+    auth_logout(request)
     return render(request, 'homepage.html')
 
 def home(request):
-	return render(request, 'index.html')
+	if request.user.username:
+		return render(request, 'index.html')
+	print request.user.is_authenticated()
+	print request.user.username
+	return redirect('/availabook/')
 
 def login(request, onsuccss = '/availabook/home', onfail = '/availabook/'):
  	user_id = request.POST.get("id")
@@ -58,6 +64,7 @@ def signup(request):
 	        user.set_password(pwd)
 	        user.save()
 	        authenticate(username=user_id, password=pwd)
+	        user.backend = 'django.contrib.auth.backends.ModelBackend'
 	        auth_login(request, user)
 	    else:
 	        messages.add_message(request, messages.INFO, 'User exists. Try again', 'signup', True)
