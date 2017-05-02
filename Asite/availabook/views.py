@@ -11,6 +11,7 @@ from availabook.models import Users, Signup, Event, get_event_list
 import time
 
 
+
 # Create your views here.
 def index(request):
     ''' render homepage'''

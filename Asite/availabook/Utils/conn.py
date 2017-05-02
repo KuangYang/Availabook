@@ -1,8 +1,4 @@
-# This is a simple connection to DynamoDB with get/put/update/delete function
-# Please fill in the Aceess_key and Secret_access_key first
-# Please create a table named "User" with the following columns:
-# id | first_name | last_name
-
+from boto3.dynamodb.conditions import Key, Attr
 from boto3.session import Session
 import os
 import sys
@@ -24,14 +20,17 @@ dynamodb = dynamodb_session.resource('dynamodb')
 table = dynamodb.Table("User")
 
 # get function
-def get():
+def get(email):
     response = table.get_item(
         Key={
-            'email': "xx@gmail.com"
+            'email': email
         }
     )
-    item = response['Item']
-    print(item)
+    if 'Item' not in response:
+        pass
+    else:
+        item = response['Item']
+        print(item)
 
 # put function
 def put(email, first_name, last_name):
@@ -64,5 +63,42 @@ def delete(email):
         }
     )
 
+# get user's most recent three events
+def getUserEvent(email):
+    tb = dynamodb.Table("Post")
+
+    # response = tb.query(
+    #     KeyConditionExpression=Key('EId').eq('001')
+    # )
+    # items = response['Items']
+    # print(items)
+
+    response = tb.scan(
+        FilterExpression=Attr('email').eq(email),
+        Limit=3
+    )
+    items = response['Items']
+    print(items)
+
+    for item in items:
+        id = item['EId']
+        getContext(id)
+
+def getContext(id):
+    print "id" + str(id)
+    tb = dynamodb.Table("Event")
+    response = tb.get_item(
+        Key={
+            'EId': id
+        }
+    )
+    if 'Item' not in response:
+        pass
+    else:
+        item = response['Item']['content']
+        print(item)
+        print("\n")
+
+
 if __name__ == '__main__':
-    get()
+    getUserEvent("xx@gmail.com")
