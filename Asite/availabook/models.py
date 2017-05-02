@@ -92,14 +92,15 @@ class Users():
 
 
 class Event():
-    def __init__(self,EId,content,date,time,label,place,):
+    def __init__(self,EId,content,date,time,label,like,place,):
         self.EId = EId  ### use hadhid, to be modify
         self.content = content
         self.date = date
         self.time = time
         self.label = label
-        self.like = []
+        self.like = like
         self.place = place
+        self.like_num = str(len(self.like))
     ### put function
     def put_into_db(self,timestamp,user_email):
         event_table.put_item(
@@ -120,27 +121,6 @@ class Event():
             'post_time': timestamp
         }
     )
-    ### get function, get_response first then use responce to get items
-    def get_response_by_EId(EId):
-        response = event_table.get_item(
-            Key = {
-                'EId':EId
-            }
-        )
-        return response['Item']
-
-    def get_content(response):
-        return response['content']
-    def get_date(response):
-        return response['date']
-    def get_time(response):
-        return response['time']
-    def get_label(response):
-        return response['label']
-    def get_like(response):
-        return response['like']
-    def get_place(response):
-        return response['place']
     ### delete function
     def delete(EId):
         event_table.delete_item(
@@ -148,9 +128,6 @@ class Event():
                 'EId': EId
             }
         )
-    ### auxiliary function
-    def get_like_num(response):
-        return len(response['like'])
 
 def get_event_list():
     ######## here need a iterator of dynamodb event table,then put them into event_list#######
@@ -167,7 +144,7 @@ def get_event_list():
     tmplist = [event001['Item'],event002['Item']]
     event_list = []
     for e in tmplist:
-        event = Event(EId=e['EId'],content=e['content'],date=e['date'],time=e['time'],label=e['label'],place=e['place'],)
+        event = Event(EId=e['EId'],content=e['content'],date=e['date'],time=e['time'],label=e['label'],like=e['like'],place=e['place'],)
         event_list.append(event)
     return event_list
 

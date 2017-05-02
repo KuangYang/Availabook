@@ -119,7 +119,8 @@ def post_event(request):
     print(content)
     event_date, event_time = request.POST.get("meeting").split("T")
     print(event_date,event_time)
-    event = Event(EId='2',content=content,date=event_date,time=event_time,label='movie',place='beijing',)
+    ###### EId to be modify
+    event = Event(EId='2',content=content,date=event_date,time=event_time,label='movie',like=[],place='beijing',)
     timestamp = time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time()))  
     event.put_into_db(timestamp =timestamp,user_email='xx@aa.com')
     event_list = get_event_list()
