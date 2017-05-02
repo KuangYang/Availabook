@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^logout/', views.logout, name='logout'),
     url(r'^home/', views.home, name='home'),
     url(r'^post_event/',views.post_event, name='post_event'),
+    url(r'^get_fave/',views.get_fave,name='get_fave')
 ]

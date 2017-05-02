@@ -99,46 +99,64 @@ class Signup():
 
 
 class Event():
-    def __init__(self,EId,content,date,time,label,like,place,):
-        self.EId = EId  ### use hadhid, to be modify
-        self.content = content
-        self.date = date
-        self.time = time
-        self.label = label
-        self.like = like
-        self.place = place
-        self.like_num = str(len(self.like))
-    ### put function
-    def put_into_db(self,timestamp,user_email):
-        event_table.put_item(
+    def __init__(self,event): ### event means event['item'] in db
+        self.EId = event['EId']  ### use hadhid, to be modify
+        self.content = event['content']
+        self.date = event['date']
+        self.time = event['time']
+        self.label = event['label']
+        self.fave = event['fave']
+        self.place = event['place']
+        self.fave_num = str(len(event['fave']))
+    ### delete function
+    def delete(self,EId):
+        event_table.delete_item(
+            Key={
+                'EId': self.EId
+            }
+        )
+    ### auxiliary function
+    def add_fave(self,user_email):
+        self.fave.append(user_email)
+        self.fave_num = str(len(self.fave))
+        event_table.update_item(
+            Key={
+            'EId': self.EId
+        },
+        UpdateExpression='SET fave = :val1',
+        ExpressionAttributeValues={
+            ':val1': self.fave,
+        }
+        )
+
+def put_event_into_db(EId,content,date,time,label,fave,place,timestamp,user_email):
+    event_table.put_item(
         Item={
-            'EId': self.EId,
-            'content': self.content,
-            'date': self.date,
-            'time': self.time,
-            'label': self.label,
-            'like': self.like,
-            'place': self.place,
+            'EId': EId,
+            'content': content,
+            'date': date,
+            'time': time,
+            'label': label,
+            'fave': fave,
+            'place': place,
         }
     )
-        post_table.put_item(
+    post_table.put_item(
         Item={
-            'EId': self.EId,
+            'EId': EId,
             'email': user_email,
             'post_time': timestamp
         }
     )
-    ### delete function
-    def delete(EId):
-        event_table.delete_item(
-            Key={
-                'EId': EId
-            }
-        )
-    ### auxiliary function
-    def add_like(user_email):
-        self.like.append(user_email)
-        self.like_num = str(len(self.like))
+
+def get_event_by_EId(EId):
+    response = event_table.get_item(
+        Key={
+            'EId': EId
+        }
+    )
+    return response['Item']
+
 
 def get_event_list():
     ######## here need a iterator of dynamodb event table,then put them into event_list#######
@@ -147,9 +165,11 @@ def get_event_list():
     )
     tmp_list = response['Items']
     for e in tmp_list:
-        event = Event(EId=e['EId'],content=e['content'],date=e['date'],time=e['time'],label=e['label'],like=e['like'],place=e['place'],)
+        event = Event(e)
         event_list.append(event)
     return event_list
+
+
 
 
 
