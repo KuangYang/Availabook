@@ -37,26 +37,24 @@ class User():
         self.verified = False
 
 
-    def check_input_passwd(self):
+    def check_input_passwd(self, passwd, passwd_again):
         if passwd == passwd_again:
             return True
         else:
             return False
 
-    def push_to_dynamodb(self):
-        if verify_email() == False:
-            if check_input_passwd() == True:
-                user_table.put_item(
-                    Item={
-                        'email': self.id,
-                        'age': self.age,
-                        'city': self.city,
-                        'first_name': self.firstname,
-                        'last_name': self.lastname,
-                        'password': self.password,
-                        'zipcode': self.zipcode,
-                    }
-                )
+    def push_to_dynamodb(self, item):
+        user_table.put_item(
+            Item={
+                'email': item['email'],
+                'age': item['age'],
+                'city':item['city'],
+                'first_name': item['first_name'],
+                'last_name': item['last_name'],
+                'password': item['password'],
+                'zipcode': item['zipcode'],
+            }
+        )
 
     def get_response_by_id(self, id):
         response = user_table.get_item(
