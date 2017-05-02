@@ -128,6 +128,10 @@ class Event():
                 'EId': EId
             }
         )
+    ### auxiliary function
+    def add_like(user_email):
+        self.like.append(user_email)
+        self.like_num = str(len(self.like))
 
 def get_event_list():
     ######## here need a iterator of dynamodb event table,then put them into event_list#######
