@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^signup/', views.signup, name='signup'),
     url(r'^logout/', views.logout, name='logout'),
     url(r'^home/', views.home, name='home'),
+    url(r'^post_event/',views.post_event, name='post_event'),
 ]
