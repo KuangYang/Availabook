@@ -66,6 +66,17 @@
     <section>
       <div class="container">
         <div class="row">
+              <input type="file" id="file_input"/>
+              <p id="status">Please select a file</p>
+              {% load static %}
+              <img id="preview" src="{% static 'img/logo.png' %}"/>
+
+              <form method="POST" action="/submit_form/">
+                <input type="hidden" id="avatar-url" name="avatar-url" value="/static/default.png">
+                <input type="text" name="username" placeholder="Username">
+                <input type="text" name="full-name" placeholder="Full name">
+                <input type="submit" value="Update profile">
+              </form>
           <div class="col-md-8">
             <div class="profile">
               <h1 class="page-header">Douglas Walter</h1>
