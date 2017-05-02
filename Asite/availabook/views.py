@@ -3,24 +3,35 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 from django.core import serializers
-
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.models import User
+from django.contrib.auth import logout as auth_logout
 from availabook.models import User
 
 # Create your views here.
 def index(request):
     ''' render homepage'''
     print "reder index"
-    print "username " + request.user.username
-    return render(request, 'index.html')
+    print len(request.user.username)
+    print request.user.is_authenticated()
+    if request.user.is_authenticated():
+    	print "index"
+    	return render(request, 'index.html')
+    return render(request, 'homepage.html')
 
-def login(request, onsuccss = '/availabook/', onfail = '/availabook/'):
+def login(request, onsuccss = '/availabook/home', onfail = '/availabook/'):
  	user_id = request.POST.get("id")
  	pwd = request.POST.get("psw")
 
  	user = User(user_id, pwd)
  	if user.authen_user():
  		user.authorize()
- 		return redirect(onsucess)
+ 		print "correct"
+ 		request.user.username = user_id
+ 		print request.user.username
+ 		print request.user.is_authenticated()
+ 		return redirect(onsuccss)
  	else:
  		#alert("User Information Not exists")
  		messages.add_message(request, messages.ERROR, 'Login Failed. Try again.', 'login', True)
