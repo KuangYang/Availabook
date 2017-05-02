@@ -9,34 +9,22 @@
     <title>Availabook Social Network: Profile Page</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="css/bootstrap.css" rel="stylesheet">
+    {% load static %}
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="css/style.css" rel="stylesheet">
-    <link href="css/font-awesome.css" rel="stylesheet">
+    {% load static %}
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    {% load static %}
+    <link href="{% static 'css/font-awesome.css' %}" rel="stylesheet">
   </head>
 
   <body>
 
   <header>
     <div class="container">
-      <img src="img/logo.png" class="logo" alt="">
-      <!-- <form class="form-inline">
-        <div class="form-group">
-          <label class="sr-only" for="exampleInputEmail3">Email address</label>
-          <input type="email" class="form-control" id="exampleInputEmail3" placeholder="Enter email">
-        </div>
-        <div class="form-group">
-          <label class="sr-only" for="exampleInputPassword3">Password</label>
-          <input type="password" class="form-control" id="exampleInputPassword3" placeholder="Password">
-        </div>
-        <button type="submit" class="btn btn-default">Sign in</button><br>
-        <div class="checkbox">
-          <label>
-            <input type="checkbox"> Remember me
-          </label>
-        </div>
-      </form> -->
+    {% load static %}
+      <img src="{% static 'img/logo.png' %}" class="logo" alt="">
     </div>
   </header>
 
@@ -52,12 +40,13 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="index.html">Home</a></li>
+          {% load static %}
+            <li class="active"><a href="{% url 'availabook:home' %}">Home</a></li>
 <!--             <li><a href="members.html">Members</a></li>
             <li><a href="contact.html">Contact</a></li>
             <li><a href="groups.html">Groups</a></li>
             <li><a href="photos.html">Photos</a></li> -->
-            <li><a href="profile.html">Profile</a></li>
+            <li><a href="#">Profile</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -68,8 +57,6 @@
         <div class="row">
               <input type="file" id="file_input"/>
               <p id="status">Please select a file</p>
-              {% load static %}
-              <img id="preview" src="{% static 'img/logo.png' %}"/>
 
               <form method="POST" action="/submit_form/">
                 <input type="hidden" id="avatar-url" name="avatar-url" value="/static/default.png">
@@ -82,7 +69,8 @@
               <h1 class="page-header">Douglas Walter</h1>
               <div class="row">
                 <div class="col-md-4">
-                  <img src="img/user.png" class="img-thumbnail" alt="">
+                {% load static %}
+                  <img src="{% static 'img/user.png' %}" class="img-thumbnail" alt="">
                 </div>
                 <div class="col-md-8">
                   <ul>
@@ -95,7 +83,7 @@
                   </ul>
                 </div>
               </div><br><br>
-              <div class="row">
+<!--               <div class="row">
                 <div class="col-md-12">
                   <div class="panel panel-default">
                     <div class="panel-heading">
@@ -117,11 +105,11 @@
                       </form>
                     </div>
                   </div>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
-          <div class="col-md-4">
+<!--           <div class="col-md-4">
             <div class="panel panel-default friends">
               <div class="panel-heading">
                 <h3 class="panel-title">My Friends</h3>
@@ -168,7 +156,7 @@
                 <a href="#" class="btn btn-primary">View All Groups</a>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </section>

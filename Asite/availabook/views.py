@@ -103,6 +103,9 @@ def logout(request):
     else:
         return redirect('/availabook/')
 
+def profile(request):
+    return render(request, 'profile.html')
+
 
 def post_event(request):
     print('post event')
