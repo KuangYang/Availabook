@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import logout as auth_logout
 from availabook.models import Users,Event,get_event_list
 import time
+import uuid
 
 
 
@@ -121,7 +122,7 @@ def post_event(request):
     event_date, event_time = request.POST.get("meeting").split("T")
     print(event_date,event_time)
     ###### EId to be modify
-    event = Event(EId='2',content=content,date=event_date,time=event_time,label='movie',like=[],place='beijing',)
+    event = Event(EId=str(uuid.uuid4()),content=content,date=event_date,time=event_time,label='movie',like=[],place='beijing',)
     timestamp = time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time()))  
     event.put_into_db(timestamp =timestamp,user_email='xx@aa.com')
     event_list = get_event_list()

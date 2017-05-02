@@ -135,22 +135,17 @@ class Event():
 
 def get_event_list():
     ######## here need a iterator of dynamodb event table,then put them into event_list#######
-    event001 = event_table.get_item(
-            Key = {
-                'EId':'001'
-            }
-    )
-    event002 = event_table.get_item(
-            Key = {
-                'EId':'002'
-            }
-    )
-    tmplist = [event001['Item'],event002['Item']]
     event_list = []
-    for e in tmplist:
+    response = event_table.scan(
+    )
+    tmp_list = response['Items']
+    for e in tmp_list:
         event = Event(EId=e['EId'],content=e['content'],date=e['date'],time=e['time'],label=e['label'],like=e['like'],place=e['place'],)
         event_list.append(event)
     return event_list
+
+
+
 
 
 
