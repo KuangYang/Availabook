@@ -14,13 +14,10 @@ from availabook.models import Users
 # Create your views here.
 def index(request):
     ''' render homepage'''
-    print "reder index"
-    print len(request.user.username)
-    print request.user.is_authenticated()
-    if request.user.is_authenticated():
-    	print "index"
-    	return render(request, 'index.html')
     return render(request, 'homepage.html')
+
+def home(request):
+	return render(request, 'index.html')
 
 def login(request, onsuccss = '/availabook/home', onfail = '/availabook/'):
  	user_id = request.POST.get("id")
@@ -94,3 +91,12 @@ def user_exists(username):
     if user_count == 0:
         return False
     return True
+
+
+def logout(request):
+    ''' logout and redirect'''
+    if request.user.username:
+        auth_logout(request)
+        return redirect('/availabook/')
+    else:
+        return redirect('/availabook/')
