@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
-from availabook.models import Users, Signup, Event, get_event_list
+from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list,put_event_into_db
 import time
 import uuid
 
@@ -110,9 +110,16 @@ def post_event(request):
     print(content)
     event_date, event_time = request.POST.get("meeting").split("T")
     print(event_date,event_time)
-    ###### EId to be modify
-    event = Event(EId=str(uuid.uuid4()),content=content,date=event_date,time=event_time,label='movie',like=[],place='beijing',)
+    username = request.user.username
+    print(username)
     timestamp = time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time()))  
-    event.put_into_db(timestamp =timestamp,user_email='xx@aa.com')
-    event_list = get_event_list()
-    return render(request,'index.html',{'event_list':event_list})
+    EId = str(uuid.uuid4())
+    put_event_into_db(EId=EId, content=content,date=event_date,time=event_time,label='movie',fave=[], place='beijing',timestamp=timestamp,user_email=username)
+    return redirect('/availabook/home')
+def get_fave(request): 
+    EId = request.POST.get("fave")
+    print(EId)
+    event = get_event_by_EId(EId)
+    event = Event(event)
+    event.add_fave(request.user.username)
+    return redirect('/availabook/home')
