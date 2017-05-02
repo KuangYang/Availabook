@@ -5,9 +5,11 @@ from django.contrib import messages
 from django.core import serializers
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
+
 from django.contrib.auth.models import User
+
 from django.contrib.auth import logout as auth_logout
-from availabook.models import User
+from availabook.models import Users
 
 # Create your views here.
 def index(request):
@@ -24,11 +26,16 @@ def login(request, onsuccss = '/availabook/home', onfail = '/availabook/'):
  	user_id = request.POST.get("id")
  	pwd = request.POST.get("psw")
 
- 	user = User(user_id, pwd)
+ 	user = authenticate(username=user_id, password=pwd)
+ 	if user is not None:
+ 		auth_login(request, user)
+ 	else:
+ 		messages.add_message(request, messages.ERROR, 'Login Failed. Try again.', 'login', True)
+
+ 	user = Users(user_id, pwd)
  	if user.authen_user():
  		user.authorize()
  		print "correct"
- 		request.user.username = user_id
  		print request.user.username
  		print request.user.is_authenticated()
  		return redirect(onsuccss)
@@ -48,7 +55,17 @@ def signup(request):
     city = request.POST.get("city")
     zipcode = request.POST.get("zipcode")
 
-    user = User(user_id, pwd)
+    if pwd == pwd_a:
+	    if not user_exists(user_id):
+	        user = User(username=user_id, email=user_id)
+	        user.set_password(pwd)
+	        user.save()
+	        authenticate(username=user_id, password=pwd)
+	        auth_login(request, user)
+	    else:
+	        messages.add_message(request, messages.INFO, 'User exists. Try again', 'signup', True)
+
+    user = Users(user_id, pwd)
 
     if user.verify_email() == False:
         if user.check_input_passwd(pwd, pwd_a) == True:
@@ -71,3 +88,9 @@ def signup(request):
     else:
         return render(request, 'index.html')
 
+def user_exists(username):
+    ''' check if user exists'''
+    user_count = User.objects.filter(username=username).count()
+    if user_count == 0:
+        return False
+    return True

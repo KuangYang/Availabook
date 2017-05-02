@@ -23,7 +23,7 @@ dynamodb = dynamodb_session.resource('dynamodb')
 user_table = dynamodb.Table("User")
 event_table = dynamodb.Table("Event")
 # Create your models here.
-class User():
+class Users():
     #def __init__(self, id, passwd, passwd_again, firstname, lastname, age, city, zipcode):
     def __init__(self, id, passwd):
         self.id = id
