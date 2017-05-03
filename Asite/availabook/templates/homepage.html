@@ -49,7 +49,7 @@
       <!-- <h3> {% if messages %}
       {% for message in messages.Error %} {{ message }} {% endfor %} {% endif %}
        <h3> -->
-      <button onclick="document.getElementById('signin').style.display='block'" style="width:auto;margin-left:600px" class="btn btn-default">Login</button>
+      <button onclick="document.getElementById('login').style.display='block'" style="width:auto;margin-left:600px" class="btn btn-default">Login</button>
       <button onclick="document.getElementById('signup').style.display='block'" style="width:auto;margin-left:30px" class="btn btn-default">Sign up</button>
 
     </div>
@@ -105,29 +105,31 @@
   </div>
 
 
-  <div id="signin" class="modal">
-    <form method = "POST" class="modal-content animate" action = "{% url 'availabook:login' %}"> {% csrf_token %}
-    <div class="imgcontainer">
-      <span onclick="document.getElementById('signin').style.display='none'" class="close" title="Close Modal">&times;</span>
+  <div id="login" class="modal">
+    <!--<form method = "POST" class="modal-content animate" action = "{% url 'availabook:login' %}"> {% csrf_token %} -->
+    <div class="modal-content animate">
+      <div class="imgcontainer">
+        <span onclick="document.getElementById('login').style.display='none'" class="close" title="Close Modal">&times;</span>
        <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
-    </div>
+      </div>
       <div class="container">
         <label><b>Email Address</b></label>
         <br>
-        <input type="text" placeholder="Email Address" name="id" required>
+        <input type="text" placeholder="Email Address" id="login_id" required>
         <br>
         <label><b>Password</b></label>
         <br>
-        <input type="password" placeholder="Password" name="psw" required>
+        <input type="password" placeholder="Password" id="login_psw" required>
         <br>
-        <button type="submit" style="margin-right:137px" class="subbtn">Login</button>
-        <button type="button" onclick="document.getElementById('signin').style.display='none'" class="cancelbtn">Cancel</button>
+        <button type="submit" id="login_btn" style="margin-right:137px" class="subbtn">Login</button>
+        <button type="button" onclick="document.getElementById('login').style.display='none'" class="cancelbtn">Cancel</button>
       </div>
 
       <!-- <div class="container" style="background-color:#f1f1f1">
         <button type="button" onclick="document.getElementById('signin').style.display='none'" class="cancelbtn">Cancel</button>
       </div> -->
-    </form>
+    <!-- </form> -->
+    </div>
   </div>
 
     <nav class="navbar navbar-default">
@@ -152,7 +154,7 @@
         </div><!--/.nav-collapse -->
       </div>
     </nav>
-<!-- 
+<!--
     <section>
       <div class="container">
         <div class="row">

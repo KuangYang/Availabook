@@ -29,27 +29,28 @@ def home(request):
     return redirect('/availabook/')
 
 def login(request, onsuccss = '/availabook/home', onfail = '/availabook/'):
- 	user_id = request.POST.get("id")
- 	pwd = request.POST.get("psw")
+    user_id = request.POST.get("id")
+    pwd = request.POST.get("psw")
+    print user_id, pwd
 
- 	user = authenticate(username=user_id, password=pwd)
- 	if user is not None:
- 		auth_login(request, user)
- 	else:
- 		messages.add_message(request, messages.ERROR, 'Login Failed. Try again.', 'login', True)
+    user = authenticate(username=user_id, password=pwd)
+    if user is not None:
+        auth_login(request, user)
+    else:
+        messages.add_message(request, messages.ERROR, 'Login Failed. Try again.', 'login', True)
 
- 	user = Users(user_id, pwd)
- 	if user.authen_user():
- 		user.authorize()
- 		print "correct"
- 		print request.user.username
- 		print request.user.is_authenticated()
- 		return redirect(onsuccss)
- 	else:
+    user = Users(user_id, pwd)
+    if user.authen_user():
+        user.authorize()
+        print "correct"
+        print request.user.username
+        print request.user.is_authenticated()
+        return redirect(onsuccss)
+    else:
  		#alert("User Information Not exists")
- 		messages.add_message(request, messages.ERROR, 'Login Failed. Try again.', 'login', True)
- 		print messages
- 		return redirect(onfail)
+        messages.add_message(request, messages.ERROR, 'Login Failed. Try again.', 'login', True)
+        print messages
+        return redirect(onfail)
 
 def signup(request):
     user_id = request.POST.get("email")
@@ -114,11 +115,11 @@ def post_event(request):
     print(event_date,event_time)
     username = request.user.username
     print(username)
-    timestamp = time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time()))  
+    timestamp = time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time()))
     EId = str(uuid.uuid4())
     put_event_into_db(EId=EId, content=content,date=event_date,time=event_time,label='movie',fave=[], place='beijing',timestamp=timestamp,user_email=username)
     return redirect('/availabook/home')
-def get_fave(request): 
+def get_fave(request):
     EId = request.POST.get("fave")
     print(EId)
     event = get_event_by_EId(EId)

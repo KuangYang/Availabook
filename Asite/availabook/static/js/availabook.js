@@ -1,6 +1,35 @@
 $(document).ready(function() {
     console.log("ready!");
 
+    $("#login_btn").on("click", function() {
+        console.log("login!");
+        var email = $("#login_id").val()
+        var psw = $("#login_psw").val()
+        console.log(email);
+        console.log(psw);
+
+        $.ajax({
+        url : "login/", // the endpoint
+        type : "POST", // http method
+        data: {
+                id : email,
+                psw: psw
+              }, // data sent with the post request
+
+        // handle a successful response
+        success : function(json) {
+            $("#login_id").val("") // remove the value from the input
+            console.log("success"); // another sanity check
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            console.log(errmsg)
+            // console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+        });
+    });
+
     // Get the modal and when the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
         var modals = document.getElementsByClassName('modal');
@@ -12,6 +41,37 @@ $(document).ready(function() {
     };
 });
 
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
 
 function login(formData) {
     id = formData['id']
@@ -19,10 +79,10 @@ function login(formData) {
     cleanData = {};
     cleanData['info'] = {
         'id':       id,
-        'password': psw]
+        'password': psw,
     }
     console.log(id);
-    
+
     $.ajax({
         type: "POST",
         url: 'https://127.0.0.1/availabook/login',
