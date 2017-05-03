@@ -57,15 +57,25 @@ def newUser(email):
     res_2 = tb_event.scan(
         FilterExpression=Attr('place').eq(location),
     )
+    res_2_diff = tb_event.scan(
+        FilterExpression=Attr('place').ne(location),
+    )
     items = res_2['Items']
+    items_diff = res_2_diff['Items']
     dic = {}
-    sorted_dic = {}
     for item in items:
         EId = item['EId']
         fave = item['fave']
         popular = len(fave)
         dic[EId] = popular
-        sorted_dic = sorted(dic.items(), key=operator.itemgetter(1), reverse=True)
+    sorted_dic = sorted(dic.items(), key=operator.itemgetter(1), reverse=True)
+    dic_diff = {}
+    for item in items_diff:
+        EId = item['EId']
+        fave = item['fave']
+        popular = len(fave)
+        dic_diff[EId] = popular
+    sorted_dic_diff = sorted(dic_diff.items(), key=operator.itemgetter(1), reverse=True)
     eventList = []
     for i in range(0,10):
         if i < len(sorted_dic):
@@ -84,8 +94,27 @@ def newUser(email):
                 eventList.append(event)
         else:
             pass
+    length = len(eventList)
+    if len(eventList) < 10:
+        for i in range(length, 10):
+            if i-length < len(sorted_dic_diff):
+                id = sorted_dic_diff[i-len(eventList)][0]
+                res_4 = tb_event.get_item(
+                    Key={
+                        'EId': id
+                    }
+                )
+                date = res_4['Item']['date']
+                time = res_4['Item']['time']
+                if isExpired(date, time):
+                    pass
+                else:
+                    event = res_4['Item']
+                    eventList.append(event)
+            else:
+                pass
     print eventList
-    print sorted_dic
+    print len(eventList)
 
 
 def returnUser(email):
@@ -99,6 +128,7 @@ def returnUser(email):
         newUser(email)
     else:
         pass
+
 
 def isExpired(date, time):
     cur = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -122,5 +152,43 @@ def isExpired(date, time):
     else:
         return True
 
+
+# for not login user
+def common():
+    tb_event = dynamodb.Table("Event")
+    event = tb_event.scan()
+    items = event['Items']
+    dic = {}
+    for item in items:
+        EId = item['EId']
+        fave = item['fave']
+        popular = len(fave)
+        dic[EId] = popular
+        sorted_dic = sorted(dic.items(), key=operator.itemgetter(1), reverse=True)
+    eventList = []
+    for i in range(0, 10):
+        if i < len(sorted_dic):
+            id = sorted_dic[i][0]
+            res_3 = tb_event.get_item(
+                Key={
+                    'EId': id
+                }
+            )
+            date = res_3['Item']['date']
+            time = res_3['Item']['time']
+            if isExpired(date, time):
+                pass
+            else:
+                event = res_3['Item']
+                eventList.append(event)
+        else:
+            pass
+    print eventList
+    print len(eventList)
+
+
 # if __name__ == '__main__':
-#     recommend("xx@aa.gmail")
+    # if not login
+    # common()
+    # if login
+    # recommend("xx@aa.gmail")
