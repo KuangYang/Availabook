@@ -40,9 +40,9 @@ def recommend(email):
                 'study': 0
             }
         )
-        newUser(email)
+        return newUser(email)
     else:
-        returnUser(email)
+        return returnUser(email)
 
 # for new registered user
 def newUser(email):
@@ -124,7 +124,7 @@ def returnUser(email):
     )
     if response['Item']['sports'] == response['Item']['music'] == response['Item']['food'] == \
             response['Item']['exihibition'] == response['Item']['movie'] == response['Item']['travel'] == response['Item']['study']:
-        newUser(email)
+        return newUser(email)
     else:
         pass
 

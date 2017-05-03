@@ -40,9 +40,9 @@ def recommend(email):
                 'study': 0
             }
         )
-        newUser(email)
+        return newUser(email)
     else:
-        returnUser(email)
+        return returnUser(email)
 
 # for new registered user
 def newUser(email):
@@ -95,7 +95,7 @@ def newUser(email):
         else:
             pass
     length = len(eventList)
-    if len(eventList) < 10:
+    if length < 10:
         for i in range(length, 10):
             if i-length < len(sorted_dic_diff):
                 id = sorted_dic_diff[i-len(eventList)][0]
@@ -113,8 +113,7 @@ def newUser(email):
                     eventList.append(event)
             else:
                 pass
-    print eventList
-    print len(eventList)
+    return eventList
 
 
 def returnUser(email):
@@ -125,7 +124,7 @@ def returnUser(email):
     )
     if response['Item']['sports'] == response['Item']['music'] == response['Item']['food'] == \
             response['Item']['exihibition'] == response['Item']['movie'] == response['Item']['travel'] == response['Item']['study']:
-        newUser(email)
+        return newUser(email)
     else:
         pass
 
@@ -183,12 +182,12 @@ def common():
                 eventList.append(event)
         else:
             pass
-    print eventList
-    print len(eventList)
+    return eventList
 
 
 if __name__ == '__main__':
     # if not login
-    common()
+    print common()
+    print ("\n")
     # if login
-    recommend("xx@aa.gmail")
+    print recommend("test@gmail.com")
