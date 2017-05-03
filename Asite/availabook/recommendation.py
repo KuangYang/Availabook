@@ -113,8 +113,7 @@ def newUser(email):
                     eventList.append(event)
             else:
                 pass
-    print eventList
-    print len(eventList)
+    return eventList
 
 
 def returnUser(email):
@@ -183,12 +182,13 @@ def common():
                 eventList.append(event)
         else:
             pass
-    print eventList
-    print len(eventList)
+    return eventList
 
 
 # if __name__ == '__main__':
     # if not login
-    # common()
+    # recommendlist1 = common()
+    # print recommendlist1
     # if login
-    # recommend("xx@aa.gmail")
+    # recommendlist2 = recommend("xx@aa.gmail")
+    # print recommendlist2
