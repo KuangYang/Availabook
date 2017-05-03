@@ -1,5 +1,61 @@
 $(document).ready(function() {
     console.log("ready!");
+    $("#home_logout_btn").hide();
+
+    $("#home_logout_btn").on("click", function() {
+        console.log("logout!");
+        $.ajax({
+            url : "logout/",
+            type : "GET",
+
+            success : function(json) {
+                $("#home_logout_btn").hide();
+                $("#home_login_btn").show();
+                $("#home_signup_btn").show();
+                console.log("logout success!");
+            },
+
+            error : function(xhr,errmsg,err) {
+                console.log("logout" + errmsg);
+            }
+        })
+    })
+
+    $("#login_btn").on("click", function() {
+        console.log("login!");
+
+        $.ajax({
+            url : "login/", // the endpoint
+            type : "POST", // http method
+            data : {
+                id : $("#login_id").val(),
+                psw: $("#login_psw").val()
+            }, // data sent with the post request
+
+        // handle a successful response
+            success : function(msg) {
+                //$('#wtf').html($(data).find('#link').text());
+                $("body").html(msg);
+                $("#login_id").val("");
+                $("#login_psw").val("");// remove the value from the input
+                console.log("login success!"); // another sanity check
+
+                var home_login_btn = document.getElementById("home_login_btn");
+                home_login_btn.style.display = "none";
+                var home_signup_btn = document.getElementById("home_signup_btn");
+                home_signup_btn.style.display = "none";
+                var login_modal = document.getElementById("login")
+                login_modal.style.display="none";
+                $("#home_logout_btn").show();
+            },
+
+        // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                console.log("login" + errmsg);
+            // console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        });
+    });
 
     $("#signup_btn").on("click", function() {
         console.log("signup!");
@@ -18,12 +74,21 @@ $(document).ready(function() {
                 zipcode : $("#signup_zipcode").val()
             },
 
-            success : function(json) {
-                console.log("success");
+            success : function(msg) {
+                $("body").html(msg);
+                console.log("signup success!");
+
+                var home_login_btn = document.getElementById("home_login_btn");
+                home_login_btn.style.display = "none";
+                var home_signup_btn = document.getElementById("home_signup_btn");
+                home_signup_btn.style.display = "none";
+                var signup_modal = document.getElementById("signup")
+                signup_modal.style.display="none";
+                $("#home_logout_btn").show();
             },
 
             error : function(xhr,errmsg,err) {
-                console.log(errmsg);
+                console.log("signup" + errmsg);
             }
         });
 
@@ -31,38 +96,9 @@ $(document).ready(function() {
         home_login_btn.style.display = "none";
         var home_signup_btn = document.getElementById("home_signup_btn");
         home_signup_btn.style.display = "none";
-    });
-
-    $("#login_btn").on("click", function() {
-        console.log("login!");
-
-        $.ajax({
-            url : "login/", // the endpoint
-            type : "POST", // http method
-            data : {
-                id : $("#login_id").val(),
-                psw: $("#login_psw").val()
-            }, // data sent with the post request
-
-        // handle a successful response
-            success : function(json) {
-                $("#login_id").val("");
-                $("#login_psw").val("");// remove the value from the input
-                console.log("success"); // another sanity check
-
-                var home_login_btn = document.getElementById("home_login_btn");
-                home_login_btn.style.display = "none";
-                var home_signup_btn = document.getElementById("home_signup_btn");
-                home_signup_btn.style.display = "none";
-                document.getElementById("login").style.display='block';
-            },
-
-        // handle a non-successful response
-            error : function(xhr,errmsg,err) {
-                console.log(errmsg);
-            // console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-            }
-        });
+        var signup_modal = document.getElementById("signup")
+        signup_modal.style.display="none";
+        $("#home_logout_btn").show();
     });
 
     // Get the modal and when the user clicks anywhere outside of the modal, close it
@@ -75,6 +111,10 @@ $(document).ready(function() {
         }
     };
 });
+
+/*$.ajaxPrefilter(function( options, original_Options, jqXHR ) {
+    options.async = true;
+});*/
 
 function getCookie(name) {
     var cookieValue = null;
@@ -92,20 +132,20 @@ function getCookie(name) {
     return cookieValue;
 }
 
-var csrftoken = getCookie('csrftoken');
-
 function csrfSafeMethod(method) {
     // these HTTP methods do not require CSRF protection
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
 
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+var csrftoken = getCookie('csrftoken');
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
         }
-    }
-});
+    });
 
 
 function login(formData) {

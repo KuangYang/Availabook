@@ -20,15 +20,17 @@ def index(request):
     # event_list = get_event_list()
     # return render(request, 'index.html',{'event_list':event_list})
 
+
 def home(request):
     if request.user.username:
         event_list = get_recommended_event_list(request.user.username)
-        return render(request, 'index.html',{'event_list':event_list})
+        return render(request, 'homepage.html',{'event_list':event_list})
     print request.user.is_authenticated()
     print request.user.username
     return redirect('/availabook/')
 
-def login(request, onsuccss = '/availabook/home', onfail = '/availabook/'):
+
+def login(request, onsuccess = '/availabook/home', onfail = '/availabook/'):
     user_id = request.POST.get("id")
     pwd = request.POST.get("psw")
     print user_id, pwd
@@ -39,18 +41,20 @@ def login(request, onsuccss = '/availabook/home', onfail = '/availabook/'):
     else:
         messages.add_message(request, messages.ERROR, 'Login Failed. Try again.', 'login', True)
 
-    user = Users(user_id, pwd)
-    if user.authen_user():
-        user.authorize()
+    #event_list = get_recommended_event_list(user_id)
+    login_user = Users(user_id, pwd)
+    if login_user.authen_user():
+        login_user.authorize()
         print "correct"
         print request.user.username
         print request.user.is_authenticated()
-        return redirect(onsuccss)
+        return redirect(onsuccess)
     else:
  		#alert("User Information Not exists")
         messages.add_message(request, messages.ERROR, 'Login Failed. Try again.', 'login', True)
         print messages
         return redirect(onfail)
+
 
 def signup(request):
     user_id = request.POST.get("email")
@@ -64,7 +68,7 @@ def signup(request):
     print user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode
 
     signup_handler = Signup(user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode)
-    event_list = get_recommended_event_list(request.user.username)
+    event_list = get_recommended_event_list(user_id)
     user_db = Users(user_id, pwd)
 
     if user_db.verify_email() == False:
@@ -77,15 +81,15 @@ def signup(request):
                 authenticate(username=user_id, password=pwd)
                 user.backend = 'django.contrib.auth.backends.ModelBackend'
                 auth_login(request, user)
-                return render(request, 'index.html',{'event_list':event_list})
+                return render(request, 'homepage.html',{'event_list':event_list})
             else:
                 messages.add_message(request, messages.INFO, 'User exists. Try again', 'signup', True)
-                return render(request, 'index.html')
+                return render(request, 'homepage.html')
         else:
             messages.add_message(request, messages.INFO, 'Input passwprds inconsistent! Try again', 'signup', True)
-            return render(request, 'index.html')
+            return render(request, 'homepage.html')
     else:
-        return render(request, 'index.html')
+        return render(request, 'homepage.html')
 
 
 def user_exists(username):
@@ -99,10 +103,12 @@ def user_exists(username):
 def logout(request):
     ''' logout and redirect'''
     if request.user.username:
+        print request.user.username
         auth_logout(request)
         return redirect('/availabook/')
     else:
         return redirect('/availabook/')
+
 
 def profile(request):
     return render(request, 'profile.html')
@@ -120,6 +126,8 @@ def post_event(request):
     EId = str(uuid.uuid4())
     put_event_into_db(EId=EId, content=content,date=event_date,time=event_time,label='movie',fave=[], place='beijing',timestamp=timestamp,user_email=username)
     return redirect('/availabook/home')
+
+
 def get_fave(request):
     EId = request.POST.get("fave")
     print(EId)

@@ -26,7 +26,7 @@
       {% load static %}
       <img src="{% static 'img/logo.png' %}" class="logo" alt="">
       <form class="form-inline">
-      <a href="{% url 'availabook:logout' %}" style="color:white">Logout</a> {% csrf_token %}
+        <a href="{% url 'availabook:logout' %}" style="color:white">Logout</a> {% csrf_token %}
         <br>
       </form>
 

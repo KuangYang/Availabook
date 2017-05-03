@@ -3,7 +3,7 @@ from boto3.session import Session
 import os
 import sys
 import json
-from availabook.recommendation import recommend
+from availabook.recommendation import recommend, common
 """reload intepretor, add credential path"""
 reload(sys)
 sys.setdefaultencoding('UTF8')
@@ -129,6 +129,7 @@ class Event():
         }
         )
 
+
 def put_event_into_db(EId,content,date,time,label,fave,place,timestamp,user_email):
     event_table.put_item(
         Item={
@@ -148,6 +149,7 @@ def put_event_into_db(EId,content,date,time,label,fave,place,timestamp,user_emai
             'post_time': timestamp
         }
     )
+
 
 def get_event_by_EId(EId):
     response = event_table.get_item(
@@ -169,8 +171,13 @@ def get_event_list():
         event_list.append(event)
     return event_list
 
+
 def get_recommended_event_list(email):
-    tmp_list = recommend(email)
+    print "email recommendation:", email
+    try:
+        tmp_list = recommend(email)
+    except:
+        tmp_list = common()
     print(tmp_list)
     event_list = []
     if tmp_list:
