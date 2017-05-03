@@ -61,6 +61,7 @@ def signup(request):
     age = request.POST.get("age")
     city = request.POST.get("city")
     zipcode = request.POST.get("zipcode")
+    print user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode
 
     signup_handler = Signup(user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode)
     event_list = get_recommended_event_list(request.user.username)

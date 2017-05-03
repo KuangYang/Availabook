@@ -1,33 +1,68 @@
 $(document).ready(function() {
     console.log("ready!");
 
-    $("#login_btn").on("click", function() {
-        console.log("login!");
-        var email = $("#login_id").val()
-        var psw = $("#login_psw").val()
-        console.log(email);
-        console.log(psw);
+    $("#signup_btn").on("click", function() {
+        console.log("signup!");
 
         $.ajax({
-        url : "login/", // the endpoint
-        type : "POST", // http method
-        data: {
-                id : email,
-                psw: psw
-              }, // data sent with the post request
+            url : "signup/",
+            type : "POST",
+            data : {
+                email : $("#signup_email").val(),
+                psw : $("#signup_psw").val(),
+                psw_a : $("#signup_psw_a").val(),
+                fn : $("#signup_fn").val(),
+                ln : $("#signup_ln").val(),
+                age : $("#signup_age").val(),
+                city : $("#signup_city").val(),
+                zipcode : $("#signup_zipcode").val()
+            },
+
+            success : function(json) {
+                console.log("success");
+            },
+
+            error : function(xhr,errmsg,err) {
+                console.log(errmsg);
+            }
+        });
+
+        var home_login_btn = document.getElementById("home_login_btn");
+        home_login_btn.style.display = "none";
+        var home_signup_btn = document.getElementById("home_signup_btn");
+        home_signup_btn.style.display = "none";
+    });
+
+    $("#login_btn").on("click", function() {
+        console.log("login!");
+
+        $.ajax({
+            url : "login/", // the endpoint
+            type : "POST", // http method
+            data : {
+                id : $("#login_id").val(),
+                psw: $("#login_psw").val()
+            }, // data sent with the post request
 
         // handle a successful response
-        success : function(json) {
-            $("#login_id").val("") // remove the value from the input
-            console.log("success"); // another sanity check
-        },
+            success : function(json) {
+                $("#login_id").val("");
+                $("#login_psw").val("");// remove the value from the input
+                console.log("success"); // another sanity check
+            },
 
         // handle a non-successful response
-        error : function(xhr,errmsg,err) {
-            console.log(errmsg)
+            error : function(xhr,errmsg,err) {
+                console.log(errmsg);
             // console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-        }
+            }
         });
+
+        var home_login_btn = document.getElementById("home_login_btn");
+        home_login_btn.style.display = "none";
+        var home_signup_btn = document.getElementById("home_signup_btn");
+        home_signup_btn.style.display = "none";
+
     });
 
     // Get the modal and when the user clicks anywhere outside of the modal, close it
