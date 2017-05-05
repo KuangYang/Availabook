@@ -2,10 +2,29 @@ $(document).ready(function() {
     console.log("ready!");
     $("#home_logout_btn").hide();
 
+    /*$("#visitor_btn").on("click", function() {
+        console.log("logout!");
+        $.ajax({
+            url : "visitor/",
+            type : 'GET',
+
+            success : function(msg) {
+                console.log("visitor success!");
+                location.reload(true);
+            },
+
+            error : function(xhr,errmsg,err) {
+                console.log("visitor" + errmsg);
+            }
+
+        });
+    });*/
+
+
     $("#home_logout_btn").on("click", function() {
         console.log("logout!");
         $.ajax({
-            url : "logout/",
+            url : "/availabook/logout/",
             type : "GET",
 
             success : function(json) {
@@ -25,7 +44,8 @@ $(document).ready(function() {
         console.log("login!");
 
         $.ajax({
-            url : "login/", // the endpoint
+            /* Use absolute url */
+            url : "/availabook/login/", // the endpoint
             type : "POST", // http method
             data : {
                 id : $("#login_id").val(),
@@ -36,6 +56,7 @@ $(document).ready(function() {
             success : function(msg) {
                 //$('#wtf').html($(data).find('#link').text());
                 $("body").html(msg);
+                console.log(msg)
                 $("#login_id").val("");
                 $("#login_psw").val("");// remove the value from the input
                 console.log("login success!"); // another sanity check
@@ -61,7 +82,7 @@ $(document).ready(function() {
         console.log("signup!");
 
         $.ajax({
-            url : "signup/",
+            url : "/availabook/signup/",
             type : "POST",
             data : {
                 email : $("#signup_email").val(),

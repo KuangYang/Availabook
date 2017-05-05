@@ -8,29 +8,39 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
 from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list,put_event_into_db,get_recommended_event_list
+from django.http import JsonResponse, HttpResponse
+from django.core  import serializers
 import time
 import uuid
+import json
+from django.views.decorators.csrf import ensure_csrf_cookie
+@ensure_csrf_cookie
 
 
 # Create your views here.
 def index(request):
     ''' render homepage'''
-    auth_logout(request)
-    return render(request, 'homepage.html')
+    # auth_logout(request)
+    return render(request, 'landing.html')
     # event_list = get_event_list()
     # return render(request, 'index.html',{'event_list':event_list})
+
+def visitor(request):
+    return render(request, 'homepage.html')
 
 
 def home(request):
     if request.user.username:
         event_list = get_recommended_event_list(request.user.username)
+        print event_list
+        # return JsonResponse(json.dumps({"event_list" : event_list}))
         return render(request, 'homepage.html',{'event_list':event_list})
     print request.user.is_authenticated()
     print request.user.username
     return redirect('/availabook/')
 
 
-def login(request, onsuccess = '/availabook/home', onfail = '/availabook/'):
+def login(request, onsuccess = '/availabook/home', onfail = '/availabook/visitor'):
     user_id = request.POST.get("id")
     pwd = request.POST.get("psw")
     print user_id, pwd
@@ -83,8 +93,7 @@ def signup(request):
                 auth_login(request, user)
                 return render(request, 'homepage.html',{'event_list':event_list})
             else:
-                messages.add_message(request, messages.INFO, 'User exists. Try again', 'signup', True)
-                return render(request, 'homepage.html')
+                return render(request, 'homepage.html',{'event_list':event_list})
         else:
             messages.add_message(request, messages.INFO, 'Input passwprds inconsistent! Try again', 'signup', True)
             return render(request, 'homepage.html')
@@ -111,6 +120,7 @@ def logout(request):
 
 
 def profile(request):
+    print "~~~~~~~~~~~~~~~"
     return render(request, 'profile.html')
 
 
