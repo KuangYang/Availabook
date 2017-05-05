@@ -43,7 +43,8 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand topnav" href="#">Availabook</a>
+          <!-- herf below can also be {% url 'availabook:index' %} -->
+          <a href="/availabook" class="navbar-brand topnav" href="#">Availabook</a>
       </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -298,7 +299,10 @@
 
     {% load static %}
     <script src= "{% static 'js/bootstrap.js' %}"></script>
+    {% load static %}
     <script src= "{% static 'js/availabook.js' %}"></script>
+    {% load static %}
+    <script src= "{% static 'js/csrf.js' %}"></script>
 
 </body>
 

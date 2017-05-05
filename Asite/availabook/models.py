@@ -178,7 +178,7 @@ def get_recommended_event_list(email):
         tmp_list = recommend(email)
     except:
         tmp_list = common()
-    print(tmp_list)
+    # print(tmp_list)
     event_list = []
     if tmp_list:
         for e in tmp_list:

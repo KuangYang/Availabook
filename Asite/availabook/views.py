@@ -9,8 +9,8 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
 from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list, put_event_into_db, get_recommended_event_list
+from django.middleware import csrf
 from django.views.decorators.csrf import ensure_csrf_cookie
-@ensure_csrf_cookie
 
 
 # Create your views here.
@@ -20,7 +20,8 @@ def index(request):
         event_list = get_recommended_event_list(request.user.username)
         print event_list
         return render(request, 'homepage.html',{'event_list':event_list, 'logedin': True})
-    return render(request, 'landing.html')
+    else:
+        return render(request, 'landing.html')
 
 
 def home(request):
@@ -28,13 +29,15 @@ def home(request):
     if request.user.is_authenticated():
         print event_list
         return render(request, 'homepage.html',{'event_list':event_list, 'logedin': True})
-    return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
+    else:
+        return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
 
 
 def login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
+    csrf_token = csrf.get_token(request)
     user_id = request.POST.get("id")
     pwd = request.POST.get("psw")
-    print user_id, pwd
+    print csrf_token, user_id, pwd
 
     user = authenticate(username=user_id, password=pwd)
     if user is not None:

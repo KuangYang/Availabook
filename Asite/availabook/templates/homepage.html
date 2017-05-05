@@ -44,7 +44,8 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand topnav" display="inline-block" style="margin-top:8px" href="#">Availabook</a>
+        <!-- herf below can also be {% url 'availabook:index' %} -->
+        <a href="/availabook/home" class="navbar-brand topnav" display="inline-block" style="margin-top:8px" href="#">Availabook</a>
       </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -54,13 +55,13 @@
           {% endif %}
 
           {% if not logedin %}
-          <button id="home_signup_btn" style="margin-bottom:5px" onclick="document.getElementById('signup').style.display='block'"  class="btn btn-default"><i class="fa fa-cloud fa-fw"></i> <span class="network-name">Sign up</span></button>
+          <button id="home_signup_btn" style="margin-bottom:5px;margin-right:20px;" onclick="document.getElementById('signup').style.display='block'"  class="btn btn-default"><i class="fa fa-cloud fa-fw"></i> <span class="network-name">Sign up</span></button>
           {% endif %}
       <!-- <form class="form-inline">
         <a href="{% url 'availabook:logout' %}" style="color:white">Logout</a> {% csrf_token %}
       </form> -->
           {% if logedin %}
-          <button id="home_logout_btn" style="width:auto;margin-left:600px" class="btn btn-default">Logout</button>
+          <button id="home_logout_btn" style="margin-bottom:5px;margin-right:19px;" class="btn btn-default"><i class="fa fa-rocket fa-fw"></i> <span class="network-name">Logout</span></button>
           {% endif %}
         </ul>
       </div>
@@ -259,11 +260,11 @@
 
     {% load static %}
     <script src= "{% static 'js/bootstrap.js' %}"></script>
+    {% load static %}
     <script src= "{% static 'js/availabook.js' %}"></script>
+    {% load static %}
+    <script src= "{% static 'js/csrf.js' %}"></script>
 
-<!--     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script> -->
-<!--     <script src="js/bootstrap.js"></script> -->
-<!--     <script type="text/javascript" src="js/availabook.js"></script> -->
 
   </body>
 </html>
