@@ -20,6 +20,10 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 # Create your views here.
 def index(request):
     ''' render landing page'''
+    if request.user.is_authenticated():
+        event_list = get_recommended_event_list(request.user.username)
+        print event_list
+        return render(request, 'homepage.html',{'event_list':event_list, 'logedin': True})
     return render(request, 'landing.html')
 
 
@@ -89,14 +93,14 @@ def signup(request):
                 authenticate(username=user_id, password=pwd)
                 user.backend = 'django.contrib.auth.backends.ModelBackend'
                 auth_login(request, user)
-                return render(request, 'homepage.html',{'event_list':event_list})
+                return render(request, 'homepage.html',{'event_list':event_list, 'logedin': True})
             else:
-                return render(request, 'homepage.html',{'event_list':event_list})
+                return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
         else:
             messages.add_message(request, messages.INFO, 'Input passwprds inconsistent! Try again', 'signup', True)
-            return render(request, 'homepage.html')
+            return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
     else:
-        return render(request, 'homepage.html')
+        return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
 
 
 def user_exists(username):
