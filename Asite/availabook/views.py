@@ -19,25 +19,24 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 # Create your views here.
 def index(request):
-    ''' render homepage'''
-    # auth_logout(request)
+    ''' render landing page'''
     return render(request, 'landing.html')
-    # event_list = get_event_list()
-    # return render(request, 'index.html',{'event_list':event_list})
+
 
 def visitor(request):
-    return render(request, 'homepage.html')
+    event_list = get_recommended_event_list(request.user.username)
+    if request.user.is_authenticated():
+        print event_list
+        return render(request, 'homepage.html',{'event_list':event_list, 'logedin': True})
+    return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
 
 
 def home(request):
+    event_list = get_recommended_event_list(request.user.username)
     if request.user.username:
-        event_list = get_recommended_event_list(request.user.username)
         print event_list
-        # return JsonResponse(json.dumps({"event_list" : event_list}))
-        return render(request, 'homepage.html',{'event_list':event_list})
-    print request.user.is_authenticated()
-    print request.user.username
-    return redirect('/availabook/')
+        return render(request, 'homepage.html',{'event_list':event_list, 'logedin': True})
+    return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
 
 
 def login(request, onsuccess = '/availabook/home', onfail = '/availabook/visitor'):
@@ -51,7 +50,6 @@ def login(request, onsuccess = '/availabook/home', onfail = '/availabook/visitor
     else:
         messages.add_message(request, messages.ERROR, 'Login Failed. Try again.', 'login', True)
 
-    #event_list = get_recommended_event_list(user_id)
     login_user = Users(user_id, pwd)
     if login_user.authen_user():
         login_user.authorize()
@@ -111,16 +109,13 @@ def user_exists(username):
 
 def logout(request):
     ''' logout and redirect'''
-    if request.user.username:
+    if request.user.is_authenticated():
         print request.user.username
         auth_logout(request)
-        return redirect('/availabook/')
-    else:
-        return redirect('/availabook/')
+    return redirect('/availabook/home')
 
 
 def profile(request):
-    print "~~~~~~~~~~~~~~~"
     return render(request, 'profile.html')
 
 

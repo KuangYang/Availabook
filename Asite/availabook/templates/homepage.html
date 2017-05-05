@@ -49,13 +49,19 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-right">
+          {% if not logedin %}
           <button id="home_login_btn" style="margin-bottom:5px;margin-right:20px;" onclick="document.getElementById('login').style.display='block'"  class="btn btn-default"><i class="fa fa-sign-in fa-fw"></i> <span class="network-name">Login</span></button>
+          {% endif %}
 
+          {% if not logedin %}
           <button id="home_signup_btn" style="margin-bottom:5px" onclick="document.getElementById('signup').style.display='block'"  class="btn btn-default"><i class="fa fa-cloud fa-fw"></i> <span class="network-name">Sign up</span></button>
+          {% endif %}
       <!-- <form class="form-inline">
         <a href="{% url 'availabook:logout' %}" style="color:white">Logout</a> {% csrf_token %}
       </form> -->
+          {% if logedin %}
           <button id="home_logout_btn" style="width:auto;margin-left:600px" class="btn btn-default">Logout</button>
+          {% endif %}
         </ul>
       </div>
             <!-- /.navbar-collapse -->

@@ -1,6 +1,6 @@
 $(document).ready(function() {
     console.log("ready!");
-    $("#home_logout_btn").hide();
+    //$("#home_logout_btn").hide();
 
     /*$("#visitor_btn").on("click", function() {
         console.log("logout!");
@@ -27,10 +27,11 @@ $(document).ready(function() {
             url : "/availabook/logout/",
             type : "GET",
 
-            success : function(json) {
-                $("#home_logout_btn").hide();
-                $("#home_login_btn").show();
-                $("#home_signup_btn").show();
+            success : function(msg) {
+                $("body").html(msg);
+                //$("#home_logout_btn").hide();
+                //$("#home_login_btn").show();
+                //$("#home_signup_btn").show();
                 console.log("logout success!");
             },
 
@@ -61,13 +62,13 @@ $(document).ready(function() {
                 $("#login_psw").val("");// remove the value from the input
                 console.log("login success!"); // another sanity check
 
-                var home_login_btn = document.getElementById("home_login_btn");
-                home_login_btn.style.display = "none";
-                var home_signup_btn = document.getElementById("home_signup_btn");
-                home_signup_btn.style.display = "none";
-                var login_modal = document.getElementById("login")
-                login_modal.style.display="none";
-                $("#home_logout_btn").show();
+                //var home_login_btn = document.getElementById("home_login_btn");
+                //home_login_btn.style.display = "none";
+                //var home_signup_btn = document.getElementById("home_signup_btn");
+                //home_signup_btn.style.display = "none";
+                //var login_modal = document.getElementById("login")
+                //login_modal.style.display="none";
+                //$("#home_logout_btn").show();
             },
 
         // handle a non-successful response
@@ -99,13 +100,13 @@ $(document).ready(function() {
                 $("body").html(msg);
                 console.log("signup success!");
 
-                var home_login_btn = document.getElementById("home_login_btn");
-                home_login_btn.style.display = "none";
-                var home_signup_btn = document.getElementById("home_signup_btn");
-                home_signup_btn.style.display = "none";
-                var signup_modal = document.getElementById("signup")
-                signup_modal.style.display="none";
-                $("#home_logout_btn").show();
+                //var home_login_btn = document.getElementById("home_login_btn");
+                //home_login_btn.style.display = "none";
+                //var home_signup_btn = document.getElementById("home_signup_btn");
+                //home_signup_btn.style.display = "none";
+                //var signup_modal = document.getElementById("signup")
+                //signup_modal.style.display="none";
+                //$("#home_logout_btn").show();
             },
 
             error : function(xhr,errmsg,err) {
@@ -113,13 +114,13 @@ $(document).ready(function() {
             }
         });
 
-        var home_login_btn = document.getElementById("home_login_btn");
-        home_login_btn.style.display = "none";
-        var home_signup_btn = document.getElementById("home_signup_btn");
-        home_signup_btn.style.display = "none";
-        var signup_modal = document.getElementById("signup")
-        signup_modal.style.display="none";
-        $("#home_logout_btn").show();
+        //var home_login_btn = document.getElementById("home_login_btn");
+        //home_login_btn.style.display = "none";
+        //var home_signup_btn = document.getElementById("home_signup_btn");
+        //home_signup_btn.style.display = "none";
+        //var signup_modal = document.getElementById("signup")
+        //signup_modal.style.display="none";
+        //$("#home_logout_btn").show();
     });
 
     // Get the modal and when the user clicks anywhere outside of the modal, close it
