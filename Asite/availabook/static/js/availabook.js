@@ -1,25 +1,5 @@
 $(document).ready(function() {
     console.log("ready!");
-    //$("#home_logout_btn").hide();
-
-    /*$("#visitor_btn").on("click", function() {
-        console.log("logout!");
-        $.ajax({
-            url : "visitor/",
-            type : 'GET',
-
-            success : function(msg) {
-                console.log("visitor success!");
-                location.reload(true);
-            },
-
-            error : function(xhr,errmsg,err) {
-                console.log("visitor" + errmsg);
-            }
-
-        });
-    });*/
-
 
     $("#home_logout_btn").on("click", function() {
         console.log("logout!");
@@ -29,9 +9,6 @@ $(document).ready(function() {
 
             success : function(msg) {
                 $("body").html(msg);
-                //$("#home_logout_btn").hide();
-                //$("#home_login_btn").show();
-                //$("#home_signup_btn").show();
                 console.log("logout success!");
             },
 
@@ -55,20 +32,11 @@ $(document).ready(function() {
 
         // handle a successful response
             success : function(msg) {
-                //$('#wtf').html($(data).find('#link').text());
                 $("body").html(msg);
                 console.log(msg)
                 $("#login_id").val("");
                 $("#login_psw").val("");// remove the value from the input
                 console.log("login success!"); // another sanity check
-
-                //var home_login_btn = document.getElementById("home_login_btn");
-                //home_login_btn.style.display = "none";
-                //var home_signup_btn = document.getElementById("home_signup_btn");
-                //home_signup_btn.style.display = "none";
-                //var login_modal = document.getElementById("login")
-                //login_modal.style.display="none";
-                //$("#home_logout_btn").show();
             },
 
         // handle a non-successful response
@@ -99,28 +67,12 @@ $(document).ready(function() {
             success : function(msg) {
                 $("body").html(msg);
                 console.log("signup success!");
-
-                //var home_login_btn = document.getElementById("home_login_btn");
-                //home_login_btn.style.display = "none";
-                //var home_signup_btn = document.getElementById("home_signup_btn");
-                //home_signup_btn.style.display = "none";
-                //var signup_modal = document.getElementById("signup")
-                //signup_modal.style.display="none";
-                //$("#home_logout_btn").show();
             },
 
             error : function(xhr,errmsg,err) {
                 console.log("signup" + errmsg);
             }
         });
-
-        //var home_login_btn = document.getElementById("home_login_btn");
-        //home_login_btn.style.display = "none";
-        //var home_signup_btn = document.getElementById("home_signup_btn");
-        //home_signup_btn.style.display = "none";
-        //var signup_modal = document.getElementById("signup")
-        //signup_modal.style.display="none";
-        //$("#home_logout_btn").show();
     });
 
     // Get the modal and when the user clicks anywhere outside of the modal, close it
@@ -134,17 +86,12 @@ $(document).ready(function() {
     };
 });
 
-/*$.ajaxPrefilter(function( options, original_Options, jqXHR ) {
-    options.async = true;
-});*/
-
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie != '') {
         var cookies = document.cookie.split(';');
         for (var i = 0; i < cookies.length; i++) {
             var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
             if (cookie.substring(0, name.length + 1) == (name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                 break;
@@ -161,13 +108,13 @@ function csrfSafeMethod(method) {
 
 var csrftoken = getCookie('csrftoken');
 
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
         }
-    });
+    }
+});
 
 
 function login(formData) {
