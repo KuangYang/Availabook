@@ -13,5 +13,5 @@ urlpatterns = [
     url(r'^post_event/',views.post_event, name='post_event'),
     url(r'^get_fave/',views.get_fave,name='get_fave'),
     url(r'^profile/',views.profile,name='profile'),
-    url(r'^visitor/',views.visitor,name='visitor'),
+    #url(r'^visitor/',views.visitor,name='visitor'),
 ]

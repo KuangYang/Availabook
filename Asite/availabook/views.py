@@ -1,4 +1,5 @@
-#from django.shortcuts import render
+import time
+import uuid
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
@@ -7,19 +8,14 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
-from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list,put_event_into_db,get_recommended_event_list
-from django.http import JsonResponse, HttpResponse
-from django.core  import serializers
-import time
-import uuid
-import json
+from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list, put_event_into_db, get_recommended_event_list
 from django.views.decorators.csrf import ensure_csrf_cookie
 @ensure_csrf_cookie
 
 
 # Create your views here.
 def index(request):
-    ''' render landing page'''
+    ''' render the landing page'''
     if request.user.is_authenticated():
         event_list = get_recommended_event_list(request.user.username)
         print event_list
@@ -27,7 +23,7 @@ def index(request):
     return render(request, 'landing.html')
 
 
-def visitor(request):
+def home(request):
     event_list = get_recommended_event_list(request.user.username)
     if request.user.is_authenticated():
         print event_list
@@ -35,15 +31,7 @@ def visitor(request):
     return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
 
 
-def home(request):
-    event_list = get_recommended_event_list(request.user.username)
-    if request.user.username:
-        print event_list
-        return render(request, 'homepage.html',{'event_list':event_list, 'logedin': True})
-    return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
-
-
-def login(request, onsuccess = '/availabook/home', onfail = '/availabook/visitor'):
+def login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
     user_id = request.POST.get("id")
     pwd = request.POST.get("psw")
     print user_id, pwd
@@ -57,9 +45,7 @@ def login(request, onsuccess = '/availabook/home', onfail = '/availabook/visitor
     login_user = Users(user_id, pwd)
     if login_user.authen_user():
         login_user.authorize()
-        print "correct"
-        print request.user.username
-        print request.user.is_authenticated()
+        print str(request.user.username) + " is logged in: " + str(request.user.is_authenticated())
         return redirect(onsuccess)
     else:
  		#alert("User Information Not exists")
@@ -68,7 +54,7 @@ def login(request, onsuccess = '/availabook/home', onfail = '/availabook/visitor
         return redirect(onfail)
 
 
-def signup(request):
+def signup(request, onsuccess="/availabook/home", onfail="/availabook/home"):
     user_id = request.POST.get("email")
     pwd = request.POST.get("psw")
     pwd_a = request.POST.get("psw_a")
@@ -93,14 +79,14 @@ def signup(request):
                 authenticate(username=user_id, password=pwd)
                 user.backend = 'django.contrib.auth.backends.ModelBackend'
                 auth_login(request, user)
-                return render(request, 'homepage.html',{'event_list':event_list, 'logedin': True})
+                print str(request.user.username) + " is signed up and logged in: " + str(request.user.is_authenticated())
+                return redirect(onsuccess)
             else:
-                return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
+                return redirect(onfail)
         else:
-            messages.add_message(request, messages.INFO, 'Input passwprds inconsistent! Try again', 'signup', True)
-            return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
+            return redirect(onfail)
     else:
-        return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
+        return redirect(onfail)
 
 
 def user_exists(username):
@@ -114,7 +100,7 @@ def user_exists(username):
 def logout(request):
     ''' logout and redirect'''
     if request.user.is_authenticated():
-        print request.user.username
+        print str(request.user.username) + " is logged out!"
         auth_logout(request)
     return redirect('/availabook/home')
 
