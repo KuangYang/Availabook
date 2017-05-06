@@ -16,6 +16,8 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 # Create your views here.
 def index(request):
     ''' render the landing page'''
+    for key in request.session.keys():
+        del request.session[key]
     if request.user.is_authenticated():
         event_list = get_recommended_event_list(request.user.username)
         print event_list
@@ -32,6 +34,53 @@ def home(request):
     else:
         return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
 
+def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/"):
+    user_id = str(request.POST.get("email"))
+    pwd = str(request.POST.get("psw"))
+    pwd_a = pwd
+    firstname = request.POST.get("fn")
+    lastname = request.POST.get("ln")
+    age = request.POST.get("age")
+    picture = request.POST.get("picture")
+    print user_id, pwd, firstname, lastname, age, picture
+    city = 'ny'
+    zipcode = '10027'
+    signup_handler = Signup(user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode)
+    signup_handler.add_picture(picture)
+    user_db = Users(user_id, pwd)
+    if user_db.verify_email() == False:
+        print "account not exist"
+        try:
+            if not user_exists(user_id):
+                    signup_handler.push_to_dynamodb()
+                    user = User(username=user_id, email=user_id)
+                    user.set_password(pwd)
+                    user.save()
+                    authenticate(username=user_id, password=pwd)
+                    user.backend = 'django.contrib.auth.backends.ModelBackend'
+                    auth_login(request, user)
+                    print str(request.user.username) + " is signed up and logged in: " + str(request.user.is_authenticated())
+                    return redirect(onsuccess)
+            else:
+                authenticate(username=user_id, password=pwd)
+                user.backend = 'django.contrib.auth.backends.ModelBackend'
+                auth_login(request, user)
+                print str(request.user.username) + " is signed up and logged in: " + str(request.user.is_authenticated())
+                return redirect(onsuccess)
+        except Exception as e:
+            print e
+    else:
+        user = authenticate(username=user_id, password=pwd)
+        print user
+        try:
+            if user is not None:
+                auth_login(request, user)
+                return redirect(onsuccess)
+            else:
+                return redirect(onfail)
+        except Exception as e:
+            print e
+            return redirect(onfail)
 
 def login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
     csrf_token = csrf.get_token(request)

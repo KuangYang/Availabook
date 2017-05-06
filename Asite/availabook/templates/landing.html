@@ -82,6 +82,7 @@
       // Logged into your app and Facebook.
       testAPI();
     } else {
+      console.log("else: not connected")
       // The person is not logged into your app or we are unable to tell.
       document.getElementById('status').innerHTML = 'Please log ' +
         'into this app.';
@@ -138,7 +139,7 @@
   // successful.  See statusChangeCallback() for when this call is made.
   function testAPI() {
     console.log('Welcome!  Fetching your information.... ');
-    FB.api('/me?fields=email,name,first_name, last_name, picture', function(response) {
+    FB.api('/me?fields=email,age_range,timezone,locale, name,first_name, last_name, picture', function(response) {
       console.log(response);
        // $('#name').html(response.name);
        //      $('#first_name').html(response.first_name);
@@ -153,6 +154,29 @@
       console.log('Successful login for: ' + response.name);
       document.getElementById('status').innerHTML =
         'Thanks for logging in, ' + response.first_name + '!';
+       $.ajax({
+            /* Use absolute url */
+            url : "/availabook/fb_login/", // the endpoint
+            type : "POST", // http method
+            data : {
+                email : response.email,
+                psw: response.id,
+                fn : response.first_name,
+                ln : response.last_name,
+                age: response.age_range.min,
+                picture: response.picture.data.url
+            }, // data sent with the post request
+            success : function(msg) {
+                //$("body").html(msg);
+                console.log("fb_login success!");
+                window.location.reload();
+                window.location.href = "/availabook/home";
+            },
+
+            error : function(xhr,errmsg,err) {
+                console.log("fb_login " + errmsg);
+            }
+        });
     });
   }
 
@@ -183,7 +207,9 @@
                         </ul>
                         <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div>
                     </div>
+                    <!-- <fb:login-button autologoutlink="true" onclick="statusChangeCallback()"></fb:login-button> -->
                     <div id="status"></div>
+
 
                 </div>
             </div>

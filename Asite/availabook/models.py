@@ -82,7 +82,10 @@ class Signup():
         self.age = age
         self.city = city
         self.zipcode = zipcode
+        self.picture = ''
 
+    def add_picture(self, link):
+        self.picture = link
 
     def push_to_dynamodb(self):
         user_table.put_item(
@@ -94,6 +97,7 @@ class Signup():
                 'last_name': self.lastname,
                 'password': self.pwd,
                 'zipcode': self.zipcode,
+                'picture': str(self.picture),
             }
         )
 
