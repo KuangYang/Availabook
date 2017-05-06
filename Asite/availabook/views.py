@@ -148,6 +148,8 @@ def user_exists(username):
         return False
     return True
 
+def fa_logout(request):
+    return HttpResponse()
 
 def logout(request):
     ''' logout and redirect'''

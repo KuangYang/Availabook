@@ -70,7 +70,7 @@
 
 <script>
 
-   // This is called with the results from from FB.getLoginStatus().
+   //This is called with the results from from FB.getLoginStatus().
   function statusChangeCallback(response) {
     console.log('statusChangeCallback');
     console.log(response);
@@ -141,16 +141,6 @@
     console.log('Welcome!  Fetching your information.... ');
     FB.api('/me?fields=email,age_range,timezone,locale, name,first_name, last_name, picture', function(response) {
       console.log(response);
-       // $('#name').html(response.name);
-       //      $('#first_name').html(response.first_name);
-       //      $('#last_name').html(response.last_name);
-       //      $('#link').html(response.link);
-       //      $('#birthday').html(response.birthday);
-       //      $('#gender').html(response.gender);
-       //      $('#timezone').html(response.timezone);
-       //      $('#locale').html(response.locale);
-       //      $('#verified').html(''+response.verified);
-       //      $('#updated_time').html(response.updated_time);
       console.log('Successful login for: ' + response.name);
       document.getElementById('status').innerHTML =
         'Thanks for logging in, ' + response.first_name + '!';
@@ -179,6 +169,23 @@
         });
     });
   }
+
+  // function userLogin()
+  //   {
+  //       FB.logout(function(response) {});
+  //       console.log("here");
+  //       FB.login(function(response) 
+  //       {
+  //          if (response && response.status === 'connected') {
+  //           console.log("test");
+  //               testAPI();
+  //               //document.location.reload();
+  //           }
+  //           else {console.log("else: not connected");
+  //   }
+  //       },  { auth_type: 'reauthenticate' });
+  //   }
+
 
 </script>
     <!-- Header -->
