@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list, put_event_into_db, get_recommended_event_list
 from django.middleware import csrf
 from django.views.decorators.csrf import ensure_csrf_cookie
-
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 def index(request):
@@ -34,7 +34,9 @@ def home(request):
     else:
         return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
 
+@csrf_exempt 
 def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
+    print "fb_login"
     user_id = str(request.POST.get("email"))
     pwd = str(request.POST.get("psw"))
     pwd_a = pwd
@@ -42,6 +44,7 @@ def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
     lastname = request.POST.get("ln")
     age = request.POST.get("age")
     picture = request.POST.get("picture")
+    print "hey"
     print user_id, pwd, firstname, lastname, age, picture
     city = 'ny'
     zipcode = '10027'
