@@ -34,7 +34,7 @@ def home(request):
     else:
         return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
 
-def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/"):
+def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
     user_id = str(request.POST.get("email"))
     pwd = str(request.POST.get("psw"))
     pwd_a = pwd
@@ -75,6 +75,7 @@ def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/"):
         try:
             if user is not None:
                 auth_login(request, user)
+                print "redirecting"
                 return redirect(onsuccess)
             else:
                 return redirect(onfail)
