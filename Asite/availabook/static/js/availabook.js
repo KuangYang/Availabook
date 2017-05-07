@@ -17,7 +17,7 @@ $(document).ready(function() {
                 console.log("logout" + errmsg);
             }
         })
-    })
+    });
 
     $("#login_btn").on("click", function(event) {
         event.preventDefault();
@@ -90,6 +90,31 @@ $(document).ready(function() {
             }
         });
     });
+
+    $("#post_btn").on("click", function() {
+        console.log("Post!");
+        $.ajax({
+            url : "/availabook/post_event/",
+            type : "POST",
+            data : {
+                post_content : $("#post_content").val(),
+                dateandtime: $("#dateandtime").val()
+            },
+
+            success : function(msg) {
+                //$("body").html(msg);
+                $("#post_content").val("");
+                $("#dateandtime").val("");
+                console.log("Put success!");
+                window.location.reload();
+            },
+
+            error : function(xhr,errmsg,err) {
+                console.log("logout" + errmsg);
+            }
+        })
+    });
+
 
     // Get the modal and when the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {

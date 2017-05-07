@@ -34,7 +34,7 @@ def home(request):
     else:
         return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
 
-@csrf_exempt 
+@csrf_exempt
 def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
     print "fb_login"
     user_id = str(request.POST.get("email"))
@@ -169,9 +169,9 @@ def profile(request):
 
 def post_event(request):
     print('post event')
-    content = request.POST.get("content")
+    content = request.POST.get("post_content")
     print(content)
-    event_date, event_time = request.POST.get("meeting").split("T")
+    event_date, event_time = request.POST.get("dateandtime").split("T")
     print(event_date,event_time)
     username = request.user.username
     print(username)
