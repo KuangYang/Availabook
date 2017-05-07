@@ -12,7 +12,27 @@ from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_
 from django.middleware import csrf
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.csrf import csrf_exempt
+import sys
+from boto3.session import Session
+import os
+import json
+"""reload intepretor, add credential path"""
+reload(sys)
+sys.setdefaultencoding('UTF8')
 
+"""import credentials from root/AppCreds"""
+
+print "path: " + os.path.dirname(sys.path[0])
+with open(os.path.dirname(sys.path[0])+ '/Asite' + '/availabook/AppCreds/AWSAcct.json','r') as AWSAcct:
+    awsconf = json.loads(AWSAcct.read())
+
+dynamodb_session = Session(aws_access_key_id=awsconf["aws_access_key_id"],
+              aws_secret_access_key=awsconf["aws_secret_access_key"],
+              region_name="us-east-1")
+
+dynamodb = dynamodb_session.resource('dynamodb')
+
+user_table = dynamodb.Table("User")
 # Create your views here.
 def index(request):
     ''' render the landing page'''
@@ -162,10 +182,39 @@ def logout(request):
         auth_logout(request)
     return redirect('/availabook/home')
 
+def get_image_by_id(id):
+        response = user_table.get_item(
+            Key={
+                'email': id
+            }
+        )
+        if 'Item' in response:
+            return response['Item']['picture']
+        return None
+
+def update_image_by_id(id, link):
+    try:
+        response = table.update_item(
+        Key={
+            'id': id
+        },
+        UpdateExpression="set user.picture = :r",
+        ExpressionAttributeValues={
+            ':r': link
+        },
+        ReturnValues="UPDATED_NEW"
+            )
+        print("UpdateItem succeeded:")
+        return True
+    except Exception as e:
+        print e
+        return False
 
 def profile(request):
     print "views profile"
-    return render(request, 'profile2.html', {'link':'https://s3.amazonaws.com/image-availabook/default'})
+    link = get_image_by_id(request.user.username)
+    print link
+    return render(request, 'profile.html', {'link':link})
 
 def upload(request):
     print "uploading"
@@ -185,12 +234,14 @@ def upload(request):
             profile_link = "https://s3.amazonaws.com/image-availabook/" + request.user.username
             profile_link = profile_link.replace('@','%40')
             print profile_link
+            uploaded = update_image_by_id(request.user.username, profile_link)
+            print uploaded
             #print k.get_contents_to_filename
         else:
             print 'invalid form'
             print form.errors
 
-    return render(request, 'profile2.html', {
+    return render(request, 'profile.html', {
         'link':profile_link
     })
 
