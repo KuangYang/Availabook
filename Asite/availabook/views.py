@@ -75,27 +75,24 @@ def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
     user_db = Users(user_id, pwd)
     if user_db.verify_email() == False:
         print "account not exist"
-        try:
-            if not user_exists(user_id):
-                    user = User(username=user_id, email=user_id)
-                    user.set_password(pwd)
-                    user.save()
-                    authenticate(username=user_id, password=pwd)
-                    user.backend = 'django.contrib.auth.backends.ModelBackend'
-                    auth_login(request, user)
-                    signup_handler.push_to_dynamodb()
-                    print str(request.user.username) + " is signed up and logged in: " + str(request.user.is_authenticated())
-                    return redirect(onsuccess)
-            else:
+        if not user_exists(user_id):
+                user = User(username=user_id, email=user_id)
+                user.set_password(pwd)
+                user.save()
                 authenticate(username=user_id, password=pwd)
                 user.backend = 'django.contrib.auth.backends.ModelBackend'
                 auth_login(request, user)
+                signup_handler.push_to_dynamodb()
                 print str(request.user.username) + " is signed up and logged in: " + str(request.user.is_authenticated())
                 return redirect(onsuccess)
-        except Exception as e:
-            print e
+        else:
+            user=authenticate(username=user_id, password=pwd)
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            auth_login(request, user)
+            print str(request.user.username) + " is signed up and logged in: " + str(request.user.is_authenticated())
+            return redirect(onsuccess)
     else:
-        print user_id, pwd
+        print "dynamo has the user info", user_id, pwd
         user = authenticate(username=user_id, password=pwd)
         print user
         try:
@@ -200,6 +197,7 @@ def profile(request):
         city = item['city']
         zipcode = item['zipcode']
         age = item['age']
+        print link
         print {'fname':fname,'lname':lname,'city':city,'age':age,'zipcode':zipcode}
         return render(request, 'profile.html', {'link':link, 'logedin': True, 'fname':fname,'lname':lname,'city':city,'age':age,'zipcode':zipcode})
     else:
@@ -253,7 +251,7 @@ def upload(request):
             print "upload!"
             profile_link = "https://s3.amazonaws.com/image-availabook/" + request.user.username
             profile_link = profile_link.replace('@','%40')
-            print profile_link
+            print "link", profile_link
             uploaded = Users.update_image_by_id(request.user.username, profile_link)
             print uploaded
             #print k.get_contents_to_filename
