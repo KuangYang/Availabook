@@ -35,14 +35,6 @@ with open(os.path.dirname(sys.path[0])+ '/Asite' + '/availabook/AppCreds/AWSAcct
 conn = S3Connection(awsconf["aws_access_key_id"], awsconf["aws_secret_access_key"])
 bucket = conn.get_bucket('image-availabook')
 
-
-dynamodb_session = Session(aws_access_key_id=awsconf["aws_access_key_id"],
-              aws_secret_access_key=awsconf["aws_secret_access_key"],
-              region_name="us-east-1")
-
-dynamodb = dynamodb_session.resource('dynamodb')
-
-user_table = dynamodb.Table("User")
 # Create your views here.
 def index(request):
     ''' render the landing page'''
@@ -75,7 +67,6 @@ def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
     lastname = request.POST.get("ln")
     age = request.POST.get("age")
     picture = request.POST.get("picture")
-    print "hey"
     print user_id, pwd, firstname, lastname, age, picture
     city = 'ny'
     zipcode = '10027'
@@ -86,13 +77,13 @@ def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
         print "account not exist"
         try:
             if not user_exists(user_id):
-                    signup_handler.push_to_dynamodb()
                     user = User(username=user_id, email=user_id)
                     user.set_password(pwd)
                     user.save()
                     authenticate(username=user_id, password=pwd)
                     user.backend = 'django.contrib.auth.backends.ModelBackend'
                     auth_login(request, user)
+                    signup_handler.push_to_dynamodb()
                     print str(request.user.username) + " is signed up and logged in: " + str(request.user.is_authenticated())
                     return redirect(onsuccess)
             else:
@@ -104,6 +95,7 @@ def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
         except Exception as e:
             print e
     else:
+        print user_id, pwd
         user = authenticate(username=user_id, password=pwd)
         print user
         try:
@@ -112,6 +104,7 @@ def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
                 print "redirecting"
                 return redirect(onsuccess)
             else:
+                print "user is none"
                 return redirect(onfail)
         except Exception as e:
             print e
