@@ -275,6 +275,7 @@ th {
   font-weight: normal;
   line-height: 1;
 
+
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -5920,7 +5921,7 @@ button.close {
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 1040;
+  z-index: -1;
   background-color: #000;
 }
 .modal-backdrop.fade {
@@ -5970,7 +5971,7 @@ button.close {
 }
 @media (min-width: 768px) {
   .modal-dialog {
-    width: 600px;
+    width: 2000px;
     margin: 30px auto;
   }
   .modal-content {
