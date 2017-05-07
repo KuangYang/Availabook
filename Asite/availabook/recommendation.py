@@ -31,13 +31,7 @@ def recommend(email):
         table.put_item(
             Item={
                 'email': email,
-                'sports': 0,
-                'music': 0,
-                'food': 0,
-                'exihibition': 0,
-                'movie': 0,
-                'travel': 0,
-                'study': 0
+                'rating': [0,0,0,0,0,0,0,0,0,0]
             }
         )
         return newUser(email)
@@ -122,8 +116,8 @@ def returnUser(email):
             'email': email
         }
     )
-    if response['Item']['sports'] == response['Item']['music'] == response['Item']['food'] == \
-            response['Item']['exihibition'] == response['Item']['movie'] == response['Item']['travel'] == response['Item']['study']:
+    rating_list = response['Item']['rating']
+    if (len(set(rating_list)) <= 1):
         return newUser(email)
     else:
         pass
