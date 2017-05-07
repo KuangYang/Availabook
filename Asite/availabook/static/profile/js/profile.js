@@ -70,6 +70,7 @@ $(document).ready(function() {
         .on('success.form.fv', function(e) {
             // Save the form data via an Ajax request
             console.log("form.fv");
+            console.log(e);
             e.preventDefault();
 
             var $form = $(e.target),
@@ -78,26 +79,32 @@ $(document).ready(function() {
             // The url and method might be different in your application
             $.ajax({
                 url: "/availabook/edit/",
-                method: 'PUT',
+                method: 'POST',
                 data: $form.serialize()
             }).success(function(response) {
                 // Get the cells
-                var $button = $('button[data-id="' + response.id + '"]'),
-                    $tr     = $button.closest('tr'),
-                    $cells  = $tr.find('td');
+                console.log(response);
+                var $button = $('button[data-id=1]')
+                    // $tr     = $button.closest('tr'),
+                    // $cells  = $tr.find('td');
 
+                document.getElementById('fn').innerHTML=response.fname
+                document.getElementById('ln').innerHTML=response.lname
+                document.getElementById('age').innerHTML=response.age
+                document.getElementById('ct').innerHTML=response.city
+                document.getElementById('zip').innerHTML=response.zipcode
                 // Update the cell data
-                $cells
-                    .eq(1).html(response.name).end()
-                    .eq(2).html(response.email).end()
-                    .eq(3).html(response.website).end();
+                // $cells
+                //     .eq(1).html(response.name).end()
+                //     .eq(2).html(response.email).end()
+                //     .eq(3).html(response.website).end();
 
                 // Hide the dialog
                 $form.parents('.bootbox').modal('hide');
 
                 // You can inform the user that the data is updated successfully
                 // by highlighting the row or showing a message box
-                bootbox.alert('The user profile is updated');
+                // bootbox.alert('The user profile is updated');
             });
         });
 

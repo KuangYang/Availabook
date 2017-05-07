@@ -188,40 +188,40 @@ def logout(request):
     return redirect('/availabook/home')
 
 
-def get_image_by_id(id):
-        response = user_table.get_item(
-            Key={
-                'email': id
-            }
-        )
-        if 'Item' in response:
-            return response['Item']['picture']
-        return None
+# def get_image_by_id(id):
+#         response = user_table.get_item(
+#             Key={
+#                 'email': id
+#             }
+#         )
+#         if 'Item' in response:
+#             return response['Item']['picture']
+#         return None
 
 
-def update_image_by_id(id, link):
-    try:
-        response = table.update_item(
-        Key={
-            'id': id
-        },
-        UpdateExpression="set user.picture = :r",
-        ExpressionAttributeValues={
-            ':r': link
-        },
-        ReturnValues="UPDATED_NEW"
-            )
-        print("UpdateItem succeeded:")
-        return True
-    except Exception as e:
-        print e
-        return False
+# def update_image_by_id(id, link):
+#     try:
+#         response = table.update_item(
+#         Key={
+#             'id': id
+#         },
+#         UpdateExpression="set user.picture = :r",
+#         ExpressionAttributeValues={
+#             ':r': link
+#         },
+#         ReturnValues="UPDATED_NEW"
+#             )
+#         print("UpdateItem succeeded:")
+#         return True
+#     except Exception as e:
+#         print e
+#         return False
 
 
 def profile(request):
     if request.user.is_authenticated():
         print "views profile"
-        link = get_image_by_id(request.user.username)
+        link = Users.get_image_by_id(request.user.username)
         print link
         return render(request, 'profile.html', {'link':link, 'logedin': True})
     else:
@@ -234,8 +234,19 @@ def info(request):
 
 def edit(request):
     print "edit"
-
-    return JsonResponse({'fname':'jiamin','lname':'huang','city':'ny','age':'21','zipcode':'10027'})
+    fname = request.POST.get("fname")
+    lname = request.POST.get("lname")
+    city = request.POST.get("city")
+    age = request.POST.get("age")
+    zipcode = request.POST.get("zipcode")
+    uid = request.user.username
+    print fname, lname, age, city, zipcode, uid
+    try:
+        Signup.update_to_dynamodb(uid, fname, lname, age, city, zipcode)
+    except Exception as e:
+        print e
+    print "?"
+    return JsonResponse({'fname':fname,'lname':lname,'city':city,'age':age,'zipcode':zipcode})
 
 
 def upload(request):
@@ -256,7 +267,7 @@ def upload(request):
             profile_link = "https://s3.amazonaws.com/image-availabook/" + request.user.username
             profile_link = profile_link.replace('@','%40')
             print profile_link
-            uploaded = update_image_by_id(request.user.username, profile_link)
+            uploaded = Users.update_image_by_id(request.user.username, profile_link)
             print uploaded
             #print k.get_contents_to_filename
         else:

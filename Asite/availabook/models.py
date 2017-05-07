@@ -79,16 +79,35 @@ class Users():
     def authorize(self):
         self.verified = True
 
-
-    def get_image_by_id(self, id):
+    @staticmethod
+    def get_image_by_id(id):
         response = user_table.get_item(
             Key={
                 'email': id
             }
         )
         if 'Item' in response:
-            return response['Item']['Picture']
+            return response['Item']['picture']
         return None
+
+    @staticmethod
+    def update_image_by_id(id, link):
+        try:
+            response = user_table.update_item(
+            Key={
+                'email': id
+            },
+            UpdateExpression="set picture = :r",
+            ExpressionAttributeValues={
+                ':r': link
+            },
+            ReturnValues="UPDATED_NEW"
+                )
+            print "Update Image succeeded"
+            return True
+        except Exception as e:
+            print e
+            return False
 
 class Signup():
     def __init__(self, user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode):
@@ -119,6 +138,31 @@ class Signup():
             }
         )
 
+    @staticmethod
+    def update_to_dynamodb(uid, first_name, last_name, age, city, zipcode):
+        print "pushing"
+        try:
+            response = user_table.update_item(
+            Key={
+                'email': uid
+            },
+            UpdateExpression="set first_name = :fname, last_name = :lname, age = :a, city = :c, zipcode = :z",
+            ExpressionAttributeValues={
+                ':fname': first_name,
+                ':lname': last_name,
+                ':a': age,
+                ':c': city,
+                ':z': zipcode
+            },
+            ReturnValues="UPDATED_NEW"
+                )
+            print "Update User succeeded"
+            print first_name, last_name, age, city, zipcode
+            return True
+        except Exception as e:
+            print e
+            return False
+
 
 class Event():
     def __init__(self,event): ### event means event['item'] in db
@@ -128,7 +172,7 @@ class Event():
         self.time = event['time']
         self.label = event['label']
         self.fave = event['fave']
-        self.place = event['place']
+        self.place = event['zipcode']
         self.fave_num = str(len(event['fave']))
     ### delete function
     def delete(self,EId):
