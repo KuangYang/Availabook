@@ -1,6 +1,36 @@
 $(document).ready(function() {
     console.log("ready!");
 
+    $("#like_btn").on("click", function() {
+        console.log("Like!");
+
+        $.ajax({
+            url : "/availabook/get_fave/",
+            type : "POST",
+            data : {
+                fave : $("#like_btn").val()
+            },
+
+            success : function(msg) {
+                console.log(msg);
+                //$("body").html(msg);
+                if (msg != {}) {
+                    console.log(msg.EId);
+                    console.log(msg.fave_num);
+                    document.getElementById(msg.EId).innerHTML=msg.fave_num + "-likes";
+                    console.log("Like success!");
+                    //window.location.reload();
+                } else {
+                    alert("Please log in first!");
+                }
+            },
+
+            error : function(xhr,errmsg,err) {
+                console.log("Like " + errmsg);
+            }
+        });
+    });
+
     $("#home_logout_btn").on("click", function() {
         console.log("logout!");
         $.ajax({
@@ -133,6 +163,13 @@ $(document).ready(function() {
         })
     });
 
+    $("#like_btn").mouseup(function(){
+        $(this).blur();
+    });
+
+    $("#outer_post_btn").mouseup(function(){
+        $(this).blur();
+    });
 
     // Get the modal and when the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {

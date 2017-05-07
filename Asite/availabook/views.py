@@ -287,9 +287,12 @@ def post_event(request):
 
 
 def get_fave(request):
-    EId = request.POST.get("fave")
-    print(EId)
-    event = get_event_by_EId(EId)
-    event = Event(event)
-    event.add_fave(request.user.username)
-    return redirect('/availabook/home')
+    if request.user.is_authenticated():
+        EId = request.POST.get("fave")
+        print(EId)
+        event = get_event_by_EId(EId)
+        event = Event(event)
+        event.add_fave(request.user.username)
+        return JsonResponse({"EId" : EId, "fave_num" : event.fave_num})
+    else:
+        return JsonResponse({})
