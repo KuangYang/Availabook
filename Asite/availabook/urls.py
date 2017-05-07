@@ -15,4 +15,6 @@ urlpatterns = [
     url(r'^get_fave/',views.get_fave,name='get_fave'),
     url(r'^profile/',views.profile,name='profile'),
     url(r'^upload/',views.upload,name='upload'),
+    url(r'^info/',views.info,name='info'),
+    url(r'^edit/',views.edit,name='edit'),
 ]

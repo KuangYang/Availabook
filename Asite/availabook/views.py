@@ -144,6 +144,7 @@ def signup(request, onsuccess="/availabook/home", onfail="/availabook/home"):
     print user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode
 
     signup_handler = Signup(user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode)
+    signup_handler.add_picture("https://s3.amazonaws.com/image-availabook/default")
     event_list = get_recommended_event_list(user_id)
     user_db = Users(user_id, pwd)
 
@@ -225,6 +226,16 @@ def profile(request):
         return render(request, 'profile.html', {'link':link, 'logedin': True})
     else:
         return redirect("/availabook/home")
+
+from django.http import JsonResponse
+def info(request):
+    print "info"
+    return JsonResponse({'fname':'jiamin','lname':'huang','city':'ny','age':'21','zipcode':'10027'})
+
+def edit(request):
+    print "edit"
+
+    return JsonResponse({'fname':'jiamin','lname':'huang','city':'ny','age':'21','zipcode':'10027'})
 
 
 def upload(request):

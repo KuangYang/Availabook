@@ -22,14 +22,24 @@
   {% load static %}
   <link href="{% static 'homepage/css/style.css' %}" rel="stylesheet">
   {% load static %}
-    <link href="{% static 'homepage/css/custom.css' %}" rel="stylesheet">
-  {% load static %}
-  <link href="{% static 'profile/fonts/css/font-awesome.css' %}" rel="stylesheet">
+<link href="{% static 'homepage/css/custom.css' %}" rel="stylesheet">
+<script data-require="jquery@1.11.3" data-semver="1.11.3" src="https://code.jquery.com/jquery-1.11.3.js"></script>
+      <script src="http://formvalidation.io/vendor/formvalidation/js/formValidation.min.js"></script>
+    <script src="http://formvalidation.io/vendor/formvalidation/js/framework/bootstrap.min.js"></script> 
+
+ <!--    <link data-require="bootstrap@3.3.6" data-semver="3.3.6" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" /> -->
+    
+    <script data-require="bootstrap@3.3.6" data-semver="3.3.6" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script data-require="angular.js@1.5.7" data-semver="1.5.7" src="https://code.angularjs.org/1.5.7/angular.js"></script>
+    <script data-require="bootbox.js@4.4.0" data-semver="4.4.0" src="https://github.com/makeusabrew/bootbox/releases/download/v4.4.0/bootbox.min.js"></script>
+
+    
 
   <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
 
-  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="https://bootswatch.com/cosmo/bootstrap.min.css"> -->
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<!--   <link rel="stylesheet" href="https://bootswatch.com/cosmo/bootstrap.min.css"> -->
 </head>
 
 <!-- Navigation -->
@@ -183,6 +193,7 @@
                   </form>
                 </div>
                 <div class="media-body">
+                 <td><button type="button" data-id="1" id="editButton" class="btn btn-default editButton">Edit Personal Info</button></td>
                   <hr>
                   <h3><strong>First Name</strong></h3>
                   <p>Kuang</p>
@@ -198,6 +209,59 @@
                   <hr>
                   <h3><strong>Zipcode</strong></h3>
                   <p>10025</p>
+    
+          
+<form id="userForm" method="post" class="form-horizontal" style="display: none;">
+    <div class="form-group">
+        <label class="col-xs-3 control-label">ID</label>
+        <div class="col-xs-3">
+            <input type="text" class="form-control" name="id" disabled="disabled" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-3 control-label">First name</label>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" name="fname" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-3 control-label">Last name</label>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" name="lname" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-3 control-label">Age</label>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" name="age" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-3 control-label">City</label>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" name="city" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-3 control-label">Zipcode</label>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" name="zipcode" />
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <div class="col-xs-5 col-xs-offset-3">
+            <button type="submit" class="btn btn-default">Save</button>
+        </div>
+    </div>
+</form>
+
                 </div>
               </div>
             </div>
@@ -559,12 +623,13 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
     {% load static %}
     <script src= "{% static 'profile/js/bootstrap.js' %}"></script>
     {% load static %}
     <script src= "{% static 'profile/js/availabook.js' %}"></script>
+    {% load static %}
+    <script src= "{% static 'profile/js/profile.js' %}"></script>
     {% load static %}
     <script src= "{% static 'profile/js/csrf.js' %}"></script>
 
