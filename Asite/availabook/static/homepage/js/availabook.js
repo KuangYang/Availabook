@@ -12,9 +12,10 @@ $(document).ready(function() {
             },
 
             success : function(msg) {
-                console.log(msg);
+                console.log(msg.EId);
+                console.log(msg.fave_num);
                 //$("body").html(msg);
-                if (msg != {}) {
+                if (msg.EId != "" && msg.fave_num != "") {
                     console.log(msg.EId);
                     console.log(msg.fave_num);
                     document.getElementById(msg.EId).innerHTML=msg.fave_num + "-likes";
@@ -49,7 +50,7 @@ $(document).ready(function() {
         })
     })
 
-        $("#home_profile_btn").on("click", function() {
+    $("#home_profile_btn").on("click", function() {
         console.log("profile!");
         $.ajax({
             url : "/availabook/profile/",
@@ -151,16 +152,21 @@ $(document).ready(function() {
 
             success : function(msg) {
                 //$("body").html(msg);
-                $("#post_content").val("");
-                $("#dateandtime").val("");
-                console.log("Put success!");
-                window.location.reload();
+                console.log(msg);
+                if (!msg) {
+                    $("#post_content").val("");
+                    $("#dateandtime").val("");
+                    console.log("Put success!");
+                    //window.location.reload();
+                } else {
+                    alert("Please log in first!");
+                }
             },
 
             error : function(xhr,errmsg,err) {
-                console.log("logout" + errmsg);
+                console.log("Post" + errmsg);
             }
-        })
+        });
     });
 
     $("#like_btn").mouseup(function(){
