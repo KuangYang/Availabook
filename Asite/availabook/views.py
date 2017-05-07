@@ -16,6 +16,11 @@ import sys
 from boto3.session import Session
 import os
 import json
+from django.http import JsonResponse
+from forms import UploadFileForm
+from boto3.session import Session
+from boto.s3.connection import S3Connection
+from boto.s3.key import Key
 """reload intepretor, add credential path"""
 reload(sys)
 sys.setdefaultencoding('UTF8')
@@ -25,6 +30,11 @@ sys.setdefaultencoding('UTF8')
 print "path: " + os.path.dirname(sys.path[0])
 with open(os.path.dirname(sys.path[0])+ '/Asite' + '/availabook/AppCreds/AWSAcct.json','r') as AWSAcct:
     awsconf = json.loads(AWSAcct.read())
+#setup the bucket
+#conn = S3Connection('<aws access key>', '<aws secret key>')
+conn = S3Connection(awsconf["aws_access_key_id"], awsconf["aws_secret_access_key"])
+bucket = conn.get_bucket('image-availabook')
+
 
 dynamodb_session = Session(aws_access_key_id=awsconf["aws_access_key_id"],
               aws_secret_access_key=awsconf["aws_secret_access_key"],
@@ -176,10 +186,6 @@ def user_exists(username):
     return True
 
 
-def fa_logout(request):
-    return HttpResponse()
-
-
 def logout(request):
     ''' logout and redirect'''
     if request.user.is_authenticated():
@@ -187,50 +193,38 @@ def logout(request):
         auth_logout(request)
     return redirect('/availabook/home')
 
-
-# def get_image_by_id(id):
-#         response = user_table.get_item(
-#             Key={
-#                 'email': id
-#             }
-#         )
-#         if 'Item' in response:
-#             return response['Item']['picture']
-#         return None
-
-
-# def update_image_by_id(id, link):
-#     try:
-#         response = table.update_item(
-#         Key={
-#             'id': id
-#         },
-#         UpdateExpression="set user.picture = :r",
-#         ExpressionAttributeValues={
-#             ':r': link
-#         },
-#         ReturnValues="UPDATED_NEW"
-#             )
-#         print("UpdateItem succeeded:")
-#         return True
-#     except Exception as e:
-#         print e
-#         return False
-
-
 def profile(request):
     if request.user.is_authenticated():
         print "views profile"
-        link = Users.get_image_by_id(request.user.username)
-        print link
-        return render(request, 'profile.html', {'link':link, 'logedin': True})
+        # link = Users.get_image_by_id(request.user.username)
+        # print link
+        item = Users.get_user_info(request.user.username)
+        if item is None:
+            return redirect("/availabook/home")
+        link = item['picture']
+        fname = item['first_name']
+        lname = item['last_name']
+        city = item['city']
+        zipcode = item['zipcode']
+        age = item['age']
+        print {'fname':fname,'lname':lname,'city':city,'age':age,'zipcode':zipcode}
+        return render(request, 'profile.html', {'link':link, 'logedin': True, 'fname':fname,'lname':lname,'city':city,'age':age,'zipcode':zipcode})
     else:
         return redirect("/availabook/home")
 
-from django.http import JsonResponse
+
 def info(request):
     print "info"
-    return JsonResponse({'fname':'jiamin','lname':'huang','city':'ny','age':'21','zipcode':'10027'})
+    item = Users.get_user_info(request.user.username)
+    if item is None:
+        return redirect("/availabook/home")
+    fname = item['first_name']
+    lname = item['last_name']
+    city = item['city']
+    zipcode = item['zipcode']
+    age = item['age']
+    print "info send json", {'fname':fname,'lname':lname,'city':city,'age':age,'zipcode':zipcode}
+    return JsonResponse({'fname':fname,'lname':lname,'city':city,'age':age,'zipcode':zipcode})
 
 def edit(request):
     print "edit"
@@ -245,7 +239,6 @@ def edit(request):
         Signup.update_to_dynamodb(uid, fname, lname, age, city, zipcode)
     except Exception as e:
         print e
-    print "?"
     return JsonResponse({'fname':fname,'lname':lname,'city':city,'age':age,'zipcode':zipcode})
 
 
@@ -273,10 +266,10 @@ def upload(request):
         else:
             print 'invalid form'
             print form.errors
-
-    return render(request, 'profile.html', {
-        'link':profile_link
-    })
+    return redirect("/availabook/profile")
+    # return render(request, 'profile.html', {
+    #     'link':profile_link
+    # })
 
 
 def post_event(request):

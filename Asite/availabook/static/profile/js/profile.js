@@ -1,6 +1,16 @@
 $(document).ready(function() {
 
-  console.log("profile ready");
+    console.log("profile ready");
+
+
+    $("#file-input").on("change", function() {
+        $("#formid").submit();
+});
+    // document.getElementById('fn').innerHTML=response.fname;
+    // document.getElementById('ln').innerHTML=response.lname;
+    // document.getElementById('age').innerHTML=response.age;
+    // document.getElementById('ct').innerHTML=response.city;
+    // document.getElementById('zip').innerHTML=response.zipcode;
 
     $('#userForm').formValidation({
             framework: 'bootstrap',

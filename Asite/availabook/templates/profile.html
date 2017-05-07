@@ -196,21 +196,22 @@
                  <td><button type="button" data-id="1" id="editButton" class="btn btn-default editButton">Edit Personal Info</button></td>
                   <hr>
                   <h3><strong>First Name</strong></h3>
-                  <p><div id="fn">Kuang</div></p>
+                  {% if fname %}
+                  <p><div id="fn">{{fname}}</div></p>
                   <hr>
                   <h3><strong>Last Name</strong></h3>
-                  <p><div id="ln">Yang</div></p>
+                  <p><div id="ln">{{lname}}</div></p>
                   <hr>
                   <h3><strong>Age</strong></h3>
-                  <p><div id="age">22</div></p>
+                  <p><div id="age">{{age}}</div></p>
                   <hr>
                   <h3><strong>City</strong></h3>
-                  <p><div id="ct">New York</div></p>
+                  <p><div id="ct">{{city}}</div></p>
                   <hr>
                   <h3><strong>Zipcode</strong></h3>
-                  <p><div id="zip">10025</div></p>
+                  <p><div id="zip">{{zipcode}}</div></p>
     
-
+                  {% endif %}
           
 <form id="userForm" method="post" class="form-horizontal" style="display: none;">
     <div class="form-group">

@@ -79,6 +79,19 @@ class Users():
     def authorize(self):
         self.verified = True
 
+
+
+    @staticmethod
+    def get_user_info(uid):
+        response = user_table.get_item(
+            Key={
+                'email': uid
+            }
+        )
+        if 'Item' in response:
+            return response['Item']
+        return None
+
     @staticmethod
     def get_image_by_id(id):
         response = user_table.get_item(
@@ -91,11 +104,11 @@ class Users():
         return None
 
     @staticmethod
-    def update_image_by_id(id, link):
+    def update_image_by_id(uid, link):
         try:
             response = user_table.update_item(
             Key={
-                'email': id
+                'email': uid
             },
             UpdateExpression="set picture = :r",
             ExpressionAttributeValues={
