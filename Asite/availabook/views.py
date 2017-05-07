@@ -165,7 +165,7 @@ def logout(request):
 
 def profile(request):
     print "views profile"
-    return render(request, 'profile2.html')
+    return render(request, 'profile2.html', {'link':'https://s3.amazonaws.com/image-availabook/default'})
 
 def upload(request):
     print "uploading"
