@@ -232,8 +232,8 @@ def recommend_item(Cid):
                 recommendation_list.append(event)
     return recommendation_list
 
-if __name__ == '__main__':
-    recommendlist1 = common()
-    print recommendlist1
-    recommendlist2 = recommend("ky2342@columbia.edu")
-    print recommendlist2
+#if __name__ == '__main__':
+#    recommendlist1 = common()
+#    print recommendlist1
+#    recommendlist2 = recommend("ky2342@columbia.edu")
+#    print recommendlist2
