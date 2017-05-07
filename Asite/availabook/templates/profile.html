@@ -1,26 +1,29 @@
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Availabook Social Network: Profile Page</title>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Availabook Social Network: Profile Page</title>
 
     <!-- Bootstrap core CSS -->
-    {% load static %}
-    <link href="{% static 'profle/css/bootstrap.css' %}" rel="stylesheet">
+  {% load static %}
+  <link href="{% static 'profile/css/bootstrap.css' %}" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    {% load static %}
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
-    {% load static %}
-    <link href="{% static 'css/font-awesome.css' %}" rel="stylesheet">
-  </head>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="https://bootswatch.com/cosmo/bootstrap.min.css">
-  <body>
+  {% load static %}
+  <link href="{% static 'profile/css/new.css' %}" rel="stylesheet">
+  {% load static %}
+  <link href="{% static 'profile/fonts/css/font-awesome.css' %}" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://bootswatch.com/cosmo/bootstrap.min.css">
+
+</head>
+
+<body>
 
 <div class="mainbody container-fluid">
     <div class="row">
@@ -480,7 +483,7 @@
 </div>
 
 </body>
-  
+
 
     <footer>
       <div class="container">
@@ -492,6 +495,8 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="profile/js/bootstrap.js"></script>
+
+    {% load static %}
+    <script src= "{% static 'profile/js/profile.js' %}" ></script>
   </body>
 </html>
