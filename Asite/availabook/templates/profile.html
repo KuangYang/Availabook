@@ -163,42 +163,45 @@
 
   <div class="mainbody container-fluid">
     <div class="row">
-        <div style="padding-top:50px;"> </div>
-          <div class="col-sm-4">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <div class="media">
-                        <div align="center">
-                            <form id='formid' method="post" enctype="multipart/form-data" action = "{% url 'availabook:upload' %}"> {% csrf_token %}
-                            <div class="image-upload">
-                            <label for="file-input">
-                            {% if link %}
-                            <img src="{{link}}" height="350" width="350"/>
-                            {% else %}
-                            <img src="https://s3.amazonaws.com/image-availabook/default" height="350" width="350"/>
-                            {% endif %}
-                            </label>
-                          <input id="file-input" style="display: none;" type="file" name='pic'/>
-                             </div>
-                            </form>
-                        </div>
-                        <div class="media-body">
-                            <hr>
-                            <h3><strong>Bio</strong></h3>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vel gravida metus, non ultrices sapien. Morbi odio metus, dapibus non nibh id amet.</p>
-                            <hr>
-                            <h3><strong>Location</strong></h3>
-                            <p>Earth</p>
-                            <hr>
-                            <h3><strong>Gender</strong></h3>
-                            <p>Unknown</p>
-                            <hr>
-                            <h3><strong>Birthday</strong></h3>
-                            <p>January 01 1901</p>
-                        </div>
+      <div style="padding-top:50px;"> </div>
+        <div class="col-sm-4">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <div class="media">
+                <div align="center">
+                  <form id='formid' method="post" enctype="multipart/form-data" action = "{% url 'availabook:upload' %}"> {% csrf_token %}
+                    <div class="image-upload">
+                      <label for="file-input">
+                        {% if link %}
+                        <img src="{{link}}" height="350" width="350"/>
+                        {% else %}
+                        <img src="https://s3.amazonaws.com/image-availabook/default" height="350" width="350"/>
+                        {% endif %}
+                      </label>
+                      <input id="file-input" style="display: none;" type="file" name='pic'/>
                     </div>
+                  </form>
                 </div>
+                <div class="media-body">
+                  <hr>
+                  <h3><strong>First Name</strong></h3>
+                  <p>Kuang</p>
+                  <hr>
+                  <h3><strong>Last Name</strong></h3>
+                  <p>Yang</p>
+                  <hr>
+                  <h3><strong>Age</strong></h3>
+                  <p>22</p>
+                  <hr>
+                  <h3><strong>City</strong></h3>
+                  <p>New York</p>
+                  <hr>
+                  <h3><strong>Zipcode</strong></h3>
+                  <p>10025</p>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
         <div class="col-md-9">
             <div class="panel panel-default">
