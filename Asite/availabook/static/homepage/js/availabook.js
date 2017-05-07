@@ -1,6 +1,37 @@
 $(document).ready(function() {
     console.log("ready!");
 
+    $("#like_btn").on("click", function() {
+        console.log("Like!");
+
+        $.ajax({
+            url : "/availabook/get_fave/",
+            type : "POST",
+            data : {
+                fave : $("#like_btn").val()
+            },
+
+            success : function(msg) {
+                console.log(msg.EId);
+                console.log(msg.fave_num);
+                //$("body").html(msg);
+                if (msg.EId != "" && msg.fave_num != "") {
+                    console.log(msg.EId);
+                    console.log(msg.fave_num);
+                    document.getElementById(msg.EId).innerHTML=msg.fave_num + "-likes";
+                    console.log("Like success!");
+                    //window.location.reload();
+                } else {
+                    alert("Please log in first!");
+                }
+            },
+
+            error : function(xhr,errmsg,err) {
+                console.log("Like " + errmsg);
+            }
+        });
+    });
+
     $("#home_logout_btn").on("click", function() {
         console.log("logout!");
         $.ajax({
@@ -19,7 +50,7 @@ $(document).ready(function() {
         })
     })
 
-        $("#home_profile_btn").on("click", function() {
+    $("#home_profile_btn").on("click", function() {
         console.log("profile!");
         $.ajax({
             url : "/availabook/profile/",
@@ -121,18 +152,30 @@ $(document).ready(function() {
 
             success : function(msg) {
                 //$("body").html(msg);
-                $("#post_content").val("");
-                $("#dateandtime").val("");
-                console.log("Put success!");
-                window.location.reload();
+                console.log(msg);
+                if (!msg) {
+                    $("#post_content").val("");
+                    $("#dateandtime").val("");
+                    console.log("Put success!");
+                    //window.location.reload();
+                } else {
+                    alert("Please log in first!");
+                }
             },
 
             error : function(xhr,errmsg,err) {
-                console.log("logout" + errmsg);
+                console.log("Post" + errmsg);
             }
-        })
+        });
     });
 
+    $("#like_btn").mouseup(function(){
+        $(this).blur();
+    });
+
+    $("#outer_post_btn").mouseup(function(){
+        $(this).blur();
+    });
 
     // Get the modal and when the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {

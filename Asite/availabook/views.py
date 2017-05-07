@@ -219,6 +219,7 @@ def info(request):
     print "info send json", {'fname':fname,'lname':lname,'city':city,'age':age,'zipcode':zipcode}
     return JsonResponse({'fname':fname,'lname':lname,'city':city,'age':age,'zipcode':zipcode})
 
+
 def edit(request):
     print "edit"
     fname = request.POST.get("fname")
@@ -266,23 +267,31 @@ def upload(request):
 
 
 def post_event(request):
-    print('post event')
-    content = request.POST.get("post_content")
-    print(content)
-    event_date, event_time = request.POST.get("dateandtime").split("T")
-    print(event_date,event_time)
-    username = request.user.username
-    print(username)
-    timestamp = time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time()))
-    EId = str(uuid.uuid4())
-    put_event_into_db(EId=EId, content=content,date=event_date,time=event_time,label='movie',fave=[], place='beijing',timestamp=timestamp,user_email=username)
-    return redirect('/availabook/home')
+    if request.user.is_authenticated():
+        print('post event')
+        content = request.POST.get("post_content")
+        print(content)
+        event_date, event_time = request.POST.get("dateandtime").split("T")
+        print(event_date,event_time)
+        username = request.user.username
+        print(username)
+        timestamp = time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time()))
+        EId = str(uuid.uuid4())
+        put_event_into_db(EId=EId, content=content,date=event_date,time=event_time,label='movie',fave=[], place='beijing',timestamp=timestamp,user_email=username)
+        return redirect('/availabook/home')
+    else:
+        print "Please log in first!"
+        return HttpResponse(None)
 
 
 def get_fave(request):
-    EId = request.POST.get("fave")
-    print(EId)
-    event = get_event_by_EId(EId)
-    event = Event(event)
-    event.add_fave(request.user.username)
-    return redirect('/availabook/home')
+    if request.user.is_authenticated():
+        EId = request.POST.get("fave")
+        print(EId)
+        event = get_event_by_EId(EId)
+        event = Event(event)
+        event.add_fave(request.user.username)
+        return JsonResponse({"EId" : EId, "fave_num" : event.fave_num})
+    else:
+        print "Please log in first!"
+        return JsonResponse({"EId" : "", "fave_num" : ""})
