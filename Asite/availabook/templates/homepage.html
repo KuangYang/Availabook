@@ -36,167 +36,97 @@
 
 <!-- Navigation -->
   <div class="navbar navbar-blue navbar-static-top">
-                    <div class="navbar-header">
-                      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                      </button>
-                      <!-- <a href="/" class="navbar-brand logo">AB</a> -->
-                      <a href="/availabook" class="navbar-brand topnav" onclick="fbLogoutUser();" display="inline-block" style="margin-top:11px"><font color="white">Availabook</font></a>
-                    </div>
-                    <nav class="collapse navbar-collapse" role="navigation">
-                    <form class="navbar-form navbar-left">
-                        <div class="input-group input-group-sm" style="max-width:360px;">
-                          <input type="text" class="form-control" placeholder="Search" style="margin-top:4px;" name="srch-term" id="srch-term">
-                          <div class="input-group-btn">
-                            <button class="btn btn-default" type="submit" style="margin-top:4px;"><i class="glyphicon glyphicon-search"></i></button>
-                          </div>
-                        </div>
-                    </form>
-                    <ul class="nav navbar-nav">
-                      <li>
-                        <a style="font-size:15px;" href="/availabook/home"><i class="glyphicon glyphicon-home" style="font-size:22px;"></i> Home</a>
-                      </li>
-                      <li>
-                        <a href="#postModal" style="font-size:15px;" role="button" data-toggle="modal"><i class="glyphicon glyphicon-plus" style="font-size:22px;"></i> Post</a>
-                      </li>
-                    </ul>
-                    <ul class="nav navbar-nav">
-                      <li class="dropdown">
-                        <a href="/availabook/profile" style="font-size:22px;"><i class="glyphicon glyphicon-user"></i></a>
-                        <!-- <ul class="dropdown-menu">
-                          <li><a href="">More</a></li>
-                          <li><a href="">More</a></li>
-                          <li><a href="">More</a></li>
-                          <li><a href="">More</a></li>
-                          <li><a href="">More</a></li>
-                        </ul> -->
-                      </li>
-                    </ul>
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <!-- <a href="/" class="navbar-brand logo">AB</a> -->
+      <a href="/availabook" class="navbar-brand topnav" onclick="fbLogoutUser();" display="inline-block" style="margin-top:11px"><font color="white">Availabook</font></a>
+    </div>
+    <nav class="collapse navbar-collapse" role="navigation">
+      <form class="navbar-form navbar-left">
+        <div class="input-group input-group-sm" style="max-width:360px;">
+          <input type="text" class="form-control" placeholder="Search" style="margin-top:4px;" name="srch-term" id="srch-term">
+          <div class="input-group-btn">
+            <button class="btn btn-default" type="submit" style="margin-top:4px;"><i class="glyphicon glyphicon-search"></i></button>
+          </div>
+        </div>
+      </form>
 
+      <ul class="nav navbar-nav">
+        <li>
+          <a style="font-size:15px;" href="/availabook/home"><i class="glyphicon glyphicon-home" style="font-size:22px;"></i> Home</a>
+        </li>
+        <li>
+          <a href="#postModal" style="font-size:15px;" role="button" data-toggle="modal"><i class="glyphicon glyphicon-plus" style="font-size:22px;"></i> Post</a>
+        </li>
+      </ul>
 
-                    <ul class="nav navbar-nav navbar-right">
-          {% if not logedin %}
-          <button id="home_login_btn" style="margin-top:11px;margin-right:20px;" onclick="document.getElementById('login').style.display='block'"  class="btn btn-default btn-sm"><i class="fa fa-sign-in fa-fw"></i> <span class="network-name">Login</span></button>
-          {% endif %}
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+          <a href="/availabook/profile" style="font-size:22px;"><i class="glyphicon glyphicon-user"></i></a>
+          <!-- <ul class="dropdown-menu">
+          <li><a href="">More</a></li>
+          <li><a href="">More</a></li>
+          <li><a href="">More</a></li>
+          <li><a href="">More</a></li>
+          <li><a href="">More</a></li>
+          </ul> -->
+        </li>
+      </ul>
 
-          {% if not logedin %}
-          <button id="home_signup_btn" style="margin-bottom:-3px;margin-right:20px;" onclick="document.getElementById('signup').style.display='block'"  class="btn btn-default btn-sm"><i class="fa fa-cloud fa-fw"></i> <span class="network-name">Sign up</span></button>
-          {% endif %}
-      <!-- <form class="form-inline">
-        <a href="{% url 'availabook:logout' %}" style="color:white">Logout</a> {% csrf_token %}
-      </form> -->
-          {% if logedin %}
-          <button id="home_logout_btn" style="margin-bottom:5px;margin-right:19px;" class="btn btn-default" onclick="fbLogoutUser();"><i class="fa fa-rocket fa-fw"></i> <span class="network-name">Logout</span></button>
+      <ul class="nav navbar-nav navbar-right">
+        {% if not logedin %}
+        <button id="home_login_btn" style="margin-top:11px;margin-right:20px;" onclick="document.getElementById('login').style.display='block'"  class="btn btn-default btn-sm"><i class="fa fa-sign-in fa-fw"></i> <span class="network-name">Login</span></button>
+        {% endif %}
 
-<!--           <form action="/availabook/profile">
-          <button style="margin-bottom:5px;margin-right:19px;" class="btn btn-default" ><i class="fa fa-rocket fa-fw"></i> <span class="network-name">Profile</span></button></form> -->
-           <!-- <div id="home_logout_btn" class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="True" data-use-continue-as="false"></div>
-                    </div> -->
+        {% if not logedin %}
+        <button id="home_signup_btn" style="margin-bottom:-3px;margin-right:20px;" onclick="document.getElementById('signup').style.display='block'"  class="btn btn-default btn-sm"><i class="fa fa-cloud fa-fw"></i> <span class="network-name">Sign up</span></button>
+        {% endif %}
 
-<!--           <button id="home_logout_btn" style="margin-top:10px;margin-right:19px;" class="btn btn-default btn-sm" onclick="fbLogoutUser();"><i class="fa fa-rocket fa-fw"></i> <span class="network-name">Logout</span></button> -->
+        {% if logedin %}
+        <button id="home_logout_btn" style="margin-top:10px;margin-right:19px;" class="btn btn-default" onclick="fbLogoutUser();"><i class="fa fa-rocket fa-fw"></i> <span class="network-name">Logout</span></button>
+        {% endif %}
+      </ul>
 
-          {% endif %}
-        </ul>
-
-                    </nav>
-                </div>
+    </nav>
+  </div>
 
 <body>
 <script>
-
-   // This is called with the results from from FB.getLoginStatus().
-  // function statusChangeCallback(response) {
-  //   console.log('statusChangeCallback');
-  //   console.log(response);
-  //   // The response object is returned with a status field that lets the
-  //   // app know the current login status of the person.
-  //   // Full docs on the response object can be found in the documentation
-  //   // for FB.getLoginStatus().
-  //   if (response.status === 'connected') {
-  //     // Logged into your app and Facebook.
-  //     testAPI();
-  //   } else {
-  //     console.log("else: not connected")
-  //     // The person is not logged into your app or we are unable to tell.
-  //     document.getElementById('status').innerHTML = 'Please log ' +
-  //       'into this app.';
-  //   }
-  // }
-
-  // This function is called when someone finishes with the Login
-  // Button.  See the onlogin handler attached to it in the sample
-  // code below.
-  // function checkLoginState() {
-  //   console.log("here");
-  //   FB.getLoginStatus(function(response) {
-  //     statusChangeCallback(response);
-  //   });
-  // }
-
   window.fbAsyncInit = function() {
-  FB.init({
-    appId      : '369715696758161',
-    cookie     : true,  // enable cookies to allow the server to access
-                        // the session
-    xfbml      : true,  // parse social plugins on this page
-    version    : 'v2.8' // use graph api version 2.8
-  });
-
-  // Now that we've initialized the JavaScript SDK, we call
-  // FB.getLoginStatus().  This function gets the state of the
-  // person visiting this page and can return one of three states to
-  // the callback you provide.  They can be:
-  //
-  // 1. Logged into your app ('connected')
-  // 2. Logged into Facebook, but not your app ('not_authorized')
-  // 3. Not logged into Facebook and can't tell if they are logged into
-  //    your app or not.
-  //
-  // These three cases are handled in the callback function.
-
-  // FB.getLoginStatus(function(response) {
-  //   statusChangeCallback(response);
-  // });
-
-
+      FB.init({
+          appId      : '369715696758161',
+          cookie     : true,  // enable cookies to allow the server to access the session
+          xfbml      : true,  // parse social plugins on this page
+          version    : 'v2.8' // use graph api version 2.8
+      });
   };
 
   // Load the SDK asynchronously
   (function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.9&appId=369715696758161";
-    fjs.parentNode.insertBefore(js, fjs);
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.9&appId=369715696758161";
+      fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));
 
-  // Here we run a very simple test of the Graph API after login is
-  // successful.  See statusChangeCallback() for when this call is made.
-  // function testAPI() {
-  //   console.log('Welcome!  Fetching your information.... ');
-  //   FB.api('/me?fields=email,age_range,timezone,locale, name,first_name, last_name, picture', function(response) {
-  //     console.log(response);
-  //     console.log('Successful login for: ' + response.name);
-  //   });
-  // }
-
   function fbLogoutUser() {
-    FB.getLoginStatus(function(response) {
-        console.log("getLoginStatus");
-        if (response && response.status === 'connected') {
-            FB.logout(function(response) {
-              console.log("logging out");
-              FB.Auth.setAuthResponse(null, 'unknown');
-              document.location.reload();
-            });
-        }
-    });
-}
-
-
+      FB.getLoginStatus(function(response) {
+          console.log("getLoginStatus");
+          if (response && response.status === 'connected') {
+              FB.logout(function(response) {
+                  console.log("logging out");
+                  FB.Auth.setAuthResponse(null, 'unknown');
+                  document.location.reload();
+              });
+          }
+      });
+  }
 </script>
 
   <!--post modal-->
