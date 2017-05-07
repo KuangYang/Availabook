@@ -120,7 +120,7 @@ def returnUser(email):
     if (len(set(rating_list)) <= 1):
         return newUser(email)
     else:
-        pass
+        return get_returnUser_recommend(email)
 
 
 def isExpired(date, time):
@@ -179,8 +179,61 @@ def common():
     return eventList
 
 
-# if __name__ == '__main__':
-#     recommendlist1 = common()
-#     print recommendlist1
-#     recommendlist2 = recommend("ky2342@columbia.edu")
-#     print recommendlist2
+# get score
+def user_based_similarity():
+    tb_preference = dynamodb.Table("Preference")
+    raw = tb_preference.scan()
+    data = raw['Items']
+    cols_count, rows_count = 10, len(data)
+    matrix = [[0 for x in range(cols_count)] for y in range(rows_count)]
+    for i in range(0, len(data)):
+        rating =  data[i]['rating']
+        for j in range(0, 10):
+            matrix[i][j] = int(rating[j])
+    train = np.array(matrix)
+
+    user_similarity = pairwise_distances(train, metric='cosine')
+    mean_user_rating = train.mean(axis=1)
+    ratings_diff = (train - mean_user_rating[:, np.newaxis])
+    pred_user = mean_user_rating[:, np.newaxis] + user_similarity.dot(ratings_diff) / np.array(
+        [np.abs(user_similarity).sum(axis=1)]).T
+    return pred_user
+
+def get_returnUser_recommend(email):
+    tb_preference = dynamodb.Table("Preference")
+    raw = tb_preference.scan()
+    data = raw['Items']
+    matrix = user_based_similarity()
+    length = len(data)
+    list = []
+    for i in range(0, length):
+        if data[i]['email'] == email:
+            list = matrix[i]
+    max_index, max_value = max(enumerate(list), key=operator.itemgetter(1))
+    cluster_id = max_index
+    return recommend_item(cluster_id)
+
+def recommend_item(Cid):
+    tb_event = dynamodb.Table("Event")
+    recommendation_list = []
+    events = tb_event.scan()
+    eventlist = events['Items']
+    for event in eventlist:
+        clusterlist = event['label']
+        if clusterlist[6] >= sum(clusterlist) / len(clusterlist):
+            res_5 = tb_event.get_item(
+                Key={
+                    'EId': event['EId']
+                }
+            )
+            date = res_5['Item']['date']
+            time = res_5['Item']['time']
+            if isExpired(date, time) == False:
+                recommendation_list.append(event)
+    return recommendation_list
+
+if __name__ == '__main__':
+    recommendlist1 = common()
+    print recommendlist1
+    recommendlist2 = recommend("ky2342@columbia.edu")
+    print recommendlist2
