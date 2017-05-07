@@ -53,12 +53,12 @@ def newUser(email):
             'email': email
         }
     )
-    location = res_1['Item']['city']
+    location = res_1['Item']['zipcode']
     res_2 = tb_event.scan(
-        FilterExpression=Attr('place').eq(location),
+        FilterExpression=Attr('zipcode').eq(location),
     )
     res_2_diff = tb_event.scan(
-        FilterExpression=Attr('place').ne(location),
+        FilterExpression=Attr('zipcode').ne(location),
     )
     items = res_2['Items']
     items_diff = res_2_diff['Items']
@@ -186,9 +186,7 @@ def common():
 
 
 # if __name__ == '__main__':
-    # if not login
-    # recommendlist1 = common()
-    # print recommendlist1
-    # if login
-    # recommendlist2 = recommend("xx@aa.gmail")
-    # print recommendlist2
+#     recommendlist1 = common()
+#     print recommendlist1
+#     recommendlist2 = recommend("ky2342@columbia.edu")
+#     print recommendlist2
