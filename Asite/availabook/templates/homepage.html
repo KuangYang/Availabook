@@ -89,16 +89,15 @@
         <a href="{% url 'availabook:logout' %}" style="color:white">Logout</a> {% csrf_token %}
       </form> -->
           {% if logedin %}
-<<<<<<< HEAD
           <button id="home_logout_btn" style="margin-bottom:5px;margin-right:19px;" class="btn btn-default" onclick="fbLogoutUser();"><i class="fa fa-rocket fa-fw"></i> <span class="network-name">Logout</span></button>
 
-          <form action="/availabook/profile">
-          <button style="margin-bottom:5px;margin-right:19px;" class="btn btn-default" ><i class="fa fa-rocket fa-fw"></i> <span class="network-name">Profile</span></button></form>
+<!--           <form action="/availabook/profile">
+          <button style="margin-bottom:5px;margin-right:19px;" class="btn btn-default" ><i class="fa fa-rocket fa-fw"></i> <span class="network-name">Profile</span></button></form> -->
            <!-- <div id="home_logout_btn" class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="True" data-use-continue-as="false"></div>
                     </div> -->
-=======
+
           <button id="home_logout_btn" style="margin-top:10px;margin-right:19px;" class="btn btn-default btn-sm" onclick="fbLogoutUser();"><i class="fa fa-rocket fa-fw"></i> <span class="network-name">Logout</span></button>
->>>>>>> 3aeaa0677657321953dafdd3fbf08304755c16b9
+
           {% endif %}
         </ul>
 
