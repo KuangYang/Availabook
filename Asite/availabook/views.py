@@ -54,6 +54,7 @@ def home(request):
     else:
         return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
 
+
 @csrf_exempt
 def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
     print "fb_login"
@@ -105,6 +106,7 @@ def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
         except Exception as e:
             print e
             return redirect(onfail)
+
 
 def login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
     csrf_token = csrf.get_token(request)
@@ -172,8 +174,10 @@ def user_exists(username):
         return False
     return True
 
+
 def fa_logout(request):
     return HttpResponse()
+
 
 def logout(request):
     ''' logout and redirect'''
@@ -181,6 +185,7 @@ def logout(request):
         print str(request.user.username) + " is logged out!"
         auth_logout(request)
     return redirect('/availabook/home')
+
 
 def get_image_by_id(id):
         response = user_table.get_item(
@@ -191,6 +196,7 @@ def get_image_by_id(id):
         if 'Item' in response:
             return response['Item']['picture']
         return None
+
 
 def update_image_by_id(id, link):
     try:
@@ -210,11 +216,16 @@ def update_image_by_id(id, link):
         print e
         return False
 
+
 def profile(request):
-    print "views profile"
-    link = get_image_by_id(request.user.username)
-    print link
-    return render(request, 'profile.html', {'link':link})
+    if request.user.is_authenticated():
+        print "views profile"
+        link = get_image_by_id(request.user.username)
+        print link
+        return render(request, 'profile.html', {'link':link, 'logedin': True})
+    else:
+        return redirect("/availabook/home")
+
 
 def upload(request):
     print "uploading"
@@ -245,6 +256,7 @@ def upload(request):
         'link':profile_link
     })
 
+
 def post_event(request):
     print('post event')
     content = request.POST.get("post_content")
@@ -257,6 +269,7 @@ def post_event(request):
     EId = str(uuid.uuid4())
     put_event_into_db(EId=EId, content=content,date=event_date,time=event_time,label='movie',fave=[], place='beijing',timestamp=timestamp,user_email=username)
     return redirect('/availabook/home')
+
 
 def get_fave(request):
     EId = request.POST.get("fave")
