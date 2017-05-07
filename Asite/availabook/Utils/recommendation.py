@@ -187,7 +187,7 @@ def common():
 
 if __name__ == '__main__':
     # if not login
-    print common()
-    print ("\n")
+    # print common()
+    # print ("\n")
     # if login
-    print recommend("test@gmail.com")
+    print newUser("test@gmail.com")
