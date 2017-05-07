@@ -14,7 +14,25 @@ $(document).ready(function() {
             },
 
             error : function(xhr,errmsg,err) {
-                console.log("logout" + errmsg);
+                console.log("logout " + errmsg);
+            }
+        })
+    })
+
+        $("#home_profile_btn").on("click", function() {
+        console.log("profile!");
+        $.ajax({
+            url : "/availabook/profile/",
+            type : "GET",
+
+            success : function(msg) {
+                //$("body").html(msg);
+                console.log("profile success!");
+                window.location.reload();
+            },
+
+            error : function(xhr,errmsg,err) {
+                console.log("profile " + errmsg);
             }
         })
     })
@@ -101,3 +119,11 @@ $(document).ready(function() {
         }
     };
 });
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+
+$(function () {
+  $('[data-toggle="popover"]').popover()
+})

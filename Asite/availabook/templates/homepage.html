@@ -62,6 +62,9 @@
       </form> -->
           {% if logedin %}
           <button id="home_logout_btn" style="margin-bottom:5px;margin-right:19px;" class="btn btn-default" onclick="fbLogoutUser();"><i class="fa fa-rocket fa-fw"></i> <span class="network-name">Logout</span></button>
+
+          <form action="/availabook/profile">
+          <button style="margin-bottom:5px;margin-right:19px;" class="btn btn-default" ><i class="fa fa-rocket fa-fw"></i> <span class="network-name">Profile</span></button></form>
            <!-- <div id="home_logout_btn" class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="True" data-use-continue-as="false"></div>
                     </div> -->
           {% endif %}

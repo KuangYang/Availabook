@@ -1,38 +1,23 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-
+  <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
 
-    <title>Landing Page - Availabook</title>
-    {% load static %}
-    <link rel="shortcut icon" href="{% static 'img/group.png' %}">
+    <title>Availabook Social Network: Profile Page</title>
 
-    <!-- Bootstrap Core CSS -->
+    <!-- Bootstrap core CSS -->
     {% load static %}
     <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    {% load static %}
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
-
-    <!-- Custom CSS -->
     {% load static %}
-    <link href="{% static 'css/landing-page.css' %}" rel="stylesheet">
-    {% load static %}
-
-
-    <!-- Custom Fonts -->
-    {% load static %}
-    <link href="{% static 'fonts/css/font-awesome.css' %}" rel="stylesheet" type="text/css">
-
-    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
-
-</head>
-
-
+    <link href="{% static 'css/font-awesome.css' %}" rel="stylesheet">
+  </head>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://bootswatch.com/cosmo/bootstrap.min.css">
 <div class="mainbody container-fluid">
@@ -482,52 +467,4 @@
         </div>
     </div>
 </div>
-
-
-<body>
-
-
-
-
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <ul class="list-inline">
-                        <li>
-                            <a href="#">Home</a>
-                        </li>
-                        <li class="footer-menu-divider">&sdot;</li>
-                        <li>
-                            <a href="#about">About</a>
-                        </li>
-                        <li class="footer-menu-divider">&sdot;</li>
-                        <li>
-                            <a href="#services">Services</a>
-                        </li>
-                        <li class="footer-menu-divider">&sdot;</li>
-                        <li>
-                            <a href="#contact">Contact</a>
-                        </li>
-                    </ul>
-                    <p class="copyright text-muted small">Copyright &copy; Availabook 2017. All Rights Reserved</p>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-
-    {% load static %}
-    <script src= "{% static 'js/bootstrap.js' %}"></script>
-    {% load static %}
-    <script src= "{% static 'js/availabook.js' %}"></script>
-    {% load static %}
-    <script src= "{% static 'js/csrf.js' %}"></script>
-
-
-  </body>
 </html>

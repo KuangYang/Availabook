@@ -164,8 +164,35 @@ def logout(request):
 
 
 def profile(request):
-    return render(request, 'profile.html')
+    print "views profile"
+    return render(request, 'profile2.html')
 
+def upload(request):
+    print "uploading"
+    profile_link = ""
+    if request.method == 'POST':
+        print "posting"
+        print request.POST
+        #print type(request.FILES['pic'].get('content_type'))
+        #print type(request.FILES['pic']['file'])
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            print 'valid form'
+            k = Key(bucket)
+            k.key = request.user.username
+            k.set_contents_from_file(request.FILES['pic'])
+            print "upload!"
+            profile_link = "https://s3.amazonaws.com/image-availabook/" + request.user.username
+            profile_link = profile_link.replace('@','%40')
+            print profile_link
+            #print k.get_contents_to_filename
+        else:
+            print 'invalid form'
+            print form.errors
+
+    return render(request, 'profile2.html', {
+        'link':profile_link
+    })
 
 def post_event(request):
     print('post event')
@@ -179,7 +206,6 @@ def post_event(request):
     EId = str(uuid.uuid4())
     put_event_into_db(EId=EId, content=content,date=event_date,time=event_time,label='movie',fave=[], place='beijing',timestamp=timestamp,user_email=username)
     return redirect('/availabook/home')
-
 
 def get_fave(request):
     EId = request.POST.get("fave")
