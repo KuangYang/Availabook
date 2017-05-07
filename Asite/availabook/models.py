@@ -72,6 +72,16 @@ class Users():
         self.verified = True
 
 
+    def get_image_by_id(self, id):
+        response = user_table.get_item(
+            Key={
+                'email': id
+            }
+        )
+        if 'Item' in response:
+            return response['Item']['Picture']
+        return None
+
 class Signup():
     def __init__(self, user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode):
         self.id = user_id
