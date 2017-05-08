@@ -284,24 +284,24 @@ def para_tuning(user_vec,event_vec):
     ### use this function whenever a new like,not post!
     return normalize(user_vec + 0.05*event_vec)
 
-user_table = dynamodb.Table("User")
-response = user_table.get_item(
-        Key={
-            'email': 'xuexun1994@gmail.com'
-        }
-)
-print(response['Item'])
-x = str(np.random.rand())
-user_table.update_item(
-    Key={
-    'email': 'xuexun1994@gmail.com'
-},
-UpdateExpression='SET rating = :val1',
-ExpressionAttributeValues={
-    ':val1': [x,0,x,0,x,x,x,x,x,x],
-}
-)
-print(get_returnUser_recommend('xuexun1994@gmail.com'))
+# user_table = dynamodb.Table("User")
+# response = user_table.get_item(
+#         Key={
+#             'email': 'xuexun1994@gmail.com'
+#         }
+# )
+# print(response['Item'])
+# x = str(np.random.rand())
+# user_table.update_item(
+#     Key={
+#     'email': 'xuexun1994@gmail.com'
+# },
+# UpdateExpression='SET rating = :val1',
+# ExpressionAttributeValues={
+#     ':val1': [x,0,x,0,x,x,x,x,x,x],
+# }
+# )
+# print(get_returnUser_recommend('xuexun1994@gmail.com'))
 
 #if __name__ == '__main__':
 #    recommendlist1 = common()
