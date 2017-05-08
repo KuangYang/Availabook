@@ -44,7 +44,7 @@
         <span class="icon-bar"></span>
       </button>
       <!-- <a href="/" class="navbar-brand logo">AB</a> -->
-      <a href="/availabook" class="navbar-brand topnav" onclick="fbLogoutUser();" display="inline-block" style="margin-top:11px;color:#777;"><font>Availabook</font></a>
+      <a href="/availabook" class="navbar-brand topnav" display="inline-block" style="margin-top:11px;color:#777;"><font>Availabook</font></a>
     </div>
     <nav class="collapse navbar-collapse" role="navigation">
       <form class="navbar-form navbar-left">
@@ -227,7 +227,7 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default">
-          <div class="panel-heading">
+          <div class="panel-heading" style="background:#7a7a7a;">
             <h3 class="panel-title">Post Wall</h3>
           </div>
           <div class="panel-body">
@@ -251,9 +251,7 @@
           </div>
         </div>
 
-        <ul>
           {% for event, email, name, picture in zipped_list %}
-          <li>
             <div class="panel panel-default post">
               <div class="panel-body">
                 <div class="row">
@@ -283,11 +281,9 @@
                 </div>
               </div>
             </div>
-          </li>
           {% endfor %}
-        </ul>
 
-  <footer>
+  <footer style="border-top: 7px solid #7a7a7a;">
     <div class="container">
       <div class="row">
         <div class="col-lg-12">

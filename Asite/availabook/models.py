@@ -1,5 +1,6 @@
 from django.db import models
 from boto3.session import Session
+from boto3.dynamodb.conditions import Attr
 import os
 import sys
 import json
@@ -265,6 +266,21 @@ def get_user_info_from_eventlist(event_list):
             user_picture_list.append("https://s3.amazonaws.com/image-availabook/default")
 
     return user_email_list, user_name_list, user_picture_list
+
+
+def get_post_events_from_user(email):
+    posts_list = []
+    events_list = []
+
+    response = post_table.scan(
+        FilterExpression=Attr('email').eq(email)
+    )
+    if response:
+        posts_list = response['Items']
+        for post in posts_list:
+            events_list.append(Event(get_event_by_EId(post["EId"])))
+
+    return posts_list, events_list
 
 
 def get_event_by_EId(EId):
