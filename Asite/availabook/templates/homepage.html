@@ -78,6 +78,8 @@
         {% endif %}
 
         {% if logedin %}
+        <a class="navbar-brand topnav" onclick="fbLogoutUser();" display="inline-block" style="margin-top:11px;color:#777;"><font> Hi {{fname}}</font></a>
+        
         <button id="home_logout_btn" style="margin-top:10px;margin-right:19px;" class="btn btn-default" onclick="fbLogoutUser();"><i class="fa fa-rocket fa-fw"></i> <span class="network-name">Logout</span></button>
         {% endif %}
       </ul>

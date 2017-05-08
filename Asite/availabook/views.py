@@ -55,8 +55,10 @@ def home(request):
     email_list, user_name_list, user_picture_list = get_user_info_from_eventlist(event_list)
     zipped_list = zip(event_list, email_list, user_name_list, user_picture_list)
     if request.user.is_authenticated():
-        return render(request, 'homepage.html',{'zipped_list':zipped_list, 'logedin': True})
+        fname = Users.get_user_info(request.user.username)['first_name']
+        return render(request, 'homepage.html',{'zipped_list':zipped_list, 'logedin': True,'fname':fname})
     else:
+        print "not authenticate"
         return render(request, 'homepage.html',{'zipped_list':zipped_list, 'logedin': False})
 
 
