@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
-from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list, put_event_into_db, get_recommended_event_list
+from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list, put_event_into_db, get_recommended_event_list, get_user_by_email, get_user_info_from_eventlist
 from django.middleware import csrf
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.csrf import csrf_exempt
@@ -25,8 +25,8 @@ from boto.s3.key import Key
 reload(sys)
 sys.setdefaultencoding('UTF8')
 
-"""import credentials from root/AppCreds"""
 
+"""import credentials from root/AppCreds"""
 print "path: " + os.path.dirname(sys.path[0])
 with open(os.path.dirname(sys.path[0])+ '/Asite' + '/availabook/AppCreds/AWSAcct.json','r') as AWSAcct:
     awsconf = json.loads(AWSAcct.read())
@@ -35,6 +35,7 @@ with open(os.path.dirname(sys.path[0])+ '/Asite' + '/availabook/AppCreds/AWSAcct
 conn = S3Connection(awsconf["aws_access_key_id"], awsconf["aws_secret_access_key"])
 bucket = conn.get_bucket('image-availabook')
 
+
 # Create your views here.
 def index(request):
     ''' render the landing page'''
@@ -42,24 +43,27 @@ def index(request):
         del request.session[key]
     if request.user.is_authenticated():
         event_list = get_recommended_event_list(request.user.username)
-        print event_list
-        return render(request, 'homepage.html',{'event_list':event_list, 'logedin': True})
+        email_list, user_name_list, user_picture_list = get_user_info_from_eventlist(event_list)
+        zipped_list = zip(event_list, email_list, user_name_list, user_picture_list)
+        return render(request, 'homepage.html',{'zipped_list':zipped_list, 'logedin': True})
     else:
         return render(request, 'landing.html')
 
 
 def home(request):
     event_list = get_recommended_event_list(request.user.username)
+    email_list, user_name_list, user_picture_list = get_user_info_from_eventlist(event_list)
+    zipped_list = zip(event_list, email_list, user_name_list, user_picture_list)
     if request.user.is_authenticated():
-        print event_list
-        return render(request, 'homepage.html',{'event_list':event_list, 'logedin': True})
+        return render(request, 'homepage.html',{'zipped_list':zipped_list, 'logedin': True})
     else:
-        return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
+        return render(request, 'homepage.html',{'zipped_list':zipped_list, 'logedin': False})
 
 
 @csrf_exempt
 def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/"):
     print "fb_login"
+
     user_id = str(request.POST.get("email"))
     pwd = str(request.POST.get("psw"))
     pwd_a = pwd
@@ -68,23 +72,25 @@ def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/"):
     age = request.POST.get("age")
     picture = request.POST.get("picture")
     print user_id, pwd, firstname, lastname, age, picture
+
     city = 'ny'
     zipcode = '10027'
     signup_handler = Signup(user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode)
     signup_handler.add_picture(picture)
+
     user_db = Users(user_id, pwd)
     if user_db.verify_email() == False:
         print "account not exist"
         if not user_exists(user_id):
-                user = User(username=user_id, email=user_id)
-                user.set_password(pwd)
-                user.save()
-                authenticate(username=user_id, password=pwd)
-                user.backend = 'django.contrib.auth.backends.ModelBackend'
-                auth_login(request, user)
-                signup_handler.push_to_dynamodb()
-                print str(request.user.username) + " is signed up and logged in: " + str(request.user.is_authenticated())
-                return redirect(onsuccess)
+            user = User(username=user_id, email=user_id)
+            user.set_password(pwd)
+            user.save()
+            authenticate(username=user_id, password=pwd)
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            auth_login(request, user)
+            signup_handler.push_to_dynamodb()
+            print str(request.user.username) + " is signed up and logged in: " + str(request.user.is_authenticated())
+            return redirect(onsuccess)
         else:
             user=authenticate(username=user_id, password=pwd)
             user.backend = 'django.contrib.auth.backends.ModelBackend'
@@ -112,13 +118,15 @@ def login(request, onsuccess="/availabook/home", onfail="/availabook/"):
     csrf_token = csrf.get_token(request)
     user_id = request.POST.get("id")
     pwd = request.POST.get("psw")
-    print csrf_token, user_id, pwd
+    print user_id, pwd, csrf_token
 
     user = authenticate(username=user_id, password=pwd)
     if user is not None:
         auth_login(request, user)
+        print ("Current input user information is already existed in Django sqlite")
     else:
-        messages.add_message(request, messages.ERROR, 'Login Failed. Try again.', 'login', True)
+        print ("Current input user information is not existed in Django sqlite or the input password incorrect with that in Django sqlite!")
+        return HttpResponse("Error")
 
     login_user = Users(user_id, pwd)
     if login_user.authen_user():
@@ -126,10 +134,9 @@ def login(request, onsuccess="/availabook/home", onfail="/availabook/"):
         print str(request.user.username) + " is logged in: " + str(request.user.is_authenticated())
         return redirect(onsuccess)
     else:
- 		#alert("User Information Not exists")
-        messages.add_message(request, messages.ERROR, 'Login Failed. Try again.', 'login', True)
-        print messages
-        return redirect(onfail)
+        print ("Current user information not exist in AWS Dynamodb or the input password is incorrect with that in AWS Dynamodb!")
+        #return redirect(onfail)
+        return HttpResponse("Error")
 
 
 @csrf_exempt
@@ -146,27 +153,49 @@ def signup(request, onsuccess="/availabook/home", onfail="/availabook/"):
 
     signup_handler = Signup(user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode)
     signup_handler.add_picture("https://s3.amazonaws.com/image-availabook/default")
-    event_list = get_recommended_event_list(user_id)
-    user_db = Users(user_id, pwd)
 
-    if user_db.verify_email() == False:
-        if pwd == pwd_a:
-            if not user_exists(user_id):
+    if pwd == pwd_a:
+        if not user_exists(user_id):
+            user = User(username=user_id, email=user_id)
+            user.set_password(pwd)
+            user.save()
+            authenticate(username=user_id, password=pwd)
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            auth_login(request, user)
+            print ("Successfully saving user information to Django sqlite.")
+            try:
                 signup_handler.push_to_dynamodb()
-                user = User(username=user_id, email=user_id)
-                user.set_password(pwd)
-                user.save()
-                authenticate(username=user_id, password=pwd)
-                user.backend = 'django.contrib.auth.backends.ModelBackend'
-                auth_login(request, user)
+                print ("Successfully pushing user information to AWS Dynamodb.")
                 print str(request.user.username) + " is signed up and logged in: " + str(request.user.is_authenticated())
                 return redirect(onsuccess)
-            else:
-                return redirect(onfail)
+            except Exception as e:
+                print (e)
+                print ("Pushing user information to AWS Dynamodb failed! Please sign up again!")
+                return HttpResponse("Error")
         else:
-            return redirect(onfail)
+            user_db = Users(user_id, pwd)
+            if user_db.verify_email() == False:
+                print "Current user is already existed in Django sqlite, but not in AWS Dynamodb! Generally, sign up will fail. For debugging, maybe you should first delete this user from your django sqlite, clean the cache in browser and sign up again!"
+                try:
+                    signup_handler.push_to_dynamodb()
+                    print ("Successfully pushing user information to AWS Dynamodb.")
+                    if request.user.is_authenticated():
+                        print str(request.user.username) + " is signed up and logged in: " + str(request.user.is_authenticated())
+                        return redirect(onsuccess)
+                    else:
+                        print ("Sign up failed. Please debug following the instructions above!")
+                        return HttpResponse("Error")
+                except Exception as e:
+                    print (e)
+                    print ("Pushing user information to AWS Dynamodb failed! Please debug and sign up again!")
+                    return HttpResponse("Error")
+            else:
+                print ("Current user is already existed in both Django sqlite and AWS Dynamodb! Please turn to log in first!")
+                print ("If you still can't sign up and log in, for debugging, please delete this user from your django sqlite, clean the cache in browser and sign up again!")
+                return HttpResponse("Error")
     else:
-        return redirect(onfail)
+        print "Two input passwords inconsistent! Please sign up again!"
+        return HttpResponse("Error")
 
 
 def user_exists(username):
@@ -183,6 +212,7 @@ def logout(request):
         print str(request.user.username) + " is logged out!"
         auth_logout(request)
     return redirect('/availabook/home')
+
 
 def profile(request):
     if request.user.is_authenticated():
@@ -231,7 +261,7 @@ def edit(request):
     try:
         Signup.update_to_dynamodb(uid, fname, lname, age, city, zipcode)
     except Exception as e:
-        print e
+        print (e)
     return JsonResponse({'fname':fname,'lname':lname,'city':city,'age':age,'zipcode':zipcode})
 
 
@@ -270,27 +300,38 @@ def post_event(request):
         print('post event')
         content = request.POST.get("post_content")
         print(content)
+        print(request.POST.get("dateandtime"))
         event_date, event_time = request.POST.get("dateandtime").split("T")
         print(event_date,event_time)
-        username = request.user.username
-        print(username)
+        email = request.user.username
+        print(email)
+        user = get_user_by_email(email)
+        print user
+        zipcode = user['zipcode']
+        print(zipcode)
         timestamp = time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time()))
         EId = str(uuid.uuid4())
-        put_event_into_db(EId=EId, content=content,date=event_date,time=event_time,label='movie',fave=[], place='beijing',timestamp=timestamp,user_email=username)
+        print (timestamp)
+        print (EId)
+        try:
+            put_event_into_db(EId=EId, content=content,date=event_date,time=event_time,fave=[], zipcode=zipcode,timestamp=timestamp,user_email=email)
+            print ("Post is successfully puhed to AWS Dynamodb!")
+        except Exception as e:
+            print (e)
         return redirect('/availabook/home')
     else:
-        print "Please log in first!"
-        return HttpResponse(None)
+        print "Please log in first before post!"
+        return HttpResponse("Error")
 
 
 def get_fave(request):
     if request.user.is_authenticated():
-        EId = request.POST.get("fave")
+        EId = request.POST.get("EId")
         print(EId)
         event = get_event_by_EId(EId)
         event = Event(event)
         event.add_fave(request.user.username)
         return JsonResponse({"EId" : EId, "fave_num" : event.fave_num})
     else:
-        print "Please log in first!"
+        print "Please log in first before like!"
         return JsonResponse({"EId" : "", "fave_num" : ""})

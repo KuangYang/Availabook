@@ -1,33 +1,29 @@
 $(document).ready(function() {
     console.log("ready!");
 
-    $("#like_btn").on("click", function() {
-        console.log("Like!");
-
+    $("#post_btn").on("click", function() {
+        console.log("Post!");
         $.ajax({
-            url : "/availabook/get_fave/",
+            url : "/availabook/post_event/",
             type : "POST",
             data : {
-                fave : $("#like_btn").val()
+                post_content : $("#post_content").val(),
+                dateandtime: $("#dateandtime").val()
             },
 
             success : function(msg) {
-                console.log(msg.EId);
-                console.log(msg.fave_num);
-                //$("body").html(msg);
-                if (msg.EId != "" && msg.fave_num != "") {
-                    console.log(msg.EId);
-                    console.log(msg.fave_num);
-                    document.getElementById(msg.EId).innerHTML=msg.fave_num + "-likes";
-                    console.log("Like success!");
-                    //window.location.reload();
+                $("#post_content").val("");
+                $("#dateandtime").val("");
+                if (msg != "Error") {
+                    console.log("Post success!");
+                    window.location.reload();
                 } else {
-                    alert("Please log in first!");
+                    alert("Please log in first before post!");
                 }
             },
 
             error : function(xhr,errmsg,err) {
-                console.log("Like " + errmsg);
+                console.log("Post" + errmsg);
             }
         });
     });
@@ -87,10 +83,15 @@ $(document).ready(function() {
                 $("#login_id").val("");
                 $("#login_psw").val("");
                 //$("body").html(msg);
-                console.log(msg)
-                console.log("login success!"); // another sanity check
-                window.location.reload();
-                window.location.href = "/availabook/home";
+                if (msg != "Error") {
+                    console.log(msg)
+                    console.log("login success!"); // another sanity check
+                    window.location.reload();
+                    window.location.href = "/availabook/home";
+                } else {
+                    alert("Password incorrect or not signed up!");
+                }
+
             },
 
             // handle a non-successful response
@@ -129,42 +130,17 @@ $(document).ready(function() {
                 $("#signup_city").val("");
                 $("#signup_zipcode").val("");
                 //$("body").html(msg);
-                console.log("signup success!");
-                window.location.reload();
-                window.location.href = "/availabook/home";
-            },
-
-            error : function(xhr,errmsg,err) {
-                console.log("signup" + errmsg);
-            }
-        });
-    });
-
-    $("#post_btn").on("click", function() {
-        console.log("Post!");
-        $.ajax({
-            url : "/availabook/post_event/",
-            type : "POST",
-            data : {
-                post_content : $("#post_content").val(),
-                dateandtime: $("#dateandtime").val()
-            },
-
-            success : function(msg) {
-                //$("body").html(msg);
-                console.log(msg);
-                if (!msg) {
-                    $("#post_content").val("");
-                    $("#dateandtime").val("");
-                    console.log("Put success!");
-                    //window.location.reload();
+                if (msg != "Error") {
+                    console.log("signup success!");
+                    window.location.reload();
+                    window.location.href = "/availabook/home";
                 } else {
-                    alert("Please log in first!");
+                    alert("User information already existed or passwords inconsistent or pushing to dynamodb failed!");
                 }
             },
 
             error : function(xhr,errmsg,err) {
-                console.log("Post" + errmsg);
+                console.log("signup" + errmsg);
             }
         });
     });
@@ -187,6 +163,37 @@ $(document).ready(function() {
         }
     };
 });
+
+function click_like(event) {
+    console.log("Like!");
+    console.log(document.getElementById(event + "_like_btn").value);
+    $.ajax({
+        url : "/availabook/get_fave/",
+        type : "POST",
+        data : {
+            EId : document.getElementById(event + "_like_btn").value
+        },
+
+        success : function(msg) {
+            console.log(msg.EId);
+            console.log(msg.fave_num);
+            if (msg.EId != "" && msg.fave_num != "") {
+                console.log(msg.EId);
+                console.log(msg.fave_num);
+                document.getElementById(msg.EId).innerHTML=msg.fave_num + "-likes";
+                console.log("Like success!");
+                    //window.location.reload();
+            } else {
+                alert("Please log in first before like!");
+            }
+        },
+
+        error : function(xhr,errmsg,err) {
+            console.log("Like " + errmsg);
+        }
+    });
+};
+
 
 $(function () {
   $('[data-toggle="tooltip"]').tooltip()

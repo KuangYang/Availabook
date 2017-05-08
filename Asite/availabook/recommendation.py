@@ -5,13 +5,14 @@ import sys
 import json
 import operator
 import datetime
-
+import numpy as np
+from sklearn.metrics.pairwise import pairwise_distances
 """reload intepretor, add credential path"""
 reload(sys)
 sys.setdefaultencoding('UTF8')
 
 """import credentials from root/AppCreds"""
-with open(os.path.dirname(sys.path[0])+'/Asite' + '/availabook/AppCreds/AWSAcct.json','r') as AWSAcct:
+with open(os.path.dirname(sys.path[0])+ '/Asite' + '/availabook/AppCreds/AWSAcct.json','r') as AWSAcct:
     awsconf = json.loads(AWSAcct.read())
 
 dynamodb_session = Session(aws_access_key_id=awsconf["aws_access_key_id"],
@@ -178,7 +179,6 @@ def common():
             pass
     return eventList
 
-
 # get score
 def user_based_similarity():
     tb_preference = dynamodb.Table("Preference")
@@ -191,10 +191,13 @@ def user_based_similarity():
         for j in range(0, 10):
             matrix[i][j] = int(rating[j])
     train = np.array(matrix)
-
+    print(train)
     user_similarity = pairwise_distances(train, metric='cosine')
+    print(user_similarity)
     mean_user_rating = train.mean(axis=1)
+    print(mean_user_rating)
     ratings_diff = (train - mean_user_rating[:, np.newaxis])
+    print(ratings_diff)
     pred_user = mean_user_rating[:, np.newaxis] + user_similarity.dot(ratings_diff) / np.array(
         [np.abs(user_similarity).sum(axis=1)]).T
     return pred_user
@@ -232,8 +235,71 @@ def recommend_item(Cid):
                 recommendation_list.append(event)
     return recommendation_list
 
-#if __name__ == '__main__':
-#    recommendlist1 = common()
-#    print recommendlist1
-#    recommendlist2 = recommend("ky2342@columbia.edu")
-#    print recommendlist2
+def normalize(vec):
+    return vec/np.sum(vec)
+
+def cosine_similarity(user_vec,event_vec):
+    ### not use it
+    dot_product = np.dot(event_vec,user_vec)
+    square_root_event = np.sqrt(np.sum(event_vec**2))
+    square_root_user = np.sqrt(np.sum(user_vec**2))
+    cosine_similarity = event_vec.dot(user_vec)/(square_root_user*square_root_event)
+    return cosine_similarity
+
+def time_score(event_date):
+    today = datetime.date.today()
+    e_year, e_month, e_day = event_date.split("-")
+    event_date = datetime.date(int(e_year),int(e_month),int(e_day))
+    date_diff = int((str(event_date - today)).split(" ")[0])
+    return math.exp(-date_diff)
+
+def distance_score(event_zipcode,user_zipcode):
+    try:
+        ### if zipcode is valid
+        zipcode1 = zipcode.isequal(user_zipcode)
+        zipcode2 = zipcode.isequal(event_zipcode)
+        distance = math.sqrt((zipcode1.lon - zipcode2.lon)**2 + (zipcode1.lat-zipcode2.lat)**2)
+        return math.exp(-distance)
+    except:
+        return None
+
+
+def popularity_score(likes_num):
+    return math.exp(-likes_num)/(1+math.exp(-likes_num))
+
+def event_vec(event):
+    ### think about put it into db to accelate the speed
+    time_score = time_score(event.date)
+    distance_score = distance_score(event.user.zipcode)
+    topic_score = origin_recommend()
+    event_vec = np.array([time_score,distance_score,topic_score])
+    return normalize(event_vec)
+
+def assign_score(user,event):
+    event_vec = event_vec(event)
+    return event_vec.dot(user.user_vec)
+
+def para_tuning(user_vec,event_vec):
+    ### user_vec and event_vec are normalized
+    ### use this function whenever a new like,not post!
+    return normalize(user_vec + 0.05*event_vec)
+
+
+# user_table = dynamodb.Table("User")
+# response = user_table.get_item(
+#         Key={
+#             'email': 'xuexun1994@gmail.com'
+#         }
+# )
+# print(response['Item'])
+# x = str(np.random.rand())
+# user_table.update_item(
+#     Key={
+#     'email': 'xuexun1994@gmail.com'
+# },
+# UpdateExpression='SET rating = :val1',
+# ExpressionAttributeValues={
+#     ':val1': [x,0,x,0,x,x,x,x,x,x],
+# }
+# )
+# print(get_returnUser_recommend('xuexun1994@gmail.com'))
