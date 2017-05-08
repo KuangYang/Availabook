@@ -58,7 +58,7 @@ def home(request):
 
 
 @csrf_exempt
-def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
+def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/"):
     print "fb_login"
     user_id = str(request.POST.get("email"))
     pwd = str(request.POST.get("psw"))
@@ -108,7 +108,7 @@ def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
             return redirect(onfail)
 
 
-def login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
+def login(request, onsuccess="/availabook/home", onfail="/availabook/"):
     csrf_token = csrf.get_token(request)
     user_id = request.POST.get("id")
     pwd = request.POST.get("psw")
@@ -133,7 +133,7 @@ def login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
 
 
 @csrf_exempt
-def signup(request, onsuccess="/availabook/home", onfail="/availabook/home"):
+def signup(request, onsuccess="/availabook/home", onfail="/availabook/"):
     user_id = request.POST.get("email")
     pwd = request.POST.get("psw")
     pwd_a = request.POST.get("psw_a")
