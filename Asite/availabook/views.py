@@ -132,6 +132,7 @@ def login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
         return redirect(onfail)
 
 
+@csrf_exempt
 def signup(request, onsuccess="/availabook/home", onfail="/availabook/home"):
     user_id = request.POST.get("email")
     pwd = request.POST.get("psw")
