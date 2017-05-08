@@ -16,6 +16,7 @@ from nltk.corpus import wordnet as wn
 reload(sys)
 sys.setdefaultencoding('UTF8')
 
+nltk.data.path.append(os.path.dirname(sys.path[0])+'/Asite/availabook/Utils/nltk_data')
 """import credentials from root/AppCreds"""
 
 print "path: " + os.path.dirname(sys.path[0])
@@ -185,7 +186,7 @@ class Event():
         self.time = event['time']
         self.label = event['label']
         self.fave = event['fave']
-        self.place = event['zipcode']
+        self.zipcode = event['zipcode']
         self.fave_num = str(len(event['fave']))
     ### delete function
     def delete(self,EId):
@@ -208,8 +209,16 @@ class Event():
         }
         )
 
+def get_user_by_email(email):
+    response = user_table.get_item(
+            Key={
+                'email': email
+            }
+    )
+    return response['Item']
 
-def put_event_into_db(EId,content,date,time,label,fave,place,timestamp,user_email):
+
+def put_event_into_db(EId,content,date,time,fave,zipcode,timestamp,user_email):
     label = get_label(content)
     event_table.put_item(
         Item={
@@ -219,7 +228,7 @@ def put_event_into_db(EId,content,date,time,label,fave,place,timestamp,user_emai
             'time': time,
             'label': label,
             'fave': fave,
-            'place': place,
+            'zipcode': zipcode,
         }
     )
     post_table.put_item(
@@ -280,7 +289,7 @@ def get_label(data):
     w2 = [w.lower() for w in data.replace(',', ' ').split(' ')]
     similarity = []
     for i in range(0, 10):
-        similarity.append(get_score(w1[i], w2))
+        similarity.append(str(get_score(w1[i], w2)))
     return similarity
 
 def get_score(w1, w2):
@@ -298,6 +307,7 @@ def get_score(w1, w2):
                 dict[i + "," + j] = max(scores)
     dict_sorted = sorted(dict.items(), key=operator.itemgetter(1), reverse=True)
     return dict_sorted[0][1]
+
 
 
 

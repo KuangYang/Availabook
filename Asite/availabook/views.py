@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
-from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list, put_event_into_db, get_recommended_event_list
+from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list, put_event_into_db, get_recommended_event_list,get_user_by_email
 from django.middleware import csrf
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.csrf import csrf_exempt
@@ -24,6 +24,7 @@ from boto.s3.key import Key
 """reload intepretor, add credential path"""
 reload(sys)
 sys.setdefaultencoding('UTF8')
+
 
 """import credentials from root/AppCreds"""
 
@@ -73,7 +74,8 @@ def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
     signup_handler = Signup(user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode)
     signup_handler.add_picture(picture)
     user_db = Users(user_id, pwd)
-    if user_db.verify_email() == False:
+    #if user_db.verify_email() == False:
+    if True:
         print "account not exist"
         if not user_exists(user_id):
                 user = User(username=user_id, email=user_id)
@@ -269,13 +271,17 @@ def post_event(request):
         print('post event')
         content = request.POST.get("post_content")
         print(content)
+        print(request.POST.get("dateandtime"))
         event_date, event_time = request.POST.get("dateandtime").split("T")
         print(event_date,event_time)
-        username = request.user.username
-        print(username)
+        email = request.user.username
+        print(email)
+        user = get_user_by_email(email)
+        zipcode = user['zipcode']
+        print(zipcode)
         timestamp = time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time()))
         EId = str(uuid.uuid4())
-        put_event_into_db(EId=EId, content=content,date=event_date,time=event_time,label='movie',fave=[], place='beijing',timestamp=timestamp,user_email=username)
+        put_event_into_db(EId=EId, content=content,date=event_date,time=event_time,fave=[], zipcode=zipcode,timestamp=timestamp,user_email=email)
         return redirect('/availabook/home')
     else:
         print "Please log in first!"
