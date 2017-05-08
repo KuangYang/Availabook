@@ -268,6 +268,7 @@ def upload(request):
 def post_event(request):
     if request.user.is_authenticated():
         print('post event')
+        print('test')
         content = request.POST.get("post_content")
         print(content)
         print(request.POST.get("dateandtime"))

@@ -6,9 +6,6 @@ import json
 from availabook.recommendation import recommend, common
 import nltk
 import operator
-
-nltk.data.path.append('./Utils/nltk_data/')
-
 from nltk.corpus import wordnet as wn
 
 
@@ -19,8 +16,7 @@ sys.setdefaultencoding('UTF8')
 nltk.data.path.append(os.path.dirname(sys.path[0])+'/Asite/availabook/Utils/nltk_data')
 """import credentials from root/AppCreds"""
 
-print "path: " + os.path.dirname(sys.path[0])
-with open(os.path.dirname(sys.path[0])+ '/Asite' + '/availabook/AppCreds/AWSAcct.json','r') as AWSAcct:
+with open(os.path.dirname(sys.path[0])+'/Asite/availabook/AppCreds/AWSAcct.json','r') as AWSAcct:
     awsconf = json.loads(AWSAcct.read())
 
 dynamodb_session = Session(aws_access_key_id=awsconf["aws_access_key_id"],

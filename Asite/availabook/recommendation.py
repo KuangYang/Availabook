@@ -12,7 +12,7 @@ reload(sys)
 sys.setdefaultencoding('UTF8')
 
 """import credentials from root/AppCreds"""
-with open(os.path.dirname(sys.path[0])+'/availabook/AppCreds/AWSAcct.json','r') as AWSAcct:
+with open(os.path.dirname(sys.path[0])+'/Asite/availabook/AppCreds/AWSAcct.json','r') as AWSAcct:
     awsconf = json.loads(AWSAcct.read())
 
 dynamodb_session = Session(aws_access_key_id=awsconf["aws_access_key_id"],
@@ -265,7 +265,7 @@ def distance_score(event_zipcode,user_zipcode):
 
 
 def popularity_score(likes_num):
-    return math.exp(-likes_num)/(1+math.exp(-likes_num))_
+    return math.exp(-likes_num)/(1+math.exp(-likes_num))
 
 def event_vec(event):
     ### think about put it into db to accelate the speed
@@ -284,24 +284,24 @@ def para_tuning(user_vec,event_vec):
     ### use this function whenever a new like,not post!
     return normalize(user_vec + 0.05*event_vec)
 
-user_table = dynamodb.Table("User")
-response = user_table.get_item(
-        Key={
-            'email': 'xuexun1994@gmail.com'
-        }
-)
-print(response['Item'])
-x = str(np.random.rand())
-user_table.update_item(
-    Key={
-    'email': 'xuexun1994@gmail.com'
-},
-UpdateExpression='SET rating = :val1',
-ExpressionAttributeValues={
-    ':val1': [x,0,x,0,x,x,x,x,x,x],
-}
-)
-print(get_returnUser_recommend('xuexun1994@gmail.com'))
+# user_table = dynamodb.Table("User")
+# response = user_table.get_item(
+#         Key={
+#             'email': 'xuexun1994@gmail.com'
+#         }
+# )
+# print(response['Item'])
+# x = str(np.random.rand())
+# user_table.update_item(
+#     Key={
+#     'email': 'xuexun1994@gmail.com'
+# },
+# UpdateExpression='SET rating = :val1',
+# ExpressionAttributeValues={
+#     ':val1': [x,0,x,0,x,x,x,x,x,x],
+# }
+# )
+# print(get_returnUser_recommend('xuexun1994@gmail.com'))
 
 #if __name__ == '__main__':
 #    recommendlist1 = common()
