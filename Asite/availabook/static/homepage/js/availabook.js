@@ -28,10 +28,6 @@ $(document).ready(function() {
         });
     });
 
-    //$(event.EId + "_like_btn").on("click", function() {
-
-    //});
-
     $("#home_logout_btn").on("click", function() {
         console.log("logout!");
         $.ajax({

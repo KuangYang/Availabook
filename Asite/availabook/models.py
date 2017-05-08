@@ -215,7 +215,10 @@ def get_user_by_email(email):
                 'email': email
             }
     )
-    return response['Item']
+    if 'Item' in response:
+        return response['Item']
+    else:
+        return None
 
 
 def put_event_into_db(EId,content,date,time,fave,zipcode,timestamp,user_email):
@@ -238,6 +241,30 @@ def put_event_into_db(EId,content,date,time,fave,zipcode,timestamp,user_email):
             'post_time': timestamp
         }
     )
+
+
+def get_user_info_from_eventlist(event_list):
+    user_email_list = []
+    user_name_list = []
+    user_picture_list = []
+
+    for event in event_list:
+        response = post_table.get_item(
+            Key={
+                'EId': event.EId
+            }
+        )
+        user_email_list.append(response['Item']['email'])
+    for email in user_email_list:
+        user = get_user_by_email(email)
+        if user:
+            user_name_list.append(user['first_name'] + " " + user['last_name'])
+            user_picture_list.append(user['picture'])
+        else:
+            user_name_list.append("Default")
+            user_picture_list.append("https://s3.amazonaws.com/image-availabook/default")
+
+    return user_email_list, user_name_list, user_picture_list
 
 
 def get_event_by_EId(EId):

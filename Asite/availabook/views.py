@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
-from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list, put_event_into_db, get_recommended_event_list,get_user_by_email
+from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list, put_event_into_db, get_recommended_event_list, get_user_by_email, get_user_info_from_eventlist
 from django.middleware import csrf
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.csrf import csrf_exempt
@@ -43,19 +43,21 @@ def index(request):
         del request.session[key]
     if request.user.is_authenticated():
         event_list = get_recommended_event_list(request.user.username)
-        print event_list
-        return render(request, 'homepage.html',{'event_list':event_list, 'logedin': True})
+        email_list, user_name_list, user_picture_list = get_user_info_from_eventlist(event_list)
+        zipped_list = zip(event_list, email_list, user_name_list, user_picture_list)
+        return render(request, 'homepage.html',{'zipped_list':zipped_list, 'logedin': True})
     else:
         return render(request, 'landing.html')
 
 
 def home(request):
     event_list = get_recommended_event_list(request.user.username)
+    email_list, user_name_list, user_picture_list = get_user_info_from_eventlist(event_list)
+    zipped_list = zip(event_list, email_list, user_name_list, user_picture_list)
     if request.user.is_authenticated():
-        print event_list
-        return render(request, 'homepage.html',{'event_list':event_list, 'logedin': True})
+        return render(request, 'homepage.html',{'zipped_list':zipped_list, 'logedin': True})
     else:
-        return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
+        return render(request, 'homepage.html',{'zipped_list':zipped_list, 'logedin': False})
 
 
 @csrf_exempt
@@ -304,6 +306,7 @@ def post_event(request):
         email = request.user.username
         print(email)
         user = get_user_by_email(email)
+        print user
         zipcode = user['zipcode']
         print(zipcode)
         timestamp = time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time()))
