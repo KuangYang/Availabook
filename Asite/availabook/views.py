@@ -74,8 +74,7 @@ def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
     signup_handler = Signup(user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode)
     signup_handler.add_picture(picture)
     user_db = Users(user_id, pwd)
-    #if user_db.verify_email() == False:
-    if True:
+    if user_db.verify_email() == False:
         print "account not exist"
         if not user_exists(user_id):
                 user = User(username=user_id, email=user_id)
