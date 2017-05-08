@@ -265,7 +265,7 @@ def distance_score(event_zipcode,user_zipcode):
 
 
 def popularity_score(likes_num):
-    return math.exp(-likes_num)/(1+math.exp(-likes_num))_
+    return math.exp(-likes_num)/(1+math.exp(-likes_num))
 
 def event_vec(event):
     ### think about put it into db to accelate the speed
