@@ -283,7 +283,6 @@ def post_event(request):
 
 
 def get_fave(request):
-    print('test')
     if request.user.is_authenticated():
         EId = request.POST.get("fave")
         print(EId)
