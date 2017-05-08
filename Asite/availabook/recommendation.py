@@ -12,7 +12,7 @@ reload(sys)
 sys.setdefaultencoding('UTF8')
 
 """import credentials from root/AppCreds"""
-with open(os.path.dirname(sys.path[0])+'/availabook/AppCreds/AWSAcct.json','r') as AWSAcct:
+with open(os.path.dirname(sys.path[0])+ '/Asite' + '/availabook/AppCreds/AWSAcct.json','r') as AWSAcct:
     awsconf = json.loads(AWSAcct.read())
 
 dynamodb_session = Session(aws_access_key_id=awsconf["aws_access_key_id"],
@@ -284,6 +284,7 @@ def para_tuning(user_vec,event_vec):
     ### use this function whenever a new like,not post!
     return normalize(user_vec + 0.05*event_vec)
 
+
 # user_table = dynamodb.Table("User")
 # response = user_table.get_item(
 #         Key={
@@ -302,9 +303,3 @@ def para_tuning(user_vec,event_vec):
 # }
 # )
 # print(get_returnUser_recommend('xuexun1994@gmail.com'))
-
-#if __name__ == '__main__':
-#    recommendlist1 = common()
-#    print recommendlist1
-#    recommendlist2 = recommend("ky2342@columbia.edu")
-#    print recommendlist2

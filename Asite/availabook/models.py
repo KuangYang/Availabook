@@ -80,8 +80,6 @@ class Users():
     def authorize(self):
         self.verified = True
 
-
-
     @staticmethod
     def get_user_info(uid):
         response = user_table.get_item(
@@ -122,6 +120,7 @@ class Users():
         except Exception as e:
             print e
             return False
+
 
 class Signup():
     def __init__(self, user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode):
@@ -209,6 +208,7 @@ class Event():
         }
         )
 
+
 def get_user_by_email(email):
     response = user_table.get_item(
             Key={
@@ -275,6 +275,7 @@ def get_recommended_event_list(email):
             event_list.append(event)
     return event_list
 
+
 def get_label(data):
     w1 = [["outdoor", "ball", "sport", "swim", "happy"],
           ["study", "library", "computer", "read", "book"],
@@ -292,6 +293,7 @@ def get_label(data):
         similarity.append(str(get_score(w1[i], w2)))
     return similarity
 
+
 def get_score(w1, w2):
     dict = {}
     for i in w2:
@@ -307,11 +309,3 @@ def get_score(w1, w2):
                 dict[i + "," + j] = max(scores)
     dict_sorted = sorted(dict.items(), key=operator.itemgetter(1), reverse=True)
     return dict_sorted[0][1]
-
-
-
-
-
-
-
-
