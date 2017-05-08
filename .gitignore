@@ -5,3 +5,4 @@
 #*.txt
 *.crc
 *.pyc
+*.sqlite3
