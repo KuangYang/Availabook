@@ -5,12 +5,19 @@ import sys
 import json
 import operator
 import datetime
+import time
 import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
+from threading import Thread
+import nltk
+from nltk.corpus import wordnet as wn
+import math
+import json
+from geopy.geocoders import Nominatim
 """reload intepretor, add credential path"""
 reload(sys)
 sys.setdefaultencoding('UTF8')
-
+nltk.data.path.append(os.path.dirname(sys.path[0])+'/Asite/availabook/Utils/nltk_data')
 """import credentials from root/AppCreds"""
 with open(os.path.dirname(sys.path[0])+'/Asite/availabook/AppCreds/AWSAcct.json','r') as AWSAcct:
     awsconf = json.loads(AWSAcct.read())
@@ -19,17 +26,29 @@ dynamodb_session = Session(aws_access_key_id=awsconf["aws_access_key_id"],
               aws_secret_access_key=awsconf["aws_secret_access_key"],
               region_name="us-east-1")
 dynamodb = dynamodb_session.resource('dynamodb')
+preference_table = dynamodb.Table("Preference")
+tb_user = dynamodb.Table("User")
+tb_event = dynamodb.Table("Event")
+tb_fave = dynamodb.Table("Fave")
+tb_result = dynamodb.Table("Result")
 
-table = dynamodb.Table("Preference")
+
+def postpone(function):
+  def decorator(*args, **kwargs):
+    t = Thread(target = function, args=args, kwargs=kwargs)
+    t.daemon = True
+    t.start()
+  return decorator
+
 
 def recommend(email):
-    response = table.get_item(
+    response = preference_table.get_item(
         Key={
             'email': email
         }
     )
     if 'Item' not in response:
-        table.put_item(
+        preference_table.put_item(
             Item={
                 'email': email,
                 'rating': [0,0,0,0,0,0,0,0,0,0]
@@ -112,7 +131,7 @@ def newUser(email):
 
 
 def returnUser(email):
-    response = table.get_item(
+    response = preference_table.get_item(
         Key={
             'email': email
         }
@@ -189,15 +208,11 @@ def user_based_similarity():
     for i in range(0, len(data)):
         rating =  data[i]['rating']
         for j in range(0, 10):
-            matrix[i][j] = int(rating[j])
+            matrix[i][j] = float(rating[j])
     train = np.array(matrix)
-    print(train)
     user_similarity = pairwise_distances(train, metric='cosine')
-    print(user_similarity)
     mean_user_rating = train.mean(axis=1)
-    print(mean_user_rating)
     ratings_diff = (train - mean_user_rating[:, np.newaxis])
-    print(ratings_diff)
     pred_user = mean_user_rating[:, np.newaxis] + user_similarity.dot(ratings_diff) / np.array(
         [np.abs(user_similarity).sum(axis=1)]).T
     return pred_user
@@ -223,7 +238,8 @@ def recommend_item(Cid):
     eventlist = events['Items']
     for event in eventlist:
         clusterlist = event['label']
-        if clusterlist[6] >= sum(clusterlist) / len(clusterlist):
+        clusterlist = [float(i) for i in clusterlist]
+        if clusterlist[Cid] >= sum(clusterlist) / len(clusterlist):
             res_5 = tb_event.get_item(
                 Key={
                     'EId': event['EId']
@@ -250,30 +266,41 @@ def time_score(event_date):
     today = datetime.date.today()
     e_year, e_month, e_day = event_date.split("-")
     event_date = datetime.date(int(e_year),int(e_month),int(e_day))
+    if event_date == today:
+        return 1
     date_diff = int((str(event_date - today)).split(" ")[0])
-    return math.exp(-date_diff)
+    #### set the threshold, if bigger than assign a penalty to discard this result
+    result = math.exp(-0.415*date_diff) ### scale the result to make it same as distance
+    if date_diff<0 or result < 0.002: ### old-of-date or later than 15 days
+        result = 0
+    return result
 
 def distance_score(event_zipcode,user_zipcode):
     try:
         ### if zipcode is valid
-        zipcode1 = zipcode.isequal(user_zipcode)
-        zipcode2 = zipcode.isequal(event_zipcode)
-        distance = math.sqrt((zipcode1.lon - zipcode2.lon)**2 + (zipcode1.lat-zipcode2.lat)**2)
-        return math.exp(-distance)
-    except:
-        return None
-
+        geolocator = Nominatim()
+        location1 = geolocator.geocode(user_zipcode)  ### 10025(mahattan) to 07747(Aberdeen in new jersey) score is 0.681003758168
+        location2 = geolocator.geocode(event_zipcode)
+    except Exception as e:
+        print('invalid zipcode')
+        print(user_zipcode,event_zipcode)
+        print(e)
+        return 0
+    distance = math.sqrt((location1.latitude - location2.latitude)**2 + (location1.longitude-location2.longitude)**2)
+    result = math.exp(-distance)
+    if result < 0.002:  ### distance farther than penn state to mahattan
+        result = 0
+    return result
+    #### set the threshold, if bigger than assign a penalty to discard this result
 
 def popularity_score(likes_num):
-    return math.exp(-likes_num)/(1+math.exp(-likes_num))
+    likes_num = likes_num
+    return (1-math.exp(-0.01*likes_num))
 
-def event_vec(event):
+def vectorize(s_time,s_distance,s_popularity,s_topic):
     ### think about put it into db to accelate the speed
-    time_score = time_score(event.date)
-    distance_score = distance_score(event.user.zipcode)
-    topic_score = origin_recommend()
-    event_vec = np.array([time_score,distance_score,topic_score])
-    return normalize(event_vec)
+    vec = np.asarray([s_time,s_distance,s_popularity,s_topic])
+    return normalize(vec)
 
 def assign_score(user,event):
     event_vec = event_vec(event)
@@ -282,29 +309,215 @@ def assign_score(user,event):
 def para_tuning(user_vec,event_vec):
     ### user_vec and event_vec are normalized
     ### use this function whenever a new like,not post!
-    return normalize(user_vec + 0.05*event_vec)
+    return normalize(user_vec + 0.001*event_vec)
 
-# user_table = dynamodb.Table("User")
-# response = user_table.get_item(
+def get_label(data):
+    w1 = [["outdoor", "ball", "sport", "swim", "happy"],
+          ["study", "library", "computer", "read", "book"],
+          ["cook", "restaurant", "food", "fish", "hungry"],
+          ["moive", "theatre", "exibition", "photo", "masterpiece"],
+          ["shopping", "shoes", "clothes", "discount", "mall"],
+          ["market", "grocery", "fruit", "vegetable", "meat"],
+          ["cat", "dog", "animal", "zoo", "bird"],
+          ["sleep", "bed", "TV", "sofa", "chip"],
+          ["drink", "bar", "beer", "cocktail", "wine"],
+          ["hiking", "mountain", "sunshine", "drive", "park"]]
+    w2 = [w.lower() for w in data.replace(',', ' ').split(' ')]
+    similarity = []
+    for i in range(0, 10):
+        similarity.append((get_score(w1[i], w2)))
+    similarity = normalize(np.asarray(similarity))
+    return similarity
+
+
+def get_score(w1, w2):
+    dict = {}
+    for i in w2:
+        for j in w1:
+            scores = []
+            s1 = wn.synsets(j)
+            s2 = wn.synsets(i)
+            for x in s1:
+                for y in s2:
+                    if x.wup_similarity(y) is not None:
+                        scores.append(x.wup_similarity(y))
+            if len(scores) != 0:
+                dict[i + "," + j] = max(scores)
+    dict_sorted = sorted(dict.items(), key=operator.itemgetter(1), reverse=True)
+    return dict_sorted[0][1]
+
+
+
+
+def update_para(email,event, like_or_post):
+    ### use whenever like or post
+    user = preference_table.get_item(
+        Key={
+            'email': email
+        }
+    )['Item']
+    para = 0.2
+    if like_or_post == 'post':
+        para = 0.2
+    elif like_or_post == 'like':
+        para = 0.02
+    else:
+        print('not valid like_or_post')
+    user_topic_vec = np.asarray([float(i) for i in user['rating']])
+    event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event)
+    
+    rec_res = tb_result.get_item(
+        Key={
+            'email': email
+        }
+    )['Item']['rec_res']
+    rec_res = json.loads(rec_res)
+    rec_res[event['EId']]=final_score
+    tb_result.update_item(
+    Key={
+        'email': email    
+    },
+    UpdateExpression='SET rec_res = :val1',
+    ExpressionAttributeValues={
+        ':val1': json.dumps(rec_res)
+    }
+    )
+    user_hyper_vec = normalize(user_hyper_vec + para*event_vec)    #### need to scale
+    user_topic_vec = normalize(user_topic_vec+ para*event_topic_vec)
+    preference_table.update_item(
+    Key={
+        'email': email    
+    },
+    UpdateExpression='SET rating = :val1, time_para=:val2, distance_para=:val3,popularity_para=:val4,topic_para=:val5',
+    ExpressionAttributeValues={
+        ':val1': [str(i) for i in user_topic_vec.tolist()],
+        ':val2': str(user_hyper_vec[0]),
+        ':val3': str(user_hyper_vec[1]),
+        ':val4': str(user_hyper_vec[2]),
+        ':val5': str(user_hyper_vec[3]),
+    }
+    )
+
+def core_calculation(email,event):
+    user = preference_table.get_item(
+        Key={
+            'email': email
+        }
+    )['Item']
+    zipcode = tb_user.get_item(
+        Key={
+            'email':email
+        }
+    )['Item']['zipcode']
+    print(user)
+    EId = event['EId']
+    event_valid = True  ### invalid if time, distance score is zero
+    time_reward = False  ### reward if score is 1, menas today, add a value to the total score
+    distance_reward = False  ## reward if score is 1, means add a value to the total score, since it is common sense that same place is important for event attending
+    s_time =time_score(event['date'])
+    s_distance = distance_score(event_zipcode=str(event['zipcode']),user_zipcode=str(zipcode))
+    s_popularity = popularity_score(len(event['fave']))
+    if s_time==0 or s_distance==0:
+        event_valid = False
+    if s_time == 1:
+        time_reward = True
+    if s_distance == 1:
+        distance_reward = True
+    event_topic_vec = get_label(event['content'])
+    print(event_topic_vec)
+    user_topic_vec = [float(i) for i in user['rating']]
+    print(user_topic_vec)
+    s_topic = cosine_similarity(np.asarray(user_topic_vec),np.asarray(event_topic_vec)) ## topicscore
+    print(s_topic)
+    print(user['time_para'],user['distance_para'],user['popularity_para'],user['topic_para'])
+    event_vec = vectorize(s_time=s_time,s_distance=s_distance,s_popularity=s_popularity,s_topic=s_topic)
+    user_hyper_vec = vectorize(s_time=float(user['time_para']),s_distance=float(user['distance_para']),s_popularity=float(user['popularity_para']),s_topic=float(user['topic_para']))
+    final_score = np.dot(event_vec,user_hyper_vec)
+    if time_reward:
+        final_score += 0.2
+    if distance_reward:
+        final_score += 1
+    if event_valid == False:
+        final_score =0
+    return event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score
+
+def origin_recommend(email): ### run one time
+    event_list = tb_event.scan()['Items']
+    rec_res = {}
+    i = 0
+    for event in event_list:
+        i +=1
+        print(i)
+        try:
+            event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event)
+            rec_res[event['EId']]=final_score
+        except: ### invalid
+            rec_res[event['EId']]=0
+    tb_result.update_item(
+    Key={
+        'email': email    
+    },
+    UpdateExpression='SET rec_res = :val1',
+    ExpressionAttributeValues={
+        ':val1': json.dumps(rec_res)
+    }
+    )
+
+
+
+
+
+@postpone
+def test_thread():
+    while True:
+        print('test')
+        update_para('aa@qq.com','ac7e0f49-4217-4674-99be-2a1fa5e560fc','like')
+
+
+
+
+#origin_recommend('aa@qq.com')
+
+#test_thread()
+
+#user_event_scoring('aa@qq.com','ac7e0f49-4217-4674-99be-2a1fa5e560fc')
+
+#print(time_score('2017-05-08'))
+#print(distance_score('10027','15001'))
+#print(popularity_score(1000))
+# x = np.random.rand(10)
+# x = normalize(x).tolist()
+# preference_table.update_item(
+# Key={
+#     'email': 'aa@qq.com'    
+# },
+# UpdateExpression='SET rating = :val1, time_para=:val2, distance_para=:val3,popularity_para=:val4,topic_para=:val5',
+# ExpressionAttributeValues={
+#     ':val1': [str(i) for i in x],
+#     ':val2': str(0.25),
+#     ':val3': str(0.25),
+#     ':val4': str(0.25),
+#     ':val5': str(0.25),
+# }
+# )
+
+
+
+# response = table.get_item(
 #         Key={
-#             'email': 'xuexun1994@gmail.com'
+#             'email': 'xx22@gmail.com'
 #         }
 # )
-# print(response['Item'])
-# x = str(np.random.rand())
-# user_table.update_item(
+# x = np.random.rand(10)
+# x = normalize(x).tolist()
+# print([str(i) for i in x])
+# preference_table.update_item(
 #     Key={
-#     'email': 'xuexun1994@gmail.com'
+#     'email': 'aa@qq.com'
 # },
 # UpdateExpression='SET rating = :val1',
 # ExpressionAttributeValues={
-#     ':val1': [x,0,x,0,x,x,x,x,x,x],
+#     ':val1': [str(i) for i in x],
 # }
 # )
-# print(get_returnUser_recommend('xuexun1994@gmail.com'))
-
-#if __name__ == '__main__':
-#    recommendlist1 = common()
-#    print recommendlist1
-#    recommendlist2 = recommend("ky2342@columbia.edu")
-#    print recommendlist2
+# print(get_returnUser_recommend('xx22@gmail.com'))

@@ -25,15 +25,15 @@
 <link href="{% static 'homepage/css/custom.css' %}" rel="stylesheet">
 <script data-require="jquery@1.11.3" data-semver="1.11.3" src="https://code.jquery.com/jquery-1.11.3.js"></script>
       <script src="http://formvalidation.io/vendor/formvalidation/js/formValidation.min.js"></script>
-    <script src="http://formvalidation.io/vendor/formvalidation/js/framework/bootstrap.min.js"></script> 
+    <script src="http://formvalidation.io/vendor/formvalidation/js/framework/bootstrap.min.js"></script>
 
  <!--    <link data-require="bootstrap@3.3.6" data-semver="3.3.6" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" /> -->
-    
+
     <script data-require="bootstrap@3.3.6" data-semver="3.3.6" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script data-require="angular.js@1.5.7" data-semver="1.5.7" src="https://code.angularjs.org/1.5.7/angular.js"></script>
     <script data-require="bootbox.js@4.4.0" data-semver="4.4.0" src="https://github.com/makeusabrew/bootbox/releases/download/v4.4.0/bootbox.min.js"></script>
 
-    
+
 
   <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
 
@@ -210,9 +210,9 @@
                   <hr>
                   <h3><strong>Zipcode</strong></h3>
                   <p><div id="zip">{{zipcode}}</div></p>
-    
+
                   {% endif %}
-          
+
 <form id="userForm" method="post" class="form-horizontal" style="display: none;">
     <div class="form-group">
         <label class="col-xs-3 control-label">ID</label>
@@ -616,11 +616,32 @@
 </body>
 
 
-    <footer>
-      <div class="container">
-        <p>Availabook Copyright &copy, 2017</p>
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <ul class="list-inline">
+            <li>
+              <a href="#">Home</a>
+            </li>
+            <li class="footer-menu-divider">&sdot;</li>
+            <li>
+              <a href="#about">About</a>
+            </li>
+            <li class="footer-menu-divider">&sdot;</li>
+            <li>
+              <a href="#services">Services</a>
+            </li>
+            <li class="footer-menu-divider">&sdot;</li>
+            <li>
+              <a href="#contact">Contact</a>
+            </li>
+            </ul>
+              <p class="copyright text-muted small">Copyright &copy; Availabook 2017. All Rights Reserved</p>
+        </div>
       </div>
-    </footer>
+    </div>
+  </footer>
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
@@ -631,9 +652,9 @@
     {% load static %}
     <script src= "{% static 'profile/js/availabook.js' %}"></script>
     {% load static %}
-    <script src= "{% static 'profile/js/profile.js' %}"></script>
-    {% load static %}
     <script src= "{% static 'profile/js/csrf.js' %}"></script>
+    {% load static %}
+    <script src= "{% static 'profile/js/profile.js' %}"></script>
 
   </body>
 </html>

@@ -279,7 +279,7 @@
                       <p class="post-actions"><button name="fave" type="submit" class="btn btn-default btn-xs" value={{event.EId}}>like</button></p>
                     </form> -->
                     <div class="pull-left btn-group-md">
-                      <button id="like_btn" class="btn btn-default btn-md" value={{event.EId}}><i class="fa fa-heart" aria-hidden="true"></i> Like</button>
+                      <button id="{{ event }}_like_btn" class="btn btn-default btn-md" value={{event.EId}} onclick='click_like("{{ event }}")'><i class="fa fa-heart" aria-hidden="true"></i> Like</button>
                       <button id="comment_btn" class="btn btn-default btn-md"><i class="fa fa-comment" aria-hidden="true"></i> Comment</button>
                     </div>
                     <div class="comment-form">
@@ -351,9 +351,9 @@
     {% load static %}
     <script src= "{% static 'homepage/js/bootstrap.js' %}"></script>
     {% load static %}
-    <script src= "{% static 'homepage/js/availabook.js' %}"></script>
-    {% load static %}
     <script src= "{% static 'homepage/js/csrf.js' %}"></script>
+    {% load static %}
+    <script src= "{% static 'homepage/js/availabook.js' %}"></script>
 
   </body>
 </html>

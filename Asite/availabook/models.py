@@ -3,7 +3,7 @@ from boto3.session import Session
 import os
 import sys
 import json
-from availabook.recommendation import recommend, common
+from availabook.recommendation import recommend, common, get_label, get_score
 import nltk
 import operator
 from nltk.corpus import wordnet as wn
@@ -28,6 +28,7 @@ dynamodb = dynamodb_session.resource('dynamodb')
 user_table = dynamodb.Table("User")
 event_table = dynamodb.Table("Event")
 post_table = dynamodb.Table("Post")
+tb_result = dynamodb.Table("Result")
 # Create your models here.
 class Users():
     #def __init__(self, id, passwd, passwd_again, firstname, lastname, age, city, zipcode):
@@ -76,8 +77,6 @@ class Users():
     def authorize(self):
         self.verified = True
 
-
-
     @staticmethod
     def get_user_info(uid):
         response = user_table.get_item(
@@ -118,6 +117,7 @@ class Users():
         except Exception as e:
             print e
             return False
+
 
 class Signup():
     def __init__(self, user_id, pwd, pwd_a, firstname, lastname, age, city, zipcode):
@@ -205,6 +205,7 @@ class Event():
         }
         )
 
+
 def get_user_by_email(email):
     response = user_table.get_item(
             Key={
@@ -216,6 +217,7 @@ def get_user_by_email(email):
 
 def put_event_into_db(EId,content,date,time,fave,zipcode,timestamp,user_email):
     label = get_label(content)
+    print('get_label')
     event_table.put_item(
         Item={
             'EId': EId,
@@ -257,7 +259,7 @@ def get_event_list():
     return event_list
 
 
-def get_recommended_event_list(email):
+def get_recommended_event_list(email): #### don't use this
     print "email recommendation:", email
     try:
         tmp_list = recommend(email)
@@ -271,42 +273,22 @@ def get_recommended_event_list(email):
             event_list.append(event)
     return event_list
 
-def get_label(data):
-    w1 = [["outdoor", "ball", "sport", "swim", "happy"],
-          ["study", "library", "computer", "read", "book"],
-          ["cook", "restaurant", "food", "fish", "hungry"],
-          ["moive", "theatre", "exibition", "photo", "masterpiece"],
-          ["shopping", "shoes", "clothes", "discount", "mall"],
-          ["market", "grocery", "fruit", "vegetable", "meat"],
-          ["cat", "dog", "animal", "zoo", "bird"],
-          ["sleep", "bed", "TV", "sofa", "chip"],
-          ["drink", "bar", "beer", "cocktail", "wine"],
-          ["hiking", "mountain", "sunshine", "drive", "park"]]
-    w2 = [w.lower() for w in data.replace(',', ' ').split(' ')]
-    similarity = []
-    for i in range(0, 10):
-        similarity.append(str(get_score(w1[i], w2)))
-    return similarity
-
-def get_score(w1, w2):
-    dict = {}
-    for i in w2:
-        for j in w1:
-            scores = []
-            s1 = wn.synsets(j)
-            s2 = wn.synsets(i)
-            for x in s1:
-                for y in s2:
-                    if x.wup_similarity(y) is not None:
-                        scores.append(x.wup_similarity(y))
-            if len(scores) != 0:
-                dict[i + "," + j] = max(scores)
-    dict_sorted = sorted(dict.items(), key=operator.itemgetter(1), reverse=True)
-    return dict_sorted[0][1]
-
-
-
-
+def get_recommend_newversion(email):
+    rec_res = tb_result.get_item(
+        Key={
+            'email': email
+        }
+    )['Item']['rec_res']
+    event_list = []
+    if rec_res:
+        rec_res = json.loads(rec_res)
+        print(rec_res)
+        rec_res = sorted(rec_res,reverse=True)
+        for EId,value in rec_res.items():
+            e = get_event_by_EId(EId)
+            event = Event(e)
+            event_list.append(event)
+    return event_list
 
 
 
