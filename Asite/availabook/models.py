@@ -328,10 +328,10 @@ def get_recommend_newversion(email):
     if rec_res:
         rec_res = json.loads(rec_res)
         print(rec_res)
-        rec_res_list = sorted(rec_res,reverse=True)
+        rec_res_list = sorted(rec_res.items(),key=lambda x:x[1],reverse=True)
         print(rec_res_list)
         i = 0
-        for EId in rec_res_list:
+        for EId,value in rec_res_list:
             i+=1
             print(i)
             try:

@@ -312,22 +312,26 @@ def para_tuning(user_vec,event_vec):
     return normalize(user_vec + 0.001*event_vec)
 
 def get_label(data):
-    w1 = [["outdoor", "ball", "sport", "swim", "happy"],
-          ["study", "library", "computer", "read", "book"],
-          ["cook", "restaurant", "food", "fish", "hungry"],
-          ["moive", "theatre", "exibition", "photo", "masterpiece"],
-          ["shopping", "shoes", "clothes", "discount", "mall"],
-          ["market", "grocery", "fruit", "vegetable", "meat"],
-          ["cat", "dog", "animal", "zoo", "bird"],
-          ["sleep", "bed", "TV", "sofa", "chip"],
-          ["drink", "bar", "beer", "cocktail", "wine"],
-          ["hiking", "mountain", "sunshine", "drive", "park"]]
-    w2 = [w.lower() for w in data.replace(',', ' ').split(' ')]
-    similarity = []
-    for i in range(0, 10):
-        similarity.append((get_score(w1[i], w2)))
-    similarity = normalize(np.asarray(similarity))
-    return similarity
+    try:
+        w1 = [["outdoor", "ball", "sport", "swim", "happy"],
+              ["study", "library", "computer", "read", "book"],
+              ["cook", "restaurant", "food", "fish", "hungry"],
+              ["moive", "theatre", "exibition", "photo", "masterpiece"],
+              ["shopping", "shoes", "clothes", "discount", "mall"],
+              ["market", "grocery", "fruit", "vegetable", "meat"],
+              ["cat", "dog", "animal", "zoo", "bird"],
+              ["sleep", "bed", "TV", "sofa", "chip"],
+              ["drink", "bar", "beer", "cocktail", "wine"],
+              ["hiking", "mountain", "sunshine", "drive", "park"]]
+        w2 = [w.lower() for w in data.replace(',', ' ').split(' ')]
+        similarity = []
+        for i in range(0, 10):
+            similarity.append((get_score(w1[i], w2)))
+        similarity = normalize(np.asarray(similarity))
+        return similarity
+    except:
+        print('get_label failed, return a default array')
+        return np.ones(10)/10
 
 
 def get_score(w1, w2):
@@ -385,8 +389,11 @@ def update_para(email,event, like_or_post):
     }
     )
     print('new post into result_table')
+    print('original hyper para: time, distance ,popularity, topic '+str(user_hyper_vec[0])+' ' +str(user_hyper_vec[1])+' '+str(user_hyper_vec[2])+' '+str(user_hyper_vec[3]))
     user_hyper_vec = normalize(user_hyper_vec + para*event_vec)    #### need to scale
     user_topic_vec = normalize(user_topic_vec+ para*event_topic_vec)
+    print('event ')
+    print('updated hyper para: time, distance ,popularity, topic '+str(user_hyper_vec[0])+' '+str(user_hyper_vec[1])+' '+str(user_hyper_vec[2])+' '+str(user_hyper_vec[3]))
     preference_table.update_item(
     Key={
         'email': email    
@@ -478,6 +485,10 @@ def test_thread():
         print('test')
         #update_para('aa@qq.com','ac7e0f49-4217-4674-99be-2a1fa5e560fc','like')
 
+
+
+
+#['580d7ee3-0e05-4e13-aae3-5ef677882930']
 
 # result_list = tb_result.scan()['Items']
 # print(result_list)
