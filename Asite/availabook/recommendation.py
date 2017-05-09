@@ -262,12 +262,21 @@ def cosine_similarity(user_vec,event_vec):
     cosine_similarity = event_vec.dot(user_vec)/(square_root_user*square_root_event)
     return cosine_similarity
 
-def time_score(event_date):
+def time_score(event_date,event_time):
     today = datetime.date.today()
     e_year, e_month, e_day = event_date.split("-")
+    print(event_time)
+    e_hour,e_minute = event_time.split(":")
+    print('event time '+str(e_hour)+str(e_minute))
     event_date = datetime.date(int(e_year),int(e_month),int(e_day))
+    event_datetime = datetime.datetime(int(e_year),int(e_month),int(e_day),int(e_hour),int(e_minute))
     if event_date == today:
-        return 1
+        if datetime.datetime.utcnow()>event_datetime:
+            print(datetime.datetime.utcnow())
+            print(event_datetime)
+            return 0
+        else:
+            return 1
     date_diff = int((str(event_date - today)).split(" ")[0])
     #### set the threshold, if bigger than assign a penalty to discard this result
     result = math.exp(-0.16*date_diff) ### scale the result to make it same as distance
@@ -295,7 +304,7 @@ def distance_score(event_zipcode,user_zipcode):
 
 def popularity_score(likes_num):
     likes_num = likes_num
-    return (1-math.exp(-0.01*likes_num))
+    return (1-math.exp(-0.05*likes_num))
 
 def vectorize(s_time,s_distance,s_popularity,s_topic):
     ### think about put it into db to accelate the speed
@@ -369,7 +378,7 @@ def update_para(email,event, like_or_post):
         print('not valid like_or_post')
     user_topic_vec = np.asarray([float(i) for i in user['rating']])
     print('before core_calculation')
-    event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event)
+    event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event,like_or_post)
     print('new event EId'+event['EId'])
     print('final_score '+str(final_score))
     rec_res = tb_result.get_item(
@@ -388,9 +397,6 @@ def update_para(email,event, like_or_post):
         ':val1': json.dumps(rec_res)
     }
     )
-
-    if like_or_post == 'post':
-        event_vec[2] = user_hyper_vec[2] #### if post, popularity keep the same
     print('new post into result_table')
     print('original hyper para: time, distance ,popularity, topic '+str(user_hyper_vec[0])+' ' +str(user_hyper_vec[1])+' '+str(user_hyper_vec[2])+' '+str(user_hyper_vec[3]))
     user_hyper_vec = normalize(user_hyper_vec + para*event_vec)    #### need to scale
@@ -413,7 +419,35 @@ def update_para(email,event, like_or_post):
     )
     print('finish update')
 
-def core_calculation(email,event):
+def recommend_to_all(event): #### run when post
+    print('start recommend to all')
+    user_list = tb_user.scan()['Items']
+    for user in user_list:
+        email = user['email']
+        event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event,'post')
+        rec_res = tb_result.get_item(
+            Key={
+                'email': email
+            }
+        )['Item']['rec_res']
+        rec_res = json.loads(rec_res)
+        rec_res[event['EId']]=final_score
+        tb_result.update_item(
+        Key={
+            'email': email    
+        },
+        UpdateExpression='SET rec_res = :val1',
+        ExpressionAttributeValues={
+            ':val1': json.dumps(rec_res)
+        }
+        )
+        print('recommend to '+email+' '+EId+' '+str(final_score))
+    print('finish recommend to all')
+
+
+
+
+def core_calculation(email,event,like_or_post):
     user = preference_table.get_item(
         Key={
             'email': email
@@ -428,7 +462,7 @@ def core_calculation(email,event):
     event_valid = True  ### invalid if time, distance score is zero
     time_reward = False  ### reward if score is 1, menas today, add a value to the total score
     distance_reward = False  ## reward if score is 1, means add a value to the total score, since it is common sense that same place is important for event attending
-    s_time =time_score(event['date'])
+    s_time =time_score(event['date'],event['time'])
     s_distance = distance_score(event_zipcode=str(event['zipcode']),user_zipcode=str(zipcode))
     s_popularity = popularity_score(len(event['fave']))
     if s_distance==0:
@@ -449,6 +483,8 @@ def core_calculation(email,event):
     #print(user['time_para'],user['distance_para'],user['popularity_para'],user['topic_para'])
     event_vec = vectorize(s_time=s_time,s_distance=s_distance,s_popularity=s_popularity,s_topic=s_topic)
     user_hyper_vec = vectorize(s_time=float(user['time_para']),s_distance=float(user['distance_para']),s_popularity=float(user['popularity_para']),s_topic=float(user['topic_para']))
+    if like_or_post == 'post':
+        event_vec[2] = user_hyper_vec[2] #### if post, popularity keep the same
     final_score = np.dot(event_vec,user_hyper_vec)
     print('final_score of dot product '+str(final_score))
     if time_reward:
