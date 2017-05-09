@@ -388,12 +388,16 @@ def update_para(email,event, like_or_post):
         ':val1': json.dumps(rec_res)
     }
     )
+
+    if like_or_post == 'post':
+        event_vec[2] = user_hyper_vec[2] #### if post, popularity keep the same
     print('new post into result_table')
     print('original hyper para: time, distance ,popularity, topic '+str(user_hyper_vec[0])+' ' +str(user_hyper_vec[1])+' '+str(user_hyper_vec[2])+' '+str(user_hyper_vec[3]))
     user_hyper_vec = normalize(user_hyper_vec + para*event_vec)    #### need to scale
-    user_topic_vec = normalize(user_topic_vec+ para*event_topic_vec)
-    print('event ')
     print('updated hyper para: time, distance ,popularity, topic '+str(user_hyper_vec[0])+' '+str(user_hyper_vec[1])+' '+str(user_hyper_vec[2])+' '+str(user_hyper_vec[3]))
+    print('original user topic vec: '+str(user_topic_vec))
+    user_topic_vec = normalize(user_topic_vec+ para*event_topic_vec)
+    print('updated user topic vec: '+str(user_topic_vec))
     preference_table.update_item(
     Key={
         'email': email    
@@ -434,8 +438,10 @@ def core_calculation(email,event):
         print('invalid time')
         event_valid = False
     if s_time == 1:
+        print('time reward')
         time_reward = True
     if s_distance == 1:
+        print('distance reward')
         distance_reward = True
     event_topic_vec = get_label(event['content'])
     user_topic_vec = [float(i) for i in user['rating']]
