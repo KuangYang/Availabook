@@ -270,8 +270,8 @@ def time_score(event_date):
         return 1
     date_diff = int((str(event_date - today)).split(" ")[0])
     #### set the threshold, if bigger than assign a penalty to discard this result
-    result = math.exp(-0.415*date_diff) ### scale the result to make it same as distance
-    if date_diff<0 or result < 0.002: ### old-of-date or later than 15 days
+    result = math.exp(-0.16*date_diff) ### scale the result to make it same as distance
+    if date_diff<0 or result < 0.1: ### old-of-date or later than 15 days
         result = 0
     return result
 
@@ -287,8 +287,8 @@ def distance_score(event_zipcode,user_zipcode):
         print(e)
         return 0
     distance = math.sqrt((location1.latitude - location2.latitude)**2 + (location1.longitude-location2.longitude)**2)
-    result = math.exp(-distance)
-    if result < 0.002:  ### distance farther than penn state to mahattan
+    result = math.exp(-0.58*distance)
+    if result < 0.1:  ### distance farther than penn state to mahattan
         result = 0
     return result
     #### set the threshold, if bigger than assign a penalty to discard this result
@@ -364,8 +364,10 @@ def update_para(email,event, like_or_post):
     else:
         print('not valid like_or_post')
     user_topic_vec = np.asarray([float(i) for i in user['rating']])
+    print('before core_calculation')
     event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event)
-    
+    print('new event EId'+event['EId'])
+    print('final_score '+str(final_score))
     rec_res = tb_result.get_item(
         Key={
             'email': email
@@ -382,7 +384,7 @@ def update_para(email,event, like_or_post):
         ':val1': json.dumps(rec_res)
     }
     )
-    print('22222222222222')
+    print('new post into result_table')
     user_hyper_vec = normalize(user_hyper_vec + para*event_vec)    #### need to scale
     user_topic_vec = normalize(user_topic_vec+ para*event_topic_vec)
     preference_table.update_item(
@@ -411,7 +413,6 @@ def core_calculation(email,event):
             'email':email
         }
     )['Item']['zipcode']
-    print(user)
     EId = event['EId']
     event_valid = True  ### invalid if time, distance score is zero
     time_reward = False  ### reward if score is 1, menas today, add a value to the total score
@@ -419,28 +420,31 @@ def core_calculation(email,event):
     s_time =time_score(event['date'])
     s_distance = distance_score(event_zipcode=str(event['zipcode']),user_zipcode=str(zipcode))
     s_popularity = popularity_score(len(event['fave']))
-    if s_time==0 or s_distance==0:
+    if s_distance==0:
+        print('invalid location')
+        event_valid = False
+    if s_time==0:
+        print('invalid time')
         event_valid = False
     if s_time == 1:
         time_reward = True
     if s_distance == 1:
         distance_reward = True
     event_topic_vec = get_label(event['content'])
-    print(event_topic_vec)
     user_topic_vec = [float(i) for i in user['rating']]
-    print(user_topic_vec)
     s_topic = cosine_similarity(np.asarray(user_topic_vec),np.asarray(event_topic_vec)) ## topicscore
-    print(s_topic)
-    print(user['time_para'],user['distance_para'],user['popularity_para'],user['topic_para'])
+    #print(user['time_para'],user['distance_para'],user['popularity_para'],user['topic_para'])
     event_vec = vectorize(s_time=s_time,s_distance=s_distance,s_popularity=s_popularity,s_topic=s_topic)
     user_hyper_vec = vectorize(s_time=float(user['time_para']),s_distance=float(user['distance_para']),s_popularity=float(user['popularity_para']),s_topic=float(user['topic_para']))
     final_score = np.dot(event_vec,user_hyper_vec)
+    print('final_score of dot product '+str(final_score))
     if time_reward:
-        final_score += 0.2
+        final_score = final_score+ 0.03
     if distance_reward:
-        final_score += 1
+        final_score = final_score + 0.1
     if event_valid == False:
         final_score =0
+    print('final_score after reward '+str(final_score))
     return event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score
 
 def origin_recommend(email): ### run one time, can offline
@@ -468,16 +472,15 @@ def origin_recommend(email): ### run one time, can offline
 
 
 
-
-
 @postpone
 def test_thread():
     while True:
         print('test')
-        update_para('aa@qq.com','ac7e0f49-4217-4674-99be-2a1fa5e560fc','like')
+        #update_para('aa@qq.com','ac7e0f49-4217-4674-99be-2a1fa5e560fc','like')
 
 
-
+# result_list = tb_result.scan()['Items']
+# print(result_list)
 
 #origin_recommend('aa@qq.com')
 

@@ -15,7 +15,7 @@ sys.setdefaultencoding('utf8')
 
 if __name__ == "__main__":
     sc = SparkContext(appName="LDA")
-    data = sc.textFile("LDA.txt")
+    data = sc.textFile("/Users/xx/Desktop/Availabook/Asite/availabook/Utils/LDA.txt")
     data = data.map(lambda x: x.replace('#',' ').replace(',',' ').replace('.',' ').replace('-',' ').replace('"',' ').lower())
     sqlContext = SQLContext(sc)
     parsedData = data.zipWithIndex().map(lambda (words,idd): Row(idd= idd, words = words.split(' ')))
