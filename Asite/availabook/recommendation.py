@@ -382,6 +382,7 @@ def update_para(email,event, like_or_post):
         ':val1': json.dumps(rec_res)
     }
     )
+    print('22222222222222')
     user_hyper_vec = normalize(user_hyper_vec + para*event_vec)    #### need to scale
     user_topic_vec = normalize(user_topic_vec+ para*event_topic_vec)
     preference_table.update_item(
@@ -397,6 +398,7 @@ def update_para(email,event, like_or_post):
         ':val5': str(user_hyper_vec[3]),
     }
     )
+    print('finish update')
 
 def core_calculation(email,event):
     user = preference_table.get_item(
@@ -441,7 +443,7 @@ def core_calculation(email,event):
         final_score =0
     return event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score
 
-def origin_recommend(email): ### run one time
+def origin_recommend(email): ### run one time, can offline
     event_list = tb_event.scan()['Items']
     rec_res = {}
     i = 0
@@ -462,6 +464,7 @@ def origin_recommend(email): ### run one time
         ':val1': json.dumps(rec_res)
     }
     )
+
 
 
 

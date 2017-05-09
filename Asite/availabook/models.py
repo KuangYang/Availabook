@@ -287,6 +287,7 @@ def get_event_by_EId(EId):
             'EId': EId
         }
     )
+    print(response)
     return response['Item']
 
 
@@ -321,15 +322,22 @@ def get_recommend_newversion(email):
         Key={
             'email': email
         }
-    )['Item']['rec_res']
+    )
+    print(rec_res)
+    rec_res = rec_res['Item']['rec_res']
     event_list = []
     if rec_res:
         rec_res = json.loads(rec_res)
         rec_res = sorted(rec_res,reverse=True)
         for EId in rec_res:
-            e = get_event_by_EId(EId)
-            event = Event(e)
-            event_list.append(event)
+            try:
+                e = get_event_by_EId(EId)
+                event = Event(e)
+                print(EId)
+                event_list.append(event)
+            except Exception as x:
+                print(x)
+                print('no such EId')
     return event_list
 
 
