@@ -9,7 +9,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
 from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list, put_event_into_db, get_recommended_event_list, get_user_by_email, get_user_info_from_eventlist, get_post_events_from_user,get_recommend_newversion
-from availabook.recommendation import update_para,recommend_to_all
+from availabook.recommendation import recommend_to_all,update_like_or_post_tag
 from django.middleware import csrf
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.csrf import csrf_exempt
@@ -25,7 +25,6 @@ from boto.s3.key import Key
 """reload intepretor, add credential path"""
 reload(sys)
 sys.setdefaultencoding('UTF8')
-
 
 
 """import credentials from root/AppCreds"""
@@ -340,8 +339,9 @@ def post_event(request):
         # except Exception as e:
         #     print (e)
         event = {'EId':EId,'content':content,'date':event_date,'time':event_time,'fave':[],'zipcode':zipcode,'timestamp':timestamp,'user_email':email}
-        update_para(email,event,'post')
-        recommend_to_all(event)
+        
+        update_like_or_post_tag(email,event,'post')
+        
         print(EId +' posted')
         return redirect('/availabook/home')
     else:
@@ -354,7 +354,9 @@ def get_fave(request):
         EId = request.POST.get("EId")
         print(EId)
         event = get_event_by_EId(EId)
-        update_para(request.user.username,event,'like')
+        
+        update_like_or_post_tag(request.user.username,event,'like')
+        
         event = Event(event)
         event.add_fave(request.user.username)
         return JsonResponse({"EId" : EId, "fave_num" : event.fave_num})

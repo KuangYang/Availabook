@@ -279,7 +279,11 @@ def time_score(event_date,event_time):
             return 1
     date_diff = int((str(event_date - today)).split(" ")[0])
     #### set the threshold, if bigger than assign a penalty to discard this result
-    result = math.exp(-0.16*date_diff) ### scale the result to make it same as distance
+    try:
+        result = math.exp(-0.16*date_diff) ### scale the result to make it same as distance
+    except Exception as x:
+        print(x)
+        return 0
     if date_diff<0 or result < 0.1: ### old-of-date or later than 15 days
         result = 0
     return result
@@ -361,9 +365,9 @@ def get_score(w1, w2):
 
 
 
-
 def update_para(email,event, like_or_post):
     ### use whenever like or post
+    print(email)
     user = preference_table.get_item(
         Key={
             'email': email
@@ -518,15 +522,73 @@ def origin_recommend(email): ### run one time, can offline
     }
     )
 
-
+def update_like_or_post_tag(email,event,like_or_post):
+    if like_or_post == 'like':
+        tb_result.update_item(
+            Key={
+                'email': email    
+            },
+            UpdateExpression='SET fave = :val1',
+            ExpressionAttributeValues={
+                ':val1': [email,event]
+            }
+        )
+    elif like_or_post == 'post':
+        tb_result.update_item(
+            Key={
+                'email': email    
+            },
+            UpdateExpression='SET post = :val1',
+            ExpressionAttributeValues={
+                ':val1': [email,event]
+            }
+        )
 
 
 @postpone
 def test_thread():
     while True:
-        print('test')
-        #update_para('aa@qq.com','ac7e0f49-4217-4674-99be-2a1fa5e560fc','like')
+        print('test thread')
+        result_list = tb_result.scan()['Items']
+        for result in result_list:
+            like_or_not = result['fave']
+            post_or_not = result['post']
+            if post_or_not=='False' and like_or_not=='False':
+                time.sleep(2)
+            else:
+                print(post_or_not)
+                print(like_or_not)
+                if post_or_not != 'False':
+                    print('post is yes')
+                    email = post_or_not[0]
+                    event = post_or_not[1]
+                    update_para(email,event,'post')
+                    tb_result.update_item(
+                        Key={
+                            'email': email    
+                        },
+                        UpdateExpression='SET post = :val1',
+                        ExpressionAttributeValues={
+                            ':val1': 'False'
+                        }
+                    )
+                if like_or_not != 'False':
+                    print('like is yes')
+                    email = like_or_not[0]
+                    event = like_or_not[1]
+                    update_para(email,event,'like')
+                    tb_result.update_item(
+                        Key={
+                            'email': email    
+                        },
+                        UpdateExpression='SET fave = :val1',
+                        ExpressionAttributeValues={
+                            ':val1': 'False'
+                        }
+                    )
 
+test_thread()
+        #update_para('aa@qq.com','ac7e0f49-4217-4674-99be-2a1fa5e560fc','like')
 
 
 
