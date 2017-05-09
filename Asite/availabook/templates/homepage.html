@@ -37,14 +37,14 @@
 <!-- Navigation -->
   <div class="navbar navbar-blue navbar-static-top">
     <div class="navbar-header">
-      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
         <span class="sr-only">Toggle</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
       <!-- <a href="/" class="navbar-brand logo">AB</a> -->
-      <a href="/availabook" class="navbar-brand topnav" onclick="fbLogoutUser();" display="inline-block" style="margin-top:11px"><font color="white">Availabook</font></a>
+      <a href="/availabook" class="navbar-brand topnav" display="inline-block" style="margin-top:11px;color:#777;"><font>Availabook</font></a>
     </div>
     <nav class="collapse navbar-collapse" role="navigation">
       <form class="navbar-form navbar-left">
@@ -58,24 +58,16 @@
 
       <ul class="nav navbar-nav">
         <li>
-          <a style="font-size:15px;" href="/availabook/home"><i class="glyphicon glyphicon-home" style="font-size:22px;"></i> Home</a>
+          <a style="font-size:15px;color:#777;" href="/availabook/home"><i class="glyphicon glyphicon-home" style="font-size:22px;color:#777;"></i> Home</a>
         </li>
         <li>
-          <a href="#postModal" style="font-size:15px;" role="button" data-toggle="modal"><i class="glyphicon glyphicon-plus" style="font-size:22px;"></i> Post</a>
+          <a href="#postModal" style="font-size:15px;color:#777;" role="button" data-toggle="modal"><i class="glyphicon glyphicon-plus" style="font-size:22px;color:#777;"></i> Post</a>
         </li>
-      </ul>
-
-      <ul class="nav navbar-nav">
-        <li class="dropdown">
-          <a href="/availabook/profile" style="font-size:22px;"><i class="glyphicon glyphicon-user"></i></a>
-          <!-- <ul class="dropdown-menu">
-          <li><a href="">More</a></li>
-          <li><a href="">More</a></li>
-          <li><a href="">More</a></li>
-          <li><a href="">More</a></li>
-          <li><a href="">More</a></li>
-          </ul> -->
+        {% if logedin %}
+        <li>
+          <a href="/availabook/profile" style="font-size:15px;color:#777;"><i class="glyphicon glyphicon-user" style="font-size:22px;color:#777;"></i> Profile</a>
         </li>
+        {% endif %}
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
@@ -88,6 +80,8 @@
         {% endif %}
 
         {% if logedin %}
+        <a class="navbar-brand topnav" onclick="fbLogoutUser();" display="inline-block" style="margin-top:11px;color:#777;"><font> Hi {{fname}}</font></a>
+
         <button id="home_logout_btn" style="margin-top:10px;margin-right:19px;" class="btn btn-default" onclick="fbLogoutUser();"><i class="fa fa-rocket fa-fw"></i> <span class="network-name">Logout</span></button>
         {% endif %}
       </ul>
@@ -233,7 +227,7 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default">
-          <div class="panel-heading">
+          <div class="panel-heading" style="background:#7a7a7a;">
             <h3 class="panel-title">Post Wall</h3>
           </div>
           <div class="panel-body">
@@ -257,16 +251,16 @@
           </div>
         </div>
 
-        <ul>
-          {% for event in event_list %}
-          <li>
+          {% for event, email, name, picture in zipped_list %}
             <div class="panel panel-default post">
               <div class="panel-body">
                 <div class="row">
                   <div class="col-sm-2">
                     {% load static %}
-                    <a href="profile.html" class="post-avatar thumbnail"><img src="{% static 'homepage/img/user.png' %}" alt=""><div class="text-center">DevUser1</div></a>
-                    <div id={{event.EId}} class="faves text-center">{{ event.fave_num }}-likes</div>
+                    <a href="profile.html" class="post-avatar thumbnail"><img src="{{ picture }}" alt=""><div class="text-center">{{ name }}</div></a>
+                    <div>
+                    <p>{{ email }}</p>
+                    </div>
                   </div>
                   <div class="col-sm-10">
                     <div class="bubble">
@@ -275,48 +269,21 @@
                       </div>
                       <div class="pointer-border"></div>
                     </div>
-                    <!-- <form method="POST" action="{% url 'availabook:get_fave' %}"> {% csrf_token %}
-                      <p class="post-actions"><button name="fave" type="submit" class="btn btn-default btn-xs" value={{event.EId}}>like</button></p>
-                    </form> -->
+                    <br>
+                    <div>
+                    <p>Date and Time: {{ event.date }} {{ event.time }}</p>
+                    <div id={{event.EId}} class="faves">{{ event.fave_num }}-likes</div>
+                    </div>
                     <div class="pull-left btn-group-md">
                       <button id="{{ event }}_like_btn" class="btn btn-default btn-md" value={{event.EId}} onclick='click_like("{{ event }}")'><i class="fa fa-heart" aria-hidden="true"></i> Like</button>
-                      <button id="comment_btn" class="btn btn-default btn-md"><i class="fa fa-comment" aria-hidden="true"></i> Comment</button>
-                    </div>
-                    <div class="comment-form">
-                      <form class="form-inline"> {% csrf_token %}
-                        <div class="form-group">
-                          <input type="text" class="form-control" placeholder="enter comment">
-                        </div>
-                        <button type="submit" class="btn btn-default">Add</button>
-                      </form>
-                    </div>
-                    <div class="clearfix"></div>
-                    <div class="comments">
-                      <div class="comment">
-                        {% load static %}
-                        <a href="#" class="comment-avatar pull-left"><img src="{% static 'homepage/img/user.png' %}" alt=""></a>
-                        <div class="comment-text">
-                          <p>I am just going to paste in a paragraph, then we will add another clearfix.</p>
-                        </div>
-                      </div>
-                      <div class="clearfix"></div>
-                      <div class="comment">
-                        <a href="#" class="comment-avatar pull-left"><img src="{% static 'homepage/img/user.png' %}" alt=""></a>
-                        <div class="comment-text">
-                          <p>I am just going to paste in a paragraph, then we will add another clearfix.</p>
-                        </div>
-                      </div>
-                      <div class="clearfix"></div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </li>
           {% endfor %}
-        </ul>
 
-  <footer>
+  <footer style="border-top: 7px solid #7a7a7a;">
     <div class="container">
       <div class="row">
         <div class="col-lg-12">

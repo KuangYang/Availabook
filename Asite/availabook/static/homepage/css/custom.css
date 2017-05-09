@@ -73,7 +73,7 @@ hr {
 
 .navbar-blue {
     border-width:0;
-    background-color:#3B5999;
+    background-color:#f9f9f9;
     color:#ffffff;
     font-family:arial,sans-serif;
     top:0;
@@ -89,7 +89,7 @@ hr {
 .navbar-blue .dropdown-menu li > a {padding-left:30px;}
 
 .navbar-blue li>a:hover, .navbar-blue li>a:focus, .navbar-blue .open, .navbar-blue .open>a, .navbar-blue .open>a:hover, .navbar-blue .open>a:focus {
-   background-color:#2A4888;
+   background-color:#bababa;
    color:#fff;
 }
 

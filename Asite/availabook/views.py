@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
-from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list, put_event_into_db, get_recommended_event_list,get_user_by_email,get_recommend_newversion
+from availabook.models import Users, Signup, Event, get_event_by_EId, get_event_list, put_event_into_db, get_recommended_event_list, get_user_by_email, get_user_info_from_eventlist, get_post_events_from_user,get_recommend_newversion
 from django.middleware import csrf
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.csrf import csrf_exempt
@@ -44,25 +44,32 @@ def index(request):
     ''' render the landing page'''
     for key in request.session.keys():
         del request.session[key]
+
     if request.user.is_authenticated():
+        print "home"
         event_list = get_recommend_newversion(request.user.username)
-        print event_list
-        return render(request, 'homepage.html',{'event_list':event_list, 'logedin': True})
+        email_list, user_name_list, user_picture_list = get_user_info_from_eventlist(event_list)
+        zipped_list = zip(event_list, email_list, user_name_list, user_picture_list)
+        return render(request, 'homepage.html',{'zipped_list': zipped_list, 'logedin': True})
     else:
+        print "landing"
         return render(request, 'landing.html')
 
 
 def home(request):
     event_list = get_recommend_newversion(request.user.username)
+    email_list, user_name_list, user_picture_list = get_user_info_from_eventlist(event_list)
+    zipped_list = zip(event_list, email_list, user_name_list, user_picture_list)
     if request.user.is_authenticated():
-        print event_list
-        return render(request, 'homepage.html',{'event_list':event_list, 'logedin': True})
+        fname = Users.get_user_info(request.user.username)['first_name']
+        return render(request, 'homepage.html',{'zipped_list':zipped_list, 'logedin': True,'fname':fname})
     else:
-        return render(request, 'homepage.html',{'event_list':event_list, 'logedin': False})
+        print "not authenticate"
+        return render(request, 'homepage.html',{'zipped_list':zipped_list, 'logedin': False})
 
 
 @csrf_exempt
-def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
+def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/"):
     print "fb_login"
 
     user_id = str(request.POST.get("email"))
@@ -123,6 +130,7 @@ def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/home"):
             return redirect(onfail)
 
 
+@csrf_exempt
 def login(request, onsuccess="/availabook/home", onfail="/availabook/"):
     csrf_token = csrf.get_token(request)
     user_id = request.POST.get("id")
@@ -225,12 +233,14 @@ def logout(request):
 
 def profile(request):
     if request.user.is_authenticated():
-        print "views profile"
-        # link = Users.get_image_by_id(request.user.username)
-        # print link
+        print "views profile: ", request.user.username
+        posts_list, events_list = get_post_events_from_user(request.user.username)
+        zipped_list = zip(posts_list, events_list)
         item = Users.get_user_info(request.user.username)
         if item is None:
+            print "No user info"
             return redirect("/availabook/home")
+        email = item['email']
         link = item['picture']
         fname = item['first_name']
         lname = item['last_name']
@@ -239,7 +249,7 @@ def profile(request):
         age = item['age']
         print link
         print {'fname':fname,'lname':lname,'city':city,'age':age,'zipcode':zipcode}
-        return render(request, 'profile.html', {'link':link, 'logedin': True, 'fname':fname,'lname':lname,'city':city,'age':age,'zipcode':zipcode})
+        return render(request, 'profile.html', {'email': email, 'link': link, 'logedin': True, 'fname': fname, 'lname': lname, 'city': city, 'age': age,'zipcode': zipcode, 'zipped_list': zipped_list})
     else:
         return redirect("/availabook/home")
 
@@ -312,10 +322,11 @@ def post_event(request):
         print(content)
         print(request.POST.get("dateandtime"))
         event_date, event_time = request.POST.get("dateandtime").split("T")
-        print(event_date,event_time)
+        print(event_date, event_time)
         email = request.user.username
         print(email)
         user = get_user_by_email(email)
+        print user
         zipcode = user['zipcode']
         print(zipcode)
         test_thread()

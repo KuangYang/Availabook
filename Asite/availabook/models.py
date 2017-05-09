@@ -1,5 +1,6 @@
 from django.db import models
 from boto3.session import Session
+from boto3.dynamodb.conditions import Attr
 import os
 import sys
 import json
@@ -212,7 +213,10 @@ def get_user_by_email(email):
                 'email': email
             }
     )
-    return response['Item']
+    if 'Item' in response:
+        return response['Item']
+    else:
+        return None
 
 
 def put_event_into_db(EId,content,date,time,fave,zipcode,timestamp,user_email):
@@ -236,6 +240,45 @@ def put_event_into_db(EId,content,date,time,fave,zipcode,timestamp,user_email):
             'post_time': timestamp
         }
     )
+
+
+def get_user_info_from_eventlist(event_list):
+    user_email_list = []
+    user_name_list = []
+    user_picture_list = []
+
+    for event in event_list:
+        response = post_table.get_item(
+            Key={
+                'EId': event.EId
+            }
+        )
+        user_email_list.append(response['Item']['email'])
+    for email in user_email_list:
+        user = get_user_by_email(email)
+        if user:
+            user_name_list.append(user['first_name'] + " " + user['last_name'])
+            user_picture_list.append(user['picture'])
+        else:
+            user_name_list.append("Default")
+            user_picture_list.append("https://s3.amazonaws.com/image-availabook/default")
+
+    return user_email_list, user_name_list, user_picture_list
+
+
+def get_post_events_from_user(email):
+    posts_list = []
+    events_list = []
+
+    response = post_table.scan(
+        FilterExpression=Attr('email').eq(email)
+    )
+    if response:
+        posts_list = response['Items']
+        for post in posts_list:
+            events_list.append(Event(get_event_by_EId(post["EId"])))
+
+    return posts_list, events_list
 
 
 def get_event_by_EId(EId):
@@ -282,9 +325,8 @@ def get_recommend_newversion(email):
     event_list = []
     if rec_res:
         rec_res = json.loads(rec_res)
-        print(rec_res)
         rec_res = sorted(rec_res,reverse=True)
-        for EId,value in rec_res.items():
+        for EId in rec_res:
             e = get_event_by_EId(EId)
             event = Event(e)
             event_list.append(event)
