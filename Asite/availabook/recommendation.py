@@ -487,9 +487,11 @@ def core_calculation(email,event,like_or_post):
     #print(user['time_para'],user['distance_para'],user['popularity_para'],user['topic_para'])
     event_vec = vectorize(s_time=s_time,s_distance=s_distance,s_popularity=s_popularity,s_topic=s_topic)
     user_hyper_vec = vectorize(s_time=float(user['time_para']),s_distance=float(user['distance_para']),s_popularity=float(user['popularity_para']),s_topic=float(user['topic_para']))
+    default_pop_event_vec = event_vec
     if like_or_post == 'post':
+        default_pop_event_vec[2] = 0.4  ### 10 likes
         event_vec[2] = user_hyper_vec[2] #### if post, popularity keep the same
-    final_score = np.dot(event_vec,user_hyper_vec)
+    final_score = np.dot(default_pop_event_vec,user_hyper_vec)
     print('final_score of dot product '+str(final_score))
     if time_reward:
         final_score = final_score+ 0.03
@@ -546,15 +548,16 @@ def update_like_or_post_tag(email,event,like_or_post):
 
 
 @postpone
-def test_thread():
+def test_update_thread():
     while True:
         print('test thread')
         result_list = tb_result.scan()['Items']
+        time.sleep(2)
         for result in result_list:
             like_or_not = result['fave']
             post_or_not = result['post']
             if post_or_not=='False' and like_or_not=='False':
-                time.sleep(2)
+                pass
             else:
                 print(post_or_not)
                 print(like_or_not)
@@ -587,8 +590,13 @@ def test_thread():
                         }
                     )
 
-test_thread()
-        #update_para('aa@qq.com','ac7e0f49-4217-4674-99be-2a1fa5e560fc','like')
+
+
+test_update_thread()
+
+
+
+#update_para('aa@qq.com','ac7e0f49-4217-4674-99be-2a1fa5e560fc','like')
 
 
 

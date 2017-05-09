@@ -333,11 +333,11 @@ def post_event(request):
         EId = str(uuid.uuid4())
         print (timestamp)
         print (EId)
-        # try:
-        put_event_into_db(EId=EId, content=content,date=event_date,time=event_time,fave=[], zipcode=zipcode,timestamp=timestamp,user_email=email)
-        print ("Post is successfully puhed to AWS Dynamodb!")
-        # except Exception as e:
-        #     print (e)
+        try:
+            put_event_into_db(EId=EId, content=content,date=event_date,time=event_time,fave=[], zipcode=zipcode,timestamp=timestamp,user_email=email)
+            print ("Post is successfully puhed to AWS Dynamodb!")
+        except Exception as e:
+            print (e)
         event = {'EId':EId,'content':content,'date':event_date,'time':event_time,'fave':[],'zipcode':zipcode,'timestamp':timestamp,'user_email':email}
         
         update_like_or_post_tag(email,event,'post')
