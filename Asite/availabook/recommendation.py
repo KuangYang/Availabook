@@ -270,23 +270,28 @@ def time_score(event_date,event_time):
     print('event time '+str(e_hour)+str(e_minute))
     event_date = datetime.date(int(e_year),int(e_month),int(e_day))
     event_datetime = datetime.datetime(int(e_year),int(e_month),int(e_day),int(e_hour),int(e_minute))
+    result = 0
+    penalty = False
+    valid = True
     if event_date == today:
         if datetime.datetime.utcnow()>event_datetime:
             print(datetime.datetime.utcnow())
             print(event_datetime)
-            return 0
+            return 0,True,False
         else:
-            return 1
+            return 1,False,True
     date_diff = int((str(event_date - today)).split(" ")[0])
     #### set the threshold, if bigger than assign a penalty to discard this result
     try:
         result = math.exp(-0.16*date_diff) ### scale the result to make it same as distance
     except Exception as x:
         print(x)
-        return 0
-    if date_diff<0 or result < 0.1: ### old-of-date or later than 15 days
-        result = 0
-    return result
+        return 0,True,False  ## result,penalty,valid
+    if date_diff<0:
+        return 0, True, False
+    if result < 0.1: ### old-of-date or later than 15 days
+        return 0, True,False
+    return result, penalty, valid
 
 def distance_score(event_zipcode,user_zipcode):
     try:
@@ -463,18 +468,20 @@ def core_calculation(email,event,like_or_post):
         }
     )['Item']['zipcode']
     EId = event['EId']
+
     event_valid = True  ### invalid if time, distance score is zero
+    time_penalty = False
+    distance_penalty = False
     time_reward = False  ### reward if score is 1, menas today, add a value to the total score
     distance_reward = False  ## reward if score is 1, means add a value to the total score, since it is common sense that same place is important for event attending
-    s_time =time_score(event['date'],event['time'])
+    s_time,time_penalty,event_valid =time_score(event['date'],event['time'])
     s_distance = distance_score(event_zipcode=str(event['zipcode']),user_zipcode=str(zipcode))
     s_popularity = popularity_score(len(event['fave']))
     if s_distance==0:
-        print('invalid location')
-        event_valid = False
+        print('distance panalty')
+        distance_penalty = True
     if s_time==0:
-        print('invalid time')
-        event_valid = False
+        print('time penalty')
     if s_time == 1:
         print('time reward')
         time_reward = True
@@ -497,6 +504,10 @@ def core_calculation(email,event,like_or_post):
         final_score = final_score+ 0.03
     if distance_reward:
         final_score = final_score + 0.1
+    if time_penalty:
+        final_score = final_score - 0.1
+    if distance_penalty:
+        final_score = final_score - 0.1
     if event_valid == False:
         final_score =0
     print('final_score after reward '+str(final_score))
@@ -547,10 +558,12 @@ def update_like_or_post_tag(email,event,like_or_post):
         )
 
 
+
+
 @postpone
-def test_update_thread():
+def update_thread():
     while True:
-        print('test thread')
+        print('update thread start')
         result_list = tb_result.scan()['Items']
         time.sleep(2)
         for result in result_list:
@@ -565,7 +578,6 @@ def test_update_thread():
                     print('post is yes')
                     email = post_or_not[0]
                     event = post_or_not[1]
-                    update_para(email,event,'post')
                     tb_result.update_item(
                         Key={
                             'email': email    
@@ -575,11 +587,14 @@ def test_update_thread():
                             ':val1': 'False'
                         }
                     )
+                    update_para(email,event,'post')
+
+                    #recommend_to_all(event)
+
                 if like_or_not != 'False':
                     print('like is yes')
                     email = like_or_not[0]
                     event = like_or_not[1]
-                    update_para(email,event,'like')
                     tb_result.update_item(
                         Key={
                             'email': email    
@@ -589,10 +604,24 @@ def test_update_thread():
                             ':val1': 'False'
                         }
                     )
+                    update_para(email,event,'like')
 
 
 
-test_update_thread()
+
+
+update_thread()
+
+# tb_result.update_item(
+#     Key={
+#         'email': 'aa@qq.com'    
+#     },
+#     UpdateExpression='SET rec_to_all = :val1',
+#     ExpressionAttributeValues={
+#         ':val1': 'False',
+#     }
+# )
+
 
 
 

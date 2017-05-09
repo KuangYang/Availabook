@@ -341,7 +341,7 @@ def post_event(request):
         event = {'EId':EId,'content':content,'date':event_date,'time':event_time,'fave':[],'zipcode':zipcode,'timestamp':timestamp,'user_email':email}
         
         update_like_or_post_tag(email,event,'post')
-        
+
         print(EId +' posted')
         return redirect('/availabook/home')
     else:
