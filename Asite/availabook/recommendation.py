@@ -14,6 +14,9 @@ from nltk.corpus import wordnet as wn
 import math
 import json
 from geopy.geocoders import Nominatim
+from django.utils import timezone
+import pytz
+from tzlocal import get_localzone
 """reload intepretor, add credential path"""
 reload(sys)
 sys.setdefaultencoding('UTF8')
@@ -144,7 +147,7 @@ def returnUser(email):
 
 
 def isExpired(date, time):
-    cur = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    cur = datetime.datetime.now(tz=get_localzone()).strftime('%Y-%m-%d %H:%M:%S')
     cur = cur.split(' ')
     curdate = cur[0].split('-')
     eventdate = date.split('-')
@@ -263,23 +266,27 @@ def cosine_similarity(user_vec,event_vec):
     return cosine_similarity
 
 def time_score(event_date,event_time):
+    utc = pytz.utc
+    utc_dt = datetime.datetime.now(pytz.utc)
+    loc_dt = utc_dt.astimezone(get_localzone())
     today = datetime.date.today()
     e_year, e_month, e_day = event_date.split("-")
-    print(event_time)
     e_hour,e_minute = event_time.split(":")
-    print('event time '+str(e_hour)+str(e_minute))
     event_date = datetime.date(int(e_year),int(e_month),int(e_day))
     event_datetime = datetime.datetime(int(e_year),int(e_month),int(e_day),int(e_hour),int(e_minute))
     result = 0
     penalty = False
     valid = True
     if event_date == today:
-        if datetime.datetime.utcnow()>event_datetime:
-            print(datetime.datetime.utcnow())
+        print(str(loc_dt),str(event_datetime))
+        if str(loc_dt)<str(event_datetime):
+            print(loc_dt)
             print(event_datetime)
-            return 0,True,False
-        else:
+            print('valid time and reward')
             return 1,False,True
+        else:
+            print('invalid time and penalty')
+            return 0,True,False
     date_diff = int((str(event_date - today)).split(" ")[0])
     #### set the threshold, if bigger than assign a penalty to discard this result
     try:
@@ -289,8 +296,10 @@ def time_score(event_date,event_time):
         return 0,True,False  ## result,penalty,valid
     if date_diff<0:
         return 0, True, False
+        print('invalid time and penalty')
     if result < 0.1: ### old-of-date or later than 15 days
-        return 0, True,False
+        return 0, True,True
+        print('valid time and penalty')
     return result, penalty, valid
 
 def distance_score(event_zipcode,user_zipcode):
@@ -609,6 +618,21 @@ def update_thread():
 
 update_thread()
 
+
+
+# utc = pytz.utc
+# utc_dt = datetime.datetime.now(pytz.utc)
+# eastern = pytz.timezone('US/Eastern')
+# loc_dt = utc_dt.astimezone(get_localzone())
+# print(str(loc_dt))
+# event_datetime = datetime.datetime(int(2017),int(5),int(9),int(12),int(11),tzinfo=utc)
+# print(str(event_datetime))
+# event_date = datetime.date(int(2017),int(5),int(9))
+# if event_datetime>loc_dt:
+#     print 'aa'
+# current_tz = timezone.get_current_timezone()
+# local = current_tz.normalize(paris.astimezone(current_tz))
+# print(local)
 # tb_result.update_item(
 #     Key={
 #         'email': 'aa@qq.com'    
