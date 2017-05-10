@@ -396,11 +396,34 @@ def update_para(email,event, like_or_post):
     event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event,like_or_post)
     print('new event EId'+event['EId'])
     print('final_score '+str(final_score))
-    rec_res = tb_result.get_item(
+    response = tb_result.get_item(
         Key={
             'email': email
         }
-    )['Item']['rec_res']
+    )
+    if 'Item' not in response:
+        print('this should not happen')
+        rec_res_new_user=tb_result.get_item(
+            key = {
+                'email':'new_user'
+            }
+        )['Item']['rec_res']
+        tb_result.put_item(
+            Item={
+                'email': email,
+                'fave': 'False',
+                'post': 'False',
+                'rec_res': rec_res_new_user,
+                'rec_to_all': 'False',
+                'sign_up_flag': 'False'
+            }
+        )
+        response = tb_result.get_item(
+            Key={
+                'email':email
+            }
+        )
+    rec_res = response['Item']['rec_res']
     rec_res = json.loads(rec_res)
     rec_res[event['EId']]=final_score
     tb_result.update_item(
@@ -440,11 +463,33 @@ def recommend_to_all(event): #### run when post
     for user in user_list:
         email = user['email']
         event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event,'post')
-        rec_res = tb_result.get_item(
+        response = tb_result.get_item(
             Key={
                 'email': email
             }
-        )['Item']['rec_res']
+        )
+        if 'Item' not in response:
+            rec_res_new_user=tb_result.get_item(
+                key = {
+                    'email':'new_user'
+                }
+            )['Item']['rec_res']
+            tb_result.put_item(
+                Item={
+                    'email': email,
+                    'fave': 'False',
+                    'post': 'False',
+                    'rec_res': rec_res_new_user,
+                    'rec_to_all': 'False',
+                    'sign_up_flag':'False'
+                }
+            )
+            response = tb_result.get_item(
+                Key={
+                    'email':email
+                }
+            )
+        rec_res = response['Item']['rec_res']    
         rec_res = json.loads(rec_res)
         rec_res[event['EId']]=final_score
         tb_result.update_item(
@@ -463,11 +508,28 @@ def recommend_to_all(event): #### run when post
 
 
 def core_calculation(email,event,like_or_post):
-    user = preference_table.get_item(
+    response = preference_table.get_item(
         Key={
             'email': email
         }
-    )['Item']
+    )
+    if 'Item' not in response:
+        preference_table.put_item(
+            Item={
+                'email': email,
+                'rating': ['0.33','0.33','0.33','0.33','0.33','0.33','0.33','0.33','0.33','0.33'],
+                'distance_para':'0.5',
+                'popularity_para':'0.5',
+                'time_para':'0.5',
+                'topic_para':'0.5'
+            }
+        )
+        response = preference_table.get_item(
+            Key={
+                'email':email
+            }
+        )
+    user = response['Item']
     zipcode = tb_user.get_item(
         Key={
             'email':email
@@ -563,7 +625,85 @@ def update_like_or_post_tag(email,event,like_or_post):
             }
         )
 
+def rec_to_new_user():
+    event_list = tb_event.scan()['Items']
+    rec_res = {}
+    for event in event_list:
+        print(event['EId'])
+        event_valid = True  ### invalid if time
+        time_penalty = False
+        time_reward = False  ### reward if score is 1, menas today, add a value to the total score
+        s_time,time_penalty,event_valid =time_score(event['date'],event['time'])
+        s_popularity = popularity_score(len(event['fave']))
+        if s_time==0:
+            print('time penalty')
+        if s_time == 1:
+            print('time reward')
+            time_reward = True
+        final_score = s_time+s_popularity
+        if time_reward:
+            final_score = final_score+ 0.03
+        if time_penalty:
+            final_score = final_score - 0.1
+        if event_valid == False:
+            final_score =0
+        rec_res[event['EId']] = final_score
+    tb_result.update_item(
+        Key={
+            'email': 'new_user'    
+        },
+        UpdateExpression='SET rec_res = :val1',
+        ExpressionAttributeValues={
+            ':val1': json.dumps(rec_res)
+        }
+    )
 
+def rec_to_signup(email,zipcode):
+    print('rec_to_signup')
+    event_list = tb_event.scan()['Items']
+    rec_res = {}
+    for event in event_list:
+        print(event['EId'])
+        event_valid = True  ### invalid if time, distance score is zero
+        time_penalty = False
+        distance_penalty = False
+        time_reward = False  ### reward if score is 1, menas today, add a value to the total score
+        distance_reward = False  ## reward if score is 1, means add a value to the total score, since it is common sense that same place is important for event attending
+        s_time,time_penalty,event_valid =time_score(event['date'],event['time'])
+        s_distance = distance_score(event_zipcode=str(event['zipcode']),user_zipcode=str(zipcode))
+        s_popularity = popularity_score(len(event['fave']))
+        if s_distance==0:
+            print('distance panalty')
+            distance_penalty = True
+        if s_time==0:
+            print('time penalty')
+        if s_time == 1:
+            print('time reward')
+            time_reward = True
+        if s_distance == 1:
+            print('distance reward')
+            distance_reward = True
+        final_score = s_time+s_popularity+s_distance
+        if time_reward:
+            final_score = final_score+ 0.03
+        if distance_reward:
+            final_score = final_score + 0.1
+        if time_penalty:
+            final_score = final_score - 0.1
+        if distance_penalty:
+            final_score = final_score - 0.1
+        if event_valid == False:
+            final_score =0
+        rec_res[event['EId']] = final_score
+    tb_result.update_item(
+        Key={
+            'email': email   
+        },
+        UpdateExpression='SET rec_res = :val1',
+        ExpressionAttributeValues={
+            ':val1': json.dumps(rec_res)
+        }
+    )
 
 
 @postpone
@@ -612,11 +752,37 @@ def update_thread():
                     )
                     update_para(email,event,'like')
 
+@postpone
+def singup_rec_thread():
+    while True:
+        result_list = tb_result.scan()['Items']
+        time.sleep(2)
+        for result in result_list:
+            if result['email'] == 'new_user':
+                pass
+            elif result['sign_up_flag'] == 'True':
+                print('a new signup')
+                tb_result.update_item(
+                    Key={
+                        'email': result['email']  
+                    },
+                    UpdateExpression='SET sign_up_flag = :val1',
+                    ExpressionAttributeValues={
+                        ':val1': 'False',
+                    }
+                )
+                print(result['email'])
+                zipcode = tb_user.get_item(
+                    Key={
+                        'email':result['email']
+                    }
+                )['Item']['zipcode']
+                rec_to_signup(result['email'],zipcode)
+                print(str(result['email'])+'finished')
 
+singup_rec_thread()
+#update_thread()
 
-
-
-update_thread()
 
 
 
@@ -637,7 +803,7 @@ update_thread()
 #     Key={
 #         'email': 'aa@qq.com'    
 #     },
-#     UpdateExpression='SET rec_to_all = :val1',
+#     UpdateExpression='SET sign_up_flag = :val1',
 #     ExpressionAttributeValues={
 #         ':val1': 'False',
 #     }

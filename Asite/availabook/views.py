@@ -47,9 +47,9 @@ def index(request):
 
     if request.user.is_authenticated():
         print "home"
-        event_list = get_recommend_newversion(request.user.username)
-        email_list, user_name_list, user_picture_list = get_user_info_from_eventlist(event_list)
-        zipped_list = zip(event_list, email_list, user_name_list, user_picture_list)
+        #event_list = get_recommend_newversion(request.user.username)
+        #email_list, user_name_list, user_picture_list = get_user_info_from_eventlist(event_list)
+        #zipped_list = zip(event_list, email_list, user_name_list, user_picture_list)
         return render(request, 'homepage.html',{'zipped_list': zipped_list, 'logedin': True})
     else:
         print "landing"

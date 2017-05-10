@@ -4,7 +4,7 @@ from boto3.dynamodb.conditions import Attr
 import os
 import sys
 import json
-from availabook.recommendation import recommend, common, get_label, get_score
+from availabook.recommendation import recommend, common, get_label, get_score,rec_to_signup
 import nltk
 import operator
 from nltk.corpus import wordnet as wn
@@ -146,6 +146,21 @@ class Signup():
                 'password': self.pwd,
                 'zipcode': self.zipcode,
                 'picture': str(self.picture),
+            }
+        )
+        rec_res_new_user=tb_result.get_item(
+            Key = {
+                'email':'new_user'
+            }
+        )['Item']['rec_res']
+        tb_result.put_item(
+            Item={
+                'email': self.id,
+                'fave': 'False',
+                'post': 'False',
+                'rec_res': rec_res_new_user,
+                'rec_to_all': 'False',
+                'sign_up_flag': 'True'
             }
         )
 
