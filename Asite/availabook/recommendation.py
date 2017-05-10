@@ -470,7 +470,7 @@ def recommend_to_all(event): #### run when post
         )
         if 'Item' not in response:
             rec_res_new_user=tb_result.get_item(
-                key = {
+                Key = {
                     'email':'new_user'
                 }
             )['Item']['rec_res']
@@ -501,7 +501,7 @@ def recommend_to_all(event): #### run when post
             ':val1': json.dumps(rec_res)
         }
         )
-        print('recommend to '+email+' '+EId+' '+str(final_score))
+        print('recommend to '+email+' '+event['EId']+' '+str(final_score))
     print('finish recommend to all')
 
 
@@ -543,41 +543,43 @@ def core_calculation(email,event,like_or_post):
     time_reward = False  ### reward if score is 1, menas today, add a value to the total score
     distance_reward = False  ## reward if score is 1, means add a value to the total score, since it is common sense that same place is important for event attending
     s_time,time_penalty,event_valid =time_score(event['date'],event['time'])
-    s_distance = distance_score(event_zipcode=str(event['zipcode']),user_zipcode=str(zipcode))
-    s_popularity = popularity_score(len(event['fave']))
-    if s_distance==0:
-        print('distance panalty')
-        distance_penalty = True
-    if s_time==0:
-        print('time penalty')
-    if s_time == 1:
-        print('time reward')
-        time_reward = True
-    if s_distance == 1:
-        print('distance reward')
-        distance_reward = True
-    event_topic_vec = get_label(event['content'])
-    user_topic_vec = [float(i) for i in user['rating']]
-    s_topic = cosine_similarity(np.asarray(user_topic_vec),np.asarray(event_topic_vec)) ## topicscore
-    #print(user['time_para'],user['distance_para'],user['popularity_para'],user['topic_para'])
-    event_vec = vectorize(s_time=s_time,s_distance=s_distance,s_popularity=s_popularity,s_topic=s_topic)
-    user_hyper_vec = vectorize(s_time=float(user['time_para']),s_distance=float(user['distance_para']),s_popularity=float(user['popularity_para']),s_topic=float(user['topic_para']))
-    default_pop_event_vec = event_vec
-    if like_or_post == 'post':
-        default_pop_event_vec[2] = 0.4  ### 10 likes
-        event_vec[2] = user_hyper_vec[2] #### if post, popularity keep the same
-    final_score = np.dot(default_pop_event_vec,user_hyper_vec)
-    print('final_score of dot product '+str(final_score))
-    if time_reward:
-        final_score = final_score+ 0.03
-    if distance_reward:
-        final_score = final_score + 0.1
-    if time_penalty:
-        final_score = final_score - 0.1
-    if distance_penalty:
-        final_score = final_score - 0.1
-    if event_valid == False:
-        final_score =0
+    final_score = 0
+    if event_valid == True:
+        s_distance = distance_score(event_zipcode=str(event['zipcode']),user_zipcode=str(zipcode))
+        s_popularity = popularity_score(len(event['fave']))
+        if s_distance==0:
+            print('distance panalty')
+            distance_penalty = True
+        if s_time==0:
+            print('time penalty')
+        if s_time == 1:
+            print('time reward')
+            time_reward = True
+        if s_distance == 1:
+            print('distance reward')
+            distance_reward = True
+        event_topic_vec = get_label(event['content'])
+        user_topic_vec = [float(i) for i in user['rating']]
+        s_topic = cosine_similarity(np.asarray(user_topic_vec),np.asarray(event_topic_vec)) ## topicscore
+        #print(user['time_para'],user['distance_para'],user['popularity_para'],user['topic_para'])
+        event_vec = vectorize(s_time=s_time,s_distance=s_distance,s_popularity=s_popularity,s_topic=s_topic)
+        user_hyper_vec = vectorize(s_time=float(user['time_para']),s_distance=float(user['distance_para']),s_popularity=float(user['popularity_para']),s_topic=float(user['topic_para']))
+        default_pop_event_vec = event_vec
+        if like_or_post == 'post':
+            default_pop_event_vec[2] = 0.4  ### 10 likes
+            event_vec[2] = user_hyper_vec[2] #### if post, popularity keep the same
+        final_score = np.dot(default_pop_event_vec,user_hyper_vec)
+        print('final_score of dot product '+str(final_score))
+        if time_reward:
+            final_score = final_score+ 0.03
+        if distance_reward:
+            final_score = final_score + 0.1
+        if time_penalty:
+            final_score = final_score - 0.1
+        if distance_penalty:
+            final_score = final_score - 0.1
+        if event_valid == False:
+            final_score =0
     print('final_score after reward '+str(final_score))
     return event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score
 
@@ -670,30 +672,32 @@ def rec_to_signup(email,zipcode):
         time_reward = False  ### reward if score is 1, menas today, add a value to the total score
         distance_reward = False  ## reward if score is 1, means add a value to the total score, since it is common sense that same place is important for event attending
         s_time,time_penalty,event_valid =time_score(event['date'],event['time'])
-        s_distance = distance_score(event_zipcode=str(event['zipcode']),user_zipcode=str(zipcode))
-        s_popularity = popularity_score(len(event['fave']))
-        if s_distance==0:
-            print('distance panalty')
-            distance_penalty = True
-        if s_time==0:
-            print('time penalty')
-        if s_time == 1:
-            print('time reward')
-            time_reward = True
-        if s_distance == 1:
-            print('distance reward')
-            distance_reward = True
-        final_score = s_time+s_popularity+s_distance
-        if time_reward:
-            final_score = final_score+ 0.03
-        if distance_reward:
-            final_score = final_score + 0.1
-        if time_penalty:
-            final_score = final_score - 0.1
-        if distance_penalty:
-            final_score = final_score - 0.1
-        if event_valid == False:
-            final_score =0
+        final_score = 0
+        if event_valid == True:
+            s_distance = distance_score(event_zipcode=str(event['zipcode']),user_zipcode=str(zipcode))
+            s_popularity = popularity_score(len(event['fave']))
+            if s_distance==0:
+                print('distance panalty')
+                distance_penalty = True
+            if s_time==0:
+                print('time penalty')
+            if s_time == 1:
+                print('time reward')
+                time_reward = True
+            if s_distance == 1:
+                print('distance reward')
+                distance_reward = True
+            final_score = s_time+s_popularity+s_distance
+            if time_reward:
+                final_score = final_score+ 0.03
+            if distance_reward:
+                final_score = final_score + 0.1
+            if time_penalty:
+                final_score = final_score - 0.1
+            if distance_penalty:
+                final_score = final_score - 0.1
+            if event_valid == False:
+                final_score =0
         rec_res[event['EId']] = final_score
     tb_result.update_item(
         Key={
@@ -737,8 +741,7 @@ def update_thread():
                             }
                         )
                         update_para(email,event,'post')
-
-                        #recommend_to_all(event)
+                        recommend_to_all(event)
 
                     if like_or_not != 'False':
                         print('like is yes')
