@@ -252,7 +252,7 @@ def recommend_item(Cid):
     return recommendation_list
 
 def normalize(vec):
-    return vec/np.sum(vec)
+    return vec/np.sqrt(np.sum(vec**2))
 
 def cosine_similarity(user_vec,event_vec):
     ### not use it
@@ -324,10 +324,7 @@ def assign_score(user,event):
     event_vec = event_vec(event)
     return event_vec.dot(user.user_vec)
 
-def para_tuning(user_vec,event_vec):
-    ### user_vec and event_vec are normalized
-    ### use this function whenever a new like,not post!
-    return normalize(user_vec + 0.001*event_vec)
+
 
 def get_label(data):
     try:
@@ -378,11 +375,11 @@ def update_para(email,event, like_or_post):
             'email': email
         }
     )['Item']
-    para = 0.2
+    para = 0.5
     if like_or_post == 'post':
-        para = 0.2
+        para = 0.5
     elif like_or_post == 'like':
-        para = 0.02
+        para = 0.1
     else:
         print('not valid like_or_post')
     user_topic_vec = np.asarray([float(i) for i in user['rating']])
@@ -411,7 +408,7 @@ def update_para(email,event, like_or_post):
     user_hyper_vec = normalize(user_hyper_vec + para*event_vec)    #### need to scale
     print('updated hyper para: time, distance ,popularity, topic '+str(user_hyper_vec[0])+' '+str(user_hyper_vec[1])+' '+str(user_hyper_vec[2])+' '+str(user_hyper_vec[3]))
     print('original user topic vec: '+str(user_topic_vec))
-    user_topic_vec = normalize(user_topic_vec+ para*event_topic_vec)
+    user_topic_vec = normalize(user_topic_vec+ 3*para*event_topic_vec)
     print('updated user topic vec: '+str(user_topic_vec))
     preference_table.update_item(
     Key={
