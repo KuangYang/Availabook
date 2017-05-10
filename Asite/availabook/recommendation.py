@@ -713,44 +713,47 @@ def update_thread():
         result_list = tb_result.scan()['Items']
         time.sleep(2)
         for result in result_list:
-            like_or_not = result['fave']
-            post_or_not = result['post']
-            if post_or_not=='False' and like_or_not=='False':
+            if result['email'] == 'new_user':
                 pass
             else:
-                print(post_or_not)
-                print(like_or_not)
-                if post_or_not != 'False':
-                    print('post is yes')
-                    email = post_or_not[0]
-                    event = post_or_not[1]
-                    tb_result.update_item(
-                        Key={
-                            'email': email    
-                        },
-                        UpdateExpression='SET post = :val1',
-                        ExpressionAttributeValues={
-                            ':val1': 'False'
-                        }
-                    )
-                    update_para(email,event,'post')
+                like_or_not = result['fave']
+                post_or_not = result['post']
+                if post_or_not=='False' and like_or_not=='False':
+                    pass
+                else:
+                    print(post_or_not)
+                    print(like_or_not)
+                    if post_or_not != 'False':
+                        print('post is yes')
+                        email = post_or_not[0]
+                        event = post_or_not[1]
+                        tb_result.update_item(
+                            Key={
+                                'email': email    
+                            },
+                            UpdateExpression='SET post = :val1',
+                            ExpressionAttributeValues={
+                                ':val1': 'False'
+                            }
+                        )
+                        update_para(email,event,'post')
 
-                    #recommend_to_all(event)
+                        #recommend_to_all(event)
 
-                if like_or_not != 'False':
-                    print('like is yes')
-                    email = like_or_not[0]
-                    event = like_or_not[1]
-                    tb_result.update_item(
-                        Key={
-                            'email': email    
-                        },
-                        UpdateExpression='SET fave = :val1',
-                        ExpressionAttributeValues={
-                            ':val1': 'False'
-                        }
-                    )
-                    update_para(email,event,'like')
+                    if like_or_not != 'False':
+                        print('like is yes')
+                        email = like_or_not[0]
+                        event = like_or_not[1]
+                        tb_result.update_item(
+                            Key={
+                                'email': email    
+                            },
+                            UpdateExpression='SET fave = :val1',
+                            ExpressionAttributeValues={
+                                ':val1': 'False'
+                            }
+                        )
+                        update_para(email,event,'like')
 
 @postpone
 def singup_rec_thread():
@@ -781,7 +784,7 @@ def singup_rec_thread():
                 print(str(result['email'])+'finished')
 
 singup_rec_thread()
-#update_thread()
+update_thread()
 
 
 

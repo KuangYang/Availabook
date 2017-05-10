@@ -30,6 +30,7 @@ user_table = dynamodb.Table("User")
 event_table = dynamodb.Table("Event")
 post_table = dynamodb.Table("Post")
 tb_result = dynamodb.Table("Result")
+preference_table = dynamodb.Table("Preference")
 # Create your models here.
 class Users():
     #def __init__(self, id, passwd, passwd_again, firstname, lastname, age, city, zipcode):
@@ -161,6 +162,16 @@ class Signup():
                 'rec_res': rec_res_new_user,
                 'rec_to_all': 'False',
                 'sign_up_flag': 'True'
+            }
+        )
+        preference_table.put_item(
+            Item={
+                'email': self.id,
+                'rating': ['0.33','0.33','0.33','0.33','0.33','0.33','0.33','0.33','0.33','0.33'],
+                'distance_para':'0.5',
+                'popularity_para':'0.5',
+                'time_para':'0.5',
+                'topic_para':'0.5'
             }
         )
 
