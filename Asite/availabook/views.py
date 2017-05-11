@@ -98,12 +98,12 @@ def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/"):
             user.backend = 'django.contrib.auth.backends.ModelBackend'
             auth_login(request, user)
 
-            # try:
-            print "~~~~~~~~~"
-            signup_handler.push_to_dynamodb()
-            print "push success"
-            # except Exception as e:
-            #     print (e)
+            try:
+                print "~~~~~~~~~"
+                signup_handler.push_to_dynamodb()
+                print "push success"
+            except Exception as e:
+                print (e)
 
 
             print str(request.user.username) + " is signed up and logged in: " + str(request.user.is_authenticated())
@@ -181,32 +181,32 @@ def signup(request, onsuccess="/availabook/temp", onfail="/availabook/"):
             user.backend = 'django.contrib.auth.backends.ModelBackend'
             auth_login(request, user)
             print ("Successfully saving user information to Django sqlite.")
-            # try:
-            signup_handler.push_to_dynamodb()
-            print ("Successfully pushing user information to AWS Dynamodb.")
-            print str(request.user.username) + " is signed up and logged in: " + str(request.user.is_authenticated())
-            return redirect(onsuccess)
-            # except Exception as e:
-            #     print (e)
-            #     print ("Pushing user information to AWS Dynamodb failed! Please sign up again!")
-            #     return HttpResponse("Error")
+            try:
+                signup_handler.push_to_dynamodb()
+                print ("Successfully pushing user information to AWS Dynamodb.")
+                print str(request.user.username) + " is signed up and logged in: " + str(request.user.is_authenticated())
+                return redirect(onsuccess)
+            except Exception as e:
+                print (e)
+                print ("Pushing user information to AWS Dynamodb failed! Please sign up again!")
+                return HttpResponse("Error")
         else:
             user_db = Users(user_id, pwd)
             if user_db.verify_email() == False:
                 print "Current user is already existed in Django sqlite, but not in AWS Dynamodb! Generally, sign up will fail. For debugging, maybe you should first delete this user from your django sqlite, clean the cache in browser and sign up again!"
-                # try:
-                signup_handler.push_to_dynamodb()
-                print ("Successfully pushing user information to AWS Dynamodb.")
-                if request.user.is_authenticated():
-                    print str(request.user.username) + " is signed up and logged in: " + str(request.user.is_authenticated())
-                    return redirect(onsuccess)
-                else:
-                    print ("Sign up failed. Please debug following the instructions above!")
+                try:
+                    signup_handler.push_to_dynamodb()
+                    print ("Successfully pushing user information to AWS Dynamodb.")
+                    if request.user.is_authenticated():
+                        print str(request.user.username) + " is signed up and logged in: " + str(request.user.is_authenticated())
+                        return redirect(onsuccess)
+                    else:
+                        print ("Sign up failed. Please debug following the instructions above!")
+                        return HttpResponse("Error")
+                except Exception as e:
+                    print (e)
+                    print ("Pushing user information to AWS Dynamodb failed! Please debug and sign up again!")
                     return HttpResponse("Error")
-                # except Exception as e:
-                #     print (e)
-                #     print ("Pushing user information to AWS Dynamodb failed! Please debug and sign up again!")
-                #     return HttpResponse("Error")
             else:
                 print ("Current user is already existed in both Django sqlite and AWS Dynamodb! Please turn to log in first!")
                 print ("If you still can't sign up and log in, for debugging, please delete this user from your django sqlite, clean the cache in browser and sign up again!")
