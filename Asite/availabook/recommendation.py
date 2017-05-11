@@ -315,8 +315,11 @@ def distance_score(event_zipcode,user_zipcode):
         print(user_zipcode,event_zipcode)
         print(e)
         return 0
+    print(str(location1.longitude)+' '+str(location2.longitude)+' '+str(location1.latitude)+' '+str(str(location2.latitude)))
     distance = math.sqrt((location1.latitude - location2.latitude)**2 + (location1.longitude-location2.longitude)**2)
+    print(distance)
     result = math.exp(-0.58*distance)
+    print(result)
     if result < 0.1:  ### distance farther than penn state to mahattan
         result = 0
     return result
@@ -869,6 +872,9 @@ rec_to_all_thread()
 new_user_rec_thread()
 update_thread()
 whole_recommendation_thread()
+
+# print(distance_score('10025','16802'))
+# print(distance_score('10025','07701'))
 
 
 

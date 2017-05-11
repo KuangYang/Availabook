@@ -369,15 +369,16 @@ def get_recommend_newversion(email):
         i = 0
         for EId,value in rec_res_list:
             i+=1
-            print(i)
-            try:
-                e = get_event_by_EId(EId)
-                event = Event(e)
-                print('get a new event'+EId +': '+ str(rec_res[EId]))
-                event_list.append(event)
-            except Exception as x:
-                print(x)
-                print('no such EId '+EId)
+            if i <= 20:
+                print(i)
+                try:
+                    e = get_event_by_EId(EId)
+                    event = Event(e)
+                    print('get a new event'+EId +': '+ str(rec_res[EId]))
+                    event_list.append(event)
+                except Exception as x:
+                    print(x)
+                    print('no such EId '+EId)
     return event_list
 
 
