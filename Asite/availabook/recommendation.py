@@ -337,34 +337,30 @@ def assign_score(user,event):
 
 
 def get_label(data):
-    try:
-        w1 = [["new", "film", "movie", "night", "outdoor", "ticket", "free", "lunch", "tonight", "special"],
-            ["shoot", "adventure", "downtown", "cigar", "donate", "bourbon", "acupuncture", "festival", "dance", "tribute"],
-            ["work", "semester", "chocolate", "shop", "college", "superstar", "volleyball", "camera", "newlook", "business"],
-            ["rose", "golf", "gather", "china", "welcome", "giveaway", "sell", "cash", "crossword", "bike"],
-            ["expert", "social", "perspective", "pint", "win", "post", "connect", "TV", "express", "fame"],
-            ["consumer", "mama", "testify", "crock", "document", "weekend", "team", "floral", "water", "foam"],
-            ["lake", "garden", "car", "gorge", "teach", "household", "compete", "gig", "bar", "omnibus"],
-            ["travel", "discuss", "ceremony", "introduction", "closing", "fight", "musician", "live", "theatre", "restaurant"],
-            ["tech", "hilarious", "create", "palace", "volunteer", "poster", "design", "hart", "confessional", "league"],
-            ["fruit", "guest", "show", "learn", "drama", "summit", "press", "center", "campaign", "fun"]]
-        w2 = [w.lower() for w in data.replace(',', ' ').split(' ')]
-        en_stop = get_stop_words('en')
-        removelist = ["go", "an", "want", "play", "someone", "like", "together"]
-        for word in w2:
-            if word in en_stop:
-                w2.remove(word)
-        for word in w2:
-            if word in removelist:
-                w2.remove(word)
-        similarity = []
-        for i in range(0, 10):
-            similarity.append((get_score(w1[i], w2)))
-        similarity = normalize(np.asarray(similarity))
-        return similarity
-    except:
-        print('get_label failed, return a default array')
-        return np.ones(10)/10
+    w1 = [["new", "film", "movie", "night", "outdoor", "ticket", "free", "lunch", "tonight", "special"],
+        ["shoot", "adventure", "downtown", "cigar", "donate", "bourbon", "acupuncture", "festival", "dance", "tribute"],
+        ["work", "semester", "chocolate", "shop", "college", "superstar", "volleyball", "camera", "newlook", "business"],
+        ["rose", "golf", "gather", "china", "welcome", "giveaway", "sell", "cash", "crossword", "bike"],
+        ["expert", "social", "perspective", "pint", "win", "post", "connect", "TV", "express", "fame"],
+        ["consumer", "mama", "testify", "crock", "document", "weekend", "team", "floral", "water", "foam"],
+        ["lake", "garden", "car", "gorge", "teach", "household", "compete", "gig", "bar", "omnibus"],
+        ["travel", "discuss", "ceremony", "introduction", "closing", "fight", "musician", "live", "theatre", "restaurant"],
+        ["tech", "hilarious", "create", "palace", "volunteer", "poster", "design", "hart", "confessional", "league"],
+        ["fruit", "guest", "show", "learn", "drama", "summit", "press", "center", "campaign", "fun"]]
+    w2 = [w.lower() for w in data.replace(',', ' ').split(' ')]
+    en_stop = get_stop_words('en')
+    removelist = ["go", "an", "want", "play", "someone", "like", "together"]
+    for word in w2:
+        if word in en_stop:
+            w2.remove(word)
+    for word in w2:
+        if word in removelist:
+            w2.remove(word)
+    similarity = []
+    for i in range(0, 10):
+        similarity.append((get_score(w1[i], w2)))
+    similarity = normalize(np.asarray(similarity))
+    return similarity
 
 
 def get_score(w1, w2):
@@ -742,13 +738,13 @@ def rec_to_signup(email,zipcode):
 @postpone
 def update_thread():
     while True:
-        print('update thread start')
         result_list = tb_result.scan()['Items']
         time.sleep(2)
         for result in result_list:
             if result['email'] == 'new_user':
                 pass
             else:
+                print('update thread start')
                 like_or_not = result['fave']
                 post_or_not = result['post']
                 if post_or_not=='False' and like_or_not=='False':
