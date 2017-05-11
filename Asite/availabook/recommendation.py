@@ -324,7 +324,7 @@ def distance_score(event_zipcode,user_zipcode):
 
 def popularity_score(likes_num):
     likes_num = likes_num
-    return (1-math.exp(-0.08*likes_num))
+    return 5*(1-math.exp(-0.05*likes_num))
 
 def vectorize(s_time,s_distance,s_popularity,s_topic):
     ### think about put it into db to accelate the speed
@@ -365,7 +365,7 @@ def get_label(data):
         return similarity
     except:
         print('get_label failed, return a default array')
-        return 0.33*np.ones(10)
+        return normalize(np.random.rand(10))
 
 
 def get_score(w1, w2):
@@ -454,7 +454,7 @@ def update_para(email,event, like_or_post):
         user_hyper_vec = normalize(user_hyper_vec + para*event_vec)    #### need to scale
         print('updated hyper para: time, distance ,popularity, topic '+str(user_hyper_vec[0])+' '+str(user_hyper_vec[1])+' '+str(user_hyper_vec[2])+' '+str(user_hyper_vec[3]))
         print('original user topic vec: '+str(user_topic_vec))
-        user_topic_vec = normalize(user_topic_vec+ 3*para*event_topic_vec)
+        user_topic_vec = normalize(user_topic_vec + para*event_topic_vec)
         print('updated user topic vec: '+str(user_topic_vec))
         preference_table.update_item(
         Key={
@@ -644,9 +644,10 @@ def update_like_or_post_tag(email,event,like_or_post):
             Key={
                 'email': email    
             },
-            UpdateExpression='SET post = :val1',
+            UpdateExpression='SET post = :val1, rec_to_all= :val2',
             ExpressionAttributeValues={
-                ':val1': [email,event]
+                ':val1': [email,event],
+                ':val2': [email,event]
             }
         )
 
@@ -703,6 +704,7 @@ def rec_to_signup(email,zipcode):
     for event in event_list:
         event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event,'sign_up')
         rec_res[event['EId']] = final_score
+        print(event['content']+'score '+str(final_score))
     tb_result.update_item(
         Key={
             'email': email   
@@ -718,7 +720,7 @@ def rec_to_signup(email,zipcode):
 def update_thread():
     while True:
         result_list = tb_result.scan()['Items']
-        time.sleep(2)
+        time.sleep(1)
         for result in result_list:
             if result['email'] == 'new_user':
                 pass
@@ -745,7 +747,7 @@ def update_thread():
                             }
                         )
                         update_para(email,event,'post')
-                        recommend_to_all(event,'post')
+                        
 
                     if like_or_not != 'False':
                         print('like is yes')
@@ -761,6 +763,32 @@ def update_thread():
                             }
                         )
                         update_para(email,event,'like')
+
+@postpone
+def rec_to_all_thread():
+    while True:
+        result_list = tb_result.scan()['Items']
+        time.sleep(1)
+        for result in result_list:
+            if result['email'] == 'new_user':
+                pass
+            else:
+                rec_to_all = result['rec_to_all']
+                if rec_to_all != 'False':
+                    print(rec_to_all)
+                    print('rec_to_all thread start')
+                    email = rec_to_all[0]
+                    event = rec_to_all[1]
+                    tb_result.update_item(
+                        Key={
+                            'email': email    
+                        },
+                        UpdateExpression='SET rec_to_all = :val1',
+                        ExpressionAttributeValues={
+                            ':val1': 'False'
+                        }
+                    )
+                    recommend_to_all(event,'post')
 
 @postpone
 def singup_rec_thread():
@@ -811,6 +839,7 @@ def whole_recommendation_thread():
 
 
 singup_rec_thread()
+rec_to_all_thread()
 new_user_rec_thread()
 update_thread()
 whole_recommendation_thread()
