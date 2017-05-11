@@ -386,9 +386,9 @@ def update_para(email,event, like_or_post):
     )['Item']
     para = 0.5
     if like_or_post == 'post':
-        para = 0.5
+        para = 0.2
     elif like_or_post == 'like':
-        para = 0.1
+        para = 0.05
     else:
         print('not valid like_or_post')
     user_topic_vec = np.asarray([float(i) for i in user['rating']])
