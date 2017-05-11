@@ -70,7 +70,7 @@ def home(request):
 
 
 @csrf_exempt
-def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/"):
+def fb_login(request, onsuccess="/availabook/temp", onfail="/availabook/"):
     print "fb_login"
 
     user_id = str(request.POST.get("email"))
