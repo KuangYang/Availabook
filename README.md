@@ -8,12 +8,17 @@
 
 #### Environment Setup
 
+##### Check if Django has been installed already.
+
 ```
-$ pip install flask-dynamo
-$ pip install -U flask-dynamo
+$ python -m django --version
 ```
 
+##### If Django isn't installed, please see [How to install Django](https://docs.djangoproject.com/en/1.11/topics/install/)
+
 #### Set Environment Variables
+
+##### Please add the AWS credentials into the ./Asite/availabook/AppCreds directory
 
 * AWS_ACCESS_KEY_ID
 
