@@ -67,9 +67,7 @@
 
 <body>
 
-
 <script>
-
    //This is called with the results from from FB.getLoginStatus().
   function statusChangeCallback(response) {
     console.log('statusChangeCallback');
@@ -188,40 +186,35 @@
 
 
 </script>
-    <!-- Header -->
-    <a name="about"></a>
+
+  <a name="about"></a>
     <div class="intro-header">
-        <div class="container">
-
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="intro-message">
-                        <h1>Availabook</h1>
-                        <h3>A Social Network Website</h3>
-                        <hr class="intro-divider">
-                        <ul class="list-inline intro-social-buttons">
-                            <li>
-                                <button id="home_login_btn" onclick="document.getElementById('login').style.display='block'"  class="btn btn-default btn-lg"><i class="fa fa-sign-in fa-fw"></i> <span class="network-name">Login</span></button>
-                            </li>
-                            <li>
-                                <button id="home_signup_btn" onclick="document.getElementById('signup').style.display='block'"  class="btn btn-default btn-lg"><i class="fa fa-cloud fa-fw"></i> <span class="network-name">Sign up</span></button>
-                            </li>
-                            <li>
-                              <form action="/availabook/home">
-                                <button id="visitor_btn" class="btn btn-default btn-lg"><i class="fa fa-coffee fa-fw"></i> <span class="network-name">Visitor</span></button>
-                              </form>
-                            </li>
-                        </ul>
-                        <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false" scope="public_profile,email" onlogin="testAPI();"></div>
-                    </div>
-                    <div id="status"></div>
-                    <!-- <fb:login-button autologoutlink="true" onclick="statusChangeCallback()"></fb:login-button> -->
-
-
-                </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="intro-message">
+              <h1>Availabook</h1>
+              <h3>A Social Network Website</h3>
+              <hr class="intro-divider">
+              <ul class="list-inline intro-social-buttons">
+                <li>
+                  <button id="home_login_btn" onclick="document.getElementById('login').style.display='block'"  class="btn btn-default btn-lg"><i class="fa fa-sign-in fa-fw"></i> <span class="network-name">Login</span></button>
+                </li>
+                <li>
+                  <button id="home_signup_btn" onclick="document.getElementById('signup').style.display='block'"  class="btn btn-default btn-lg"><i class="fa fa-cloud fa-fw"></i> <span class="network-name">Sign up</span></button>
+                </li>
+                <li>
+                  <form action="/availabook/home">
+                    <button id="visitor_btn" class="btn btn-default btn-lg"><i class="fa fa-coffee fa-fw"></i> <span class="network-name">Visitor</span></button>
+                  </form>
+                </li>
+              </ul>
+              <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false" scope="public_profile,email" onlogin="testAPI();"></div>
             </div>
-
+            <div id="status"></div>
+          </div>
         </div>
+      </div>
     </div>
     <!-- /.container -->
 
@@ -294,132 +287,116 @@
 
 	<a  name="services"></a>
     <div class="content-section-a">
-
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-5 col-sm-6">
-                    <hr class="section-heading-spacer">
-                    <div class="clearfix"></div>
-                    <h2 class="section-heading">A New World<br>and Events</h2>
-                    <p class="lead">A special thanks to <a target="_blank" href="http://join.deathtothestockphoto.com/">Death to the Stock Photo</a> for providing the photographs that you see in this template. Visit their website to become a member.</p>
-
-                </div>
-                <div class="col-lg-5 col-lg-offset-2 col-sm-6">
-                    {% load static %}
-                    <img class="img-responsive" src="{% static 'homepage/img/events.jpg' %}" alt="">
-                </div>
-            </div>
-
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-5 col-sm-6">
+            <hr class="section-heading-spacer">
+            <div class="clearfix"></div>
+            <h2 class="section-heading">A New World<br>and Events</h2>
+            <p class="lead">Let's explore the world with exciting events!</p>
+          </div>
+          <div class="col-lg-5 col-lg-offset-2 col-sm-6">
+            {% load static %}
+            <img class="img-responsive" src="{% static 'homepage/img/events.jpg' %}" alt="">
+          </div>
         </div>
+      </div>
         <!-- /.container -->
-
     </div>
     <!-- /.content-section-a -->
 
     <div class="content-section-b">
-
-        <div class="container">
-
-            <div class="row">
-                <div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
-                    <hr class="section-heading-spacer">
-                    <div class="clearfix"></div>
-                    <h2 class="section-heading">A Wonderful Life<br>with Friends</h2>
-                    <p class="lead">Turn your 2D designs into high quality, 3D product shots in seconds using free Photoshop actions by <a target="_blank" href="http://www.psdcovers.com/">PSDCovers</a>! Visit their website to download some of their awesome, free photoshop actions!</p>
-                </div>
-                <div class="col-lg-5 col-sm-pull-6  col-sm-6">
-                    {% load static %}
-                    <img class="img-responsive" src="{% static 'homepage/img/dog.png' %}" alt="">
-                </div>
-            </div>
-
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
+            <hr class="section-heading-spacer">
+            <div class="clearfix"></div>
+            <h2 class="section-heading">A Wonderful Life<br>with Friends</h2>
+            <p class="lead">Let's find new friends at Availabook!</p>
+          </div>
+          <div class="col-lg-5 col-sm-pull-6  col-sm-6">
+            {% load static %}
+            <img class="img-responsive" src="{% static 'homepage/img/dog.png' %}" alt="">
+          </div>
         </div>
+      </div>
         <!-- /.container -->
-
     </div>
     <!-- /.content-section-b -->
 
     <div class="content-section-a">
-
-        <div class="container">
-
-            <div class="row">
-                <div class="col-lg-5 col-sm-6">
-                    <hr class="section-heading-spacer">
-                    <div class="clearfix"></div>
-                    <h2 class="section-heading">An Awesome Place<br>of Interests</h2>
-                    <p class="lead">This template features the 'Lato' font, part of the <a target="_blank" href="http://www.google.com/fonts">Google Web Font library</a>, as well as <a target="_blank" href="http://fontawesome.io">icons from Font Awesome</a>.</p>
-                </div>
-                <div class="col-lg-5 col-lg-offset-2 col-sm-6">
-                    {% load static %}
-                    <img class="img-responsive" src="{% static 'homepage/img/interests.png' %}" alt="">
-                </div>
-            </div>
-
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-5 col-sm-6">
+            <hr class="section-heading-spacer">
+            <div class="clearfix"></div>
+            <h2 class="section-heading">An Awesome Place<br>of Interests</h2>
+            <p class="lead">Enjoy your interests, NOW!</p>
+          </div>
+          <div class="col-lg-5 col-lg-offset-2 col-sm-6">
+            {% load static %}
+            <img class="img-responsive" src="{% static 'homepage/img/interests.png' %}" alt="">
+          </div>
         </div>
-        <!-- /.container -->
-
+      </div>
+      <!-- /.container -->
     </div>
     <!-- /.content-section-a -->
 
 	<a  name="contact"></a>
     <div class="banner">
-
-        <div class="container">
-
-            <div class="row">
-                <div class="col-lg-6">
-                    <h2>Connect to Availabook:</h2>
-                </div>
-                <div class="col-lg-6">
-                    <ul class="list-inline banner-social-buttons">
-                        <li>
-                            <button id="home_login_btn" onclick="document.getElementById('login').style.display='block'"  class="btn btn-default btn-lg"><i class="fa fa-sign-in fa-fw"></i> <span class="network-name">Login</span></button>
-                        </li>
-                        <li>
-                            <button id="home_signup_btn" onclick="document.getElementById('signup').style.display='block'"  class="btn btn-default btn-lg"><i class="fa fa-cloud fa-fw"></i> <span class="network-name">Sign up</span></button>
-                        </li>
-                        <li>
-                          <form action="/availabook/home">
-                            <button id="visitor_btn" class="btn btn-default btn-lg"><i class="fa fa-coffee fa-fw"></i> <span class="network-name">Visitor</span></button>
-                          </form>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-6">
+            <h2>Connect to Availabook:</h2>
+          </div>
+          <div class="col-lg-6">
+            <ul class="list-inline banner-social-buttons">
+              <li>
+                <button id="home_login_btn" onclick="document.getElementById('login').style.display='block'"  class="btn btn-default btn-lg"><i class="fa fa-sign-in fa-fw"></i> <span class="network-name">Login</span></button>
+              </li>
+              <li>
+                <button id="home_signup_btn" onclick="document.getElementById('signup').style.display='block'"  class="btn btn-default btn-lg"><i class="fa fa-cloud fa-fw"></i> <span class="network-name">Sign up</span></button>
+              </li>
+              <li>
+                <form action="/availabook/home">
+                  <button id="visitor_btn" class="btn btn-default btn-lg"><i class="fa fa-coffee fa-fw"></i> <span class="network-name">Visitor</span></button>
+                </form>
+              </li>
+            </ul>
+          </div>
         </div>
-        <!-- /.container -->
-
+      </div>
+      <!-- /.container -->
     </div>
     <!-- /.banner -->
 
     <!-- Footer -->
     <footer style="border-top: 7px solid #7a7a7a;">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <ul class="list-inline">
-                        <li>
-                            <a href="#">Home</a>
-                        </li>
-                        <li class="footer-menu-divider">&sdot;</li>
-                        <li>
-                            <a href="#about">About</a>
-                        </li>
-                        <li class="footer-menu-divider">&sdot;</li>
-                        <li>
-                            <a href="#services">Services</a>
-                        </li>
-                        <li class="footer-menu-divider">&sdot;</li>
-                        <li>
-                            <a href="#contact">Contact</a>
-                        </li>
-                    </ul>
-                    <p class="copyright text-muted small">Copyright &copy; Availabook 2017. All Rights Reserved</p>
-                </div>
-            </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <ul class="list-inline">
+              <li>
+                <a href="#">Home</a>
+              </li>
+              <li class="footer-menu-divider">&sdot;</li>
+              <li>
+                <a href="#about">About</a>
+              </li>
+              <li class="footer-menu-divider">&sdot;</li>
+              <li>
+                <a href="#services">Services</a>
+              </li>
+              <li class="footer-menu-divider">&sdot;</li>
+              <li>
+                <a href="#contact">Contact</a>
+              </li>
+            </ul>
+            <p class="copyright text-muted small">Copyright &copy; Availabook 2017. All Rights Reserved</p>
+          </div>
         </div>
+      </div>
     </footer>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
