@@ -294,6 +294,7 @@ def time_score(event_date,event_time):
         result = math.exp(-0.16*date_diff) ### scale the result to make it same as distance
     except Exception as x:
         print(x)
+        print('1211212112312123')
         return 0,True,False  ## result,penalty,valid
     if date_diff<0:
         return 0, True, False
@@ -323,7 +324,7 @@ def distance_score(event_zipcode,user_zipcode):
 
 def popularity_score(likes_num):
     likes_num = likes_num
-    return (1-math.exp(-0.3*likes_num))
+    return (1-math.exp(-0.08*likes_num))
 
 def vectorize(s_time,s_distance,s_popularity,s_topic):
     ### think about put it into db to accelate the speed
@@ -403,6 +404,9 @@ def update_para(email,event, like_or_post):
     user_topic_vec = np.asarray([float(i) for i in user['rating']])
     print('before core_calculation')
     event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event,like_or_post)
+    print(final_score)
+    print('11111111')
+    print(event_vec)
     if final_score > 0:
         print('new event EId'+event['EId'])
         print('final_score '+str(final_score))
@@ -573,6 +577,8 @@ def core_calculation(email,event,like_or_post):
             print('distance reward')
             distance_reward = True
         event_topic_vec = get_label(event['content'])
+        print('22444444444444')
+        print(event_topic_vec)
         user_topic_vec = [float(i) for i in user['rating']]
         s_topic = cosine_similarity(np.asarray(user_topic_vec),np.asarray(event_topic_vec)) ## topicscore
         #print(user['time_para'],user['distance_para'],user['popularity_para'],user['topic_para'])
@@ -597,6 +603,7 @@ def core_calculation(email,event,like_or_post):
         print('final_score after reward '+str(final_score))
         return event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score
     else:
+        print('55555555')
         return None,None,None,None,None,None,0
 
 def origin_recommend(email): ### run one time, can offline
