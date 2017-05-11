@@ -17,6 +17,7 @@ from geopy.geocoders import Nominatim
 from django.utils import timezone
 import pytz
 from tzlocal import get_localzone
+from stop_words import get_stop_words
 """reload intepretor, add credential path"""
 reload(sys)
 sys.setdefaultencoding('UTF8')
@@ -337,17 +338,25 @@ def assign_score(user,event):
 
 def get_label(data):
     try:
-        w1 = [["outdoor", "ball", "sport", "swim", "happy"],
-              ["study", "library", "computer", "read", "book"],
-              ["cook", "restaurant", "food", "fish", "hungry"],
-              ["moive", "theatre", "exibition", "photo", "masterpiece"],
-              ["shopping", "shoes", "clothes", "discount", "mall"],
-              ["market", "grocery", "fruit", "vegetable", "meat"],
-              ["cat", "dog", "animal", "zoo", "bird"],
-              ["sleep", "bed", "TV", "sofa", "chip"],
-              ["drink", "bar", "beer", "cocktail", "wine"],
-              ["hiking", "mountain", "sunshine", "drive", "park"]]
+        w1 = [["new", "film", "movie", "night", "outdoor", "ticket", "free", "lunch", "tonight", "special"],
+            ["shoot", "adventure", "downtown", "cigar", "donate", "bourbon", "acupuncture", "festival", "dance", "tribute"],
+            ["work", "semester", "chocolate", "shop", "college", "superstar", "volleyball", "camera", "newlook", "business"],
+            ["rose", "golf", "gather", "china", "welcome", "giveaway", "sell", "cash", "crossword", "bike"],
+            ["expert", "social", "perspective", "pint", "win", "post", "connect", "TV", "express", "fame"],
+            ["consumer", "mama", "testify", "crock", "document", "weekend", "team", "floral", "water", "foam"],
+            ["lake", "garden", "car", "gorge", "teach", "household", "compete", "gig", "bar", "omnibus"],
+            ["travel", "discuss", "ceremony", "introduction", "closing", "fight", "musician", "live", "theatre", "restaurant"],
+            ["tech", "hilarious", "create", "palace", "volunteer", "poster", "design", "hart", "confessional", "league"],
+            ["fruit", "guest", "show", "learn", "drama", "summit", "press", "center", "campaign", "fun"]]
         w2 = [w.lower() for w in data.replace(',', ' ').split(' ')]
+        en_stop = get_stop_words('en')
+        removelist = ["go", "an", "want", "play", "someone", "like", "together"]
+        for word in w2:
+            if word in en_stop:
+                w2.remove(word)
+        for word in w2:
+            if word in removelist:
+                w2.remove(word)
         similarity = []
         for i in range(0, 10):
             similarity.append((get_score(w1[i], w2)))
@@ -598,7 +607,7 @@ def origin_recommend(email): ### run one time, can offline
         i +=1
         print(i)
         try:
-            event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event,'sign_up')
+            event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event)
             rec_res[event['EId']]=final_score
         except: ### invalid
             rec_res[event['EId']]=0
@@ -685,7 +694,39 @@ def rec_to_signup(email,zipcode):
     event_list = tb_event.scan()['Items']
     rec_res = {}
     for event in event_list:
-        event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event,'sign_up')      
+        print(event['EId'])
+        event_valid = True  ### invalid if time, distance score is zero
+        time_penalty = False
+        distance_penalty = False
+        time_reward = False  ### reward if score is 1, menas today, add a value to the total score
+        distance_reward = False  ## reward if score is 1, means add a value to the total score, since it is common sense that same place is important for event attending
+        s_time,time_penalty,event_valid =time_score(event['date'],event['time'])
+        final_score = 0
+        if event_valid == True:
+            s_distance = distance_score(event_zipcode=str(event['zipcode']),user_zipcode=str(zipcode))
+            s_popularity = popularity_score(len(event['fave']))
+            if s_distance==0:
+                print('distance panalty')
+                distance_penalty = True
+            if s_time==0:
+                print('time penalty')
+            if s_time == 1:
+                print('time reward')
+                time_reward = True
+            if s_distance == 1:
+                print('distance reward')
+                distance_reward = True
+            final_score = s_time+s_popularity+s_distance
+            if time_reward:
+                final_score = final_score+ 0.03
+            if distance_reward:
+                final_score = final_score + 0.1
+            if time_penalty:
+                final_score = final_score - 0.1
+            if distance_penalty:
+                final_score = final_score - 0.1
+            if event_valid == False:
+                final_score =0
         rec_res[event['EId']] = final_score
     tb_result.update_item(
         Key={
@@ -701,6 +742,7 @@ def rec_to_signup(email,zipcode):
 @postpone
 def update_thread():
     while True:
+        print('update thread start')
         result_list = tb_result.scan()['Items']
         time.sleep(2)
         for result in result_list:
@@ -712,7 +754,6 @@ def update_thread():
                 if post_or_not=='False' and like_or_not=='False':
                     pass
                 else:
-                    print('update thread start')
                     print(post_or_not)
                     print(like_or_not)
                     if post_or_not != 'False':
