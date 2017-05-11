@@ -340,7 +340,7 @@ def get_label(data):
     try:
         w1 = [["new", "film", "movie", "night", "outdoor", "ticket", "free", "lunch", "tonight", "special"],
             ["shoot", "adventure", "downtown", "cigar", "donate", "bourbon", "acupuncture", "festival", "dance", "tribute"],
-            ["work", "semester", "chocolate", "cloud", "college", "superstar", "volleyball", "camera", "newlook", "business"],
+            ["work", "semester", "chocolate", "shop", "college", "superstar", "volleyball", "camera", "newlook", "business"],
             ["rose", "golf", "gather", "china", "welcome", "giveaway", "sell", "cash", "crossword", "bike"],
             ["expert", "social", "perspective", "pint", "win", "post", "connect", "TV", "express", "fame"],
             ["consumer", "mama", "testify", "crock", "document", "weekend", "team", "floral", "water", "foam"],
