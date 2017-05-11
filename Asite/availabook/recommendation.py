@@ -442,7 +442,7 @@ def update_para(email,event, like_or_post):
         rec_res[event['EId']]=final_score
         tb_result.update_item(
         Key={
-            'email': email    
+            'email': email
         },
         UpdateExpression='SET rec_res = :val1',
         ExpressionAttributeValues={
@@ -458,7 +458,7 @@ def update_para(email,event, like_or_post):
         print('updated user topic vec: '+str(user_topic_vec))
         preference_table.update_item(
         Key={
-            'email': email    
+            'email': email
         },
         UpdateExpression='SET rating = :val1, time_para=:val2, distance_para=:val3,popularity_para=:val4,topic_para=:val5',
         ExpressionAttributeValues={
@@ -506,12 +506,12 @@ def recommend_to_all(event, whole_or_post): #### run when post
                         'email':email
                     }
                 )
-            rec_res = response['Item']['rec_res']    
+            rec_res = response['Item']['rec_res']
             rec_res = json.loads(rec_res)
             rec_res[event['EId']]=final_score
             tb_result.update_item(
             Key={
-                'email': email    
+                'email': email
             },
             UpdateExpression='SET rec_res = :val1',
             ExpressionAttributeValues={
@@ -620,7 +620,7 @@ def origin_recommend(email): ### run one time, can offline
             rec_res[event['EId']]=0
     tb_result.update_item(
     Key={
-        'email': email    
+        'email': email
     },
     UpdateExpression='SET rec_res = :val1',
     ExpressionAttributeValues={
@@ -632,7 +632,7 @@ def update_like_or_post_tag(email,event,like_or_post):
     if like_or_post == 'like':
         tb_result.update_item(
             Key={
-                'email': email    
+                'email': email
             },
             UpdateExpression='SET fave = :val1',
             ExpressionAttributeValues={
@@ -642,7 +642,7 @@ def update_like_or_post_tag(email,event,like_or_post):
     elif like_or_post == 'post':
         tb_result.update_item(
             Key={
-                'email': email    
+                'email': email
             },
             UpdateExpression='SET post = :val1',
             ExpressionAttributeValues={
@@ -688,7 +688,7 @@ def rec_to_new_user():
         )
     tb_result.update_item(
         Key={
-            'email': 'new_user'    
+            'email': 'new_user'
         },
         UpdateExpression='SET rec_res = :val1',
         ExpressionAttributeValues={
@@ -705,7 +705,7 @@ def rec_to_signup(email,zipcode):
         rec_res[event['EId']] = final_score
     tb_result.update_item(
         Key={
-            'email': email   
+            'email': email
         },
         UpdateExpression='SET rec_res = :val1',
         ExpressionAttributeValues={
@@ -737,7 +737,7 @@ def update_thread():
                         event = post_or_not[1]
                         tb_result.update_item(
                             Key={
-                                'email': email    
+                                'email': email
                             },
                             UpdateExpression='SET post = :val1',
                             ExpressionAttributeValues={
@@ -753,7 +753,7 @@ def update_thread():
                         event = like_or_not[1]
                         tb_result.update_item(
                             Key={
-                                'email': email    
+                                'email': email
                             },
                             UpdateExpression='SET fave = :val1',
                             ExpressionAttributeValues={
@@ -774,7 +774,7 @@ def singup_rec_thread():
                 print('a new signup')
                 tb_result.update_item(
                     Key={
-                        'email': result['email']  
+                        'email': result['email']
                     },
                     UpdateExpression='SET sign_up_flag = :val1',
                     ExpressionAttributeValues={
@@ -836,7 +836,7 @@ whole_recommendation_thread()
 # print(local)
 # tb_result.update_item(
 #     Key={
-#         'email': 'aa@qq.com'    
+#         'email': 'aa@qq.com'
 #     },
 #     UpdateExpression='SET sign_up_flag = :val1',
 #     ExpressionAttributeValues={
@@ -869,7 +869,7 @@ whole_recommendation_thread()
 # x = normalize(x).tolist()
 # preference_table.update_item(
 # Key={
-#     'email': 'aa@qq.com'    
+#     'email': 'aa@qq.com'
 # },
 # UpdateExpression='SET rating = :val1, time_para=:val2, distance_para=:val3,popularity_para=:val4,topic_para=:val5',
 # ExpressionAttributeValues={
