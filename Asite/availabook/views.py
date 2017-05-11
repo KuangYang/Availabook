@@ -59,10 +59,14 @@ def index(request):
 def home(request):
     print(request.user.username)
     event_list = get_recommend_newversion(request.user.username)
+    print('12312321312312312312312')
     email_list, user_name_list, user_picture_list = get_user_info_from_eventlist(event_list)
     zipped_list = zip(event_list, email_list, user_name_list, user_picture_list)
+    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     if request.user.is_authenticated():
+        print "~~~~~~~~~~~~~~~~~~~~~~~~~~"
         fname = Users.get_user_info(request.user.username)['first_name']
+        print('qweqweqweqweqweqweqwqw')
         return render(request, 'homepage.html',{'zipped_list':zipped_list, 'logedin': True,'fname':fname})
     else:
         print "not authenticate"
@@ -132,7 +136,7 @@ def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/"):
 
 
 @csrf_exempt
-def login(request, onsuccess="/availabook/home", onfail="/availabook/"):
+def login(request, onsuccess="/availabook/home/", onfail="/availabook/"):
     csrf_token = csrf.get_token(request)
     user_id = request.POST.get("id")
     pwd = request.POST.get("psw")

@@ -82,12 +82,13 @@ $(document).ready(function() {
                 // remove the value from the input
                 $("#login_id").val("");
                 $("#login_psw").val("");
+                window.location.href = "/availabook/home";
                 //$("body").html(msg);
                 if (msg != "Error") {
                     console.log(msg)
                     console.log("login success!"); // another sanity check
-                    window.location.reload();
-                    window.location.href = "/availabook/home";
+                    //window.location.reload();
+                    //window.location.href = "/availabook/home";
                 } else {
                     alert("Password incorrect or not signed up!");
                 }
