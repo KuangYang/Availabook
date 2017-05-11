@@ -1,4 +1,7 @@
 $(document).ready(function() {
+    $(window).load(function() {
+        $(".loader").fadeOut("slow");
+    });
     console.log("ready!");
 
     $("#post_btn").on("click", function() {
