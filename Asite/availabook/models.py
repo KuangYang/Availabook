@@ -344,11 +344,20 @@ def get_recommended_event_list(email): #### don't use this
     return event_list
 
 def get_recommend_newversion(email):
-    rec_res = tb_result.get_item(
-        Key={
-            'email': email
-        }
-    )
+    rec_res = None
+    try:
+        rec_res = tb_result.get_item(
+            Key={
+                'email': email
+            }
+        )
+    except:
+        print('no such email, a visitor')
+        rec_res = tb_result.get_item(
+            Key={
+                'email':'new_user'
+            }
+        )
     rec_res = rec_res['Item']['rec_res']
     event_list = []
     if rec_res:

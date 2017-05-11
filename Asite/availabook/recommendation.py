@@ -394,83 +394,18 @@ def update_para(email,event, like_or_post):
     user_topic_vec = np.asarray([float(i) for i in user['rating']])
     print('before core_calculation')
     event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event,like_or_post)
-    print('new event EId'+event['EId'])
-    print('final_score '+str(final_score))
-    response = tb_result.get_item(
-        Key={
-            'email': email
-        }
-    )
-    if 'Item' not in response:
-        print('this should not happen')
-        rec_res_new_user=tb_result.get_item(
-            key = {
-                'email':'new_user'
-            }
-        )['Item']['rec_res']
-        tb_result.put_item(
-            Item={
-                'email': email,
-                'fave': 'False',
-                'post': 'False',
-                'rec_res': rec_res_new_user,
-                'rec_to_all': 'False',
-                'sign_up_flag': 'False'
-            }
-        )
-        response = tb_result.get_item(
-            Key={
-                'email':email
-            }
-        )
-    rec_res = response['Item']['rec_res']
-    rec_res = json.loads(rec_res)
-    rec_res[event['EId']]=final_score
-    tb_result.update_item(
-    Key={
-        'email': email    
-    },
-    UpdateExpression='SET rec_res = :val1',
-    ExpressionAttributeValues={
-        ':val1': json.dumps(rec_res)
-    }
-    )
-    print('new post into result_table')
-    print('original hyper para: time, distance ,popularity, topic '+str(user_hyper_vec[0])+' ' +str(user_hyper_vec[1])+' '+str(user_hyper_vec[2])+' '+str(user_hyper_vec[3]))
-    user_hyper_vec = normalize(user_hyper_vec + para*event_vec)    #### need to scale
-    print('updated hyper para: time, distance ,popularity, topic '+str(user_hyper_vec[0])+' '+str(user_hyper_vec[1])+' '+str(user_hyper_vec[2])+' '+str(user_hyper_vec[3]))
-    print('original user topic vec: '+str(user_topic_vec))
-    user_topic_vec = normalize(user_topic_vec+ 3*para*event_topic_vec)
-    print('updated user topic vec: '+str(user_topic_vec))
-    preference_table.update_item(
-    Key={
-        'email': email    
-    },
-    UpdateExpression='SET rating = :val1, time_para=:val2, distance_para=:val3,popularity_para=:val4,topic_para=:val5',
-    ExpressionAttributeValues={
-        ':val1': [str(i) for i in user_topic_vec.tolist()],
-        ':val2': str(user_hyper_vec[0]),
-        ':val3': str(user_hyper_vec[1]),
-        ':val4': str(user_hyper_vec[2]),
-        ':val5': str(user_hyper_vec[3]),
-    }
-    )
-    print('finish update')
-
-def recommend_to_all(event): #### run when post
-    print('start recommend to all')
-    user_list = tb_user.scan()['Items']
-    for user in user_list:
-        email = user['email']
-        event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event,'post')
+    if final_score > 0:
+        print('new event EId'+event['EId'])
+        print('final_score '+str(final_score))
         response = tb_result.get_item(
             Key={
                 'email': email
             }
         )
         if 'Item' not in response:
+            print('this should not happen')
             rec_res_new_user=tb_result.get_item(
-                Key = {
+                key = {
                     'email':'new_user'
                 }
             )['Item']['rec_res']
@@ -481,7 +416,7 @@ def recommend_to_all(event): #### run when post
                     'post': 'False',
                     'rec_res': rec_res_new_user,
                     'rec_to_all': 'False',
-                    'sign_up_flag':'False'
+                    'sign_up_flag': 'False'
                 }
             )
             response = tb_result.get_item(
@@ -489,7 +424,7 @@ def recommend_to_all(event): #### run when post
                     'email':email
                 }
             )
-        rec_res = response['Item']['rec_res']    
+        rec_res = response['Item']['rec_res']
         rec_res = json.loads(rec_res)
         rec_res[event['EId']]=final_score
         tb_result.update_item(
@@ -501,7 +436,78 @@ def recommend_to_all(event): #### run when post
             ':val1': json.dumps(rec_res)
         }
         )
-        print('recommend to '+email+' '+event['EId']+' '+str(final_score))
+        print('new post into result_table')
+        print('original hyper para: time, distance ,popularity, topic '+str(user_hyper_vec[0])+' ' +str(user_hyper_vec[1])+' '+str(user_hyper_vec[2])+' '+str(user_hyper_vec[3]))
+        user_hyper_vec = normalize(user_hyper_vec + para*event_vec)    #### need to scale
+        print('updated hyper para: time, distance ,popularity, topic '+str(user_hyper_vec[0])+' '+str(user_hyper_vec[1])+' '+str(user_hyper_vec[2])+' '+str(user_hyper_vec[3]))
+        print('original user topic vec: '+str(user_topic_vec))
+        user_topic_vec = normalize(user_topic_vec+ 3*para*event_topic_vec)
+        print('updated user topic vec: '+str(user_topic_vec))
+        preference_table.update_item(
+        Key={
+            'email': email    
+        },
+        UpdateExpression='SET rating = :val1, time_para=:val2, distance_para=:val3,popularity_para=:val4,topic_para=:val5',
+        ExpressionAttributeValues={
+            ':val1': [str(i) for i in user_topic_vec.tolist()],
+            ':val2': str(user_hyper_vec[0]),
+            ':val3': str(user_hyper_vec[1]),
+            ':val4': str(user_hyper_vec[2]),
+            ':val5': str(user_hyper_vec[3]),
+        }
+        )
+        print('finish update')
+    else:
+        print('invalid event!!!!!!maybe out of date')
+
+def recommend_to_all(event): #### run when post
+    print('start recommend to all')
+    user_list = tb_user.scan()['Items']
+    for user in user_list:
+        email = user['email']
+        event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event,'post')
+        if final_score > 0:
+            response = tb_result.get_item(
+                Key={
+                    'email': email
+                }
+            )
+            if 'Item' not in response:
+                rec_res_new_user=tb_result.get_item(
+                    Key = {
+                        'email':'new_user'
+                    }
+                )['Item']['rec_res']
+                tb_result.put_item(
+                    Item={
+                        'email': email,
+                        'fave': 'False',
+                        'post': 'False',
+                        'rec_res': rec_res_new_user,
+                        'rec_to_all': 'False',
+                        'sign_up_flag':'False'
+                    }
+                )
+                response = tb_result.get_item(
+                    Key={
+                        'email':email
+                    }
+                )
+            rec_res = response['Item']['rec_res']    
+            rec_res = json.loads(rec_res)
+            rec_res[event['EId']]=final_score
+            tb_result.update_item(
+            Key={
+                'email': email    
+            },
+            UpdateExpression='SET rec_res = :val1',
+            ExpressionAttributeValues={
+                ':val1': json.dumps(rec_res)
+            }
+            )
+            print('recommend to '+email+' '+event['EId']+' '+str(final_score))
+        else:
+            print('invalid event!!!!!!maybe out of date')
     print('finish recommend to all')
 
 
@@ -536,7 +542,6 @@ def core_calculation(email,event,like_or_post):
         }
     )['Item']['zipcode']
     EId = event['EId']
-
     event_valid = True  ### invalid if time, distance score is zero
     time_penalty = False
     distance_penalty = False
@@ -580,8 +585,10 @@ def core_calculation(email,event,like_or_post):
             final_score = final_score - 0.1
         if event_valid == False:
             final_score =0
-    print('final_score after reward '+str(final_score))
-    return event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score
+        print('final_score after reward '+str(final_score))
+        return event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score
+    else:
+        return None,None,None,None,None,None,0
 
 def origin_recommend(email): ### run one time, can offline
     event_list = tb_event.scan()['Items']
@@ -650,6 +657,19 @@ def rec_to_new_user():
         if event_valid == False:
             final_score =0
         rec_res[event['EId']] = final_score
+
+    response = tb_result.get_item(
+        Key={
+            'email': 'new_user'
+        }
+    )
+    if 'Item' not in response:
+        tb_result.put_item(
+            Item={
+                'email': 'new_user',
+                'rec_res': json.dumps(rec_res)
+            }
+        )
     tb_result.update_item(
         Key={
             'email': 'new_user'    
@@ -786,8 +806,33 @@ def singup_rec_thread():
                 rec_to_signup(result['email'],zipcode)
                 print(str(result['email'])+'finished')
 
+@postpone
+def new_user_rec_thread():
+    while True:
+        print('rec_to_new_user thread start')
+        rec_to_new_user()
+        print('rec_to_new_user thread finish')
+        time.sleep(3600)
+
+@postpone
+def whole_recommendation_thread():
+    while True:
+        time.sleep(86400) ### one day run a time
+        print('whole recommendation start')
+        event_list = tb_event.scan()['Items']
+        for event in event_list:
+            print(event)
+            recommend_to_all(event)
+        print('whole recommendation finish')
+
+
 singup_rec_thread()
+new_user_rec_thread()
 update_thread()
+whole_recommendation_thread()
+
+
+
 
 
 

@@ -57,6 +57,7 @@ def index(request):
 
 
 def home(request):
+    print(request.user.username)
     event_list = get_recommend_newversion(request.user.username)
     email_list, user_name_list, user_picture_list = get_user_info_from_eventlist(event_list)
     zipped_list = zip(event_list, email_list, user_name_list, user_picture_list)
