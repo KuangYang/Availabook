@@ -716,12 +716,12 @@ def update_thread():
             if result['email'] == 'new_user':
                 pass
             else:
-                print('update thread start')
                 like_or_not = result['fave']
                 post_or_not = result['post']
                 if post_or_not=='False' and like_or_not=='False':
                     pass
                 else:
+                    print('update thread start')
                     print(post_or_not)
                     print(like_or_not)
                     if post_or_not != 'False':
