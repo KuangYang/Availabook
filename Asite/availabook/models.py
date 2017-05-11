@@ -4,10 +4,11 @@ from boto3.dynamodb.conditions import Attr
 import os
 import sys
 import json
-from availabook.recommendation import recommend, common, get_label, get_score,rec_to_signup
+from availabook.recommendation import recommend, common, get_label, get_score,rec_to_signup,normalize
 import nltk
 import operator
 from nltk.corpus import wordnet as wn
+import numpy as np
 
 
 """reload intepretor, add credential path"""
@@ -164,14 +165,16 @@ class Signup():
                 'sign_up_flag': 'True'
             }
         )
+        rating_default = normalize(np.random.rand(10))
+        hyper_para_default = normalize(np.random.rand(4))
         preference_table.put_item(
             Item={
                 'email': self.id,
-                'rating': ['0.33','0.33','0.33','0.33','0.33','0.33','0.33','0.33','0.33','0.33'],
-                'distance_para':'0.5',
-                'popularity_para':'0.5',
-                'time_para':'0.5',
-                'topic_para':'0.5'
+                'rating': [str(i) for i in rating_default.tolist()],
+                'distance_para':str(hyper_para_default[0]),
+                'popularity_para':str(hyper_para_default[1]),
+                'time_para':str(hyper_para_default[2]),
+                'topic_para':str(hyper_para_default[3])
             }
         )
 

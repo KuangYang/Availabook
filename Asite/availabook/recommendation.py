@@ -324,7 +324,11 @@ def distance_score(event_zipcode,user_zipcode):
 
 def popularity_score(likes_num):
     likes_num = likes_num
-    return 5*(1-math.exp(-0.05*likes_num))
+    result = 2*(1-math.exp(-0.05*likes_num))
+    popularity_reward = 0
+    if likes_num > 10:
+        popularity_reward = 0.015*(likes_num-10)
+    return result, popularity_reward
 
 def vectorize(s_time,s_distance,s_popularity,s_topic):
     ### think about put it into db to accelate the speed
@@ -533,14 +537,17 @@ def core_calculation(email,event,like_or_post):
         }
     )
     if 'Item' not in response:
+        print('this should not happen')
+        rating_default = normalize(np.random.rand(10))
+        hyper_para_default = normalize(np.random.rand(4))
         preference_table.put_item(
             Item={
                 'email': email,
-                'rating': ['0.33','0.33','0.33','0.33','0.33','0.33','0.33','0.33','0.33','0.33'],
-                'distance_para':'0.5',
-                'popularity_para':'0.5',
-                'time_para':'0.5',
-                'topic_para':'0.5'
+                'rating': [str(i) for i in rating_default.tolist()],
+                'distance_para':str(hyper_para_default[0]),
+                'popularity_para':str(hyper_para_default[1]),
+                'time_para':str(hyper_para_default[2]),
+                'topic_para':str(hyper_para_default[3])
             }
         )
         response = preference_table.get_item(
@@ -564,7 +571,7 @@ def core_calculation(email,event,like_or_post):
     final_score = 0
     if event_valid == True:
         s_distance = distance_score(event_zipcode=str(event['zipcode']),user_zipcode=str(zipcode))
-        s_popularity = popularity_score(len(event['fave']))
+        s_popularity, popularity_reward = popularity_score(len(event['fave']))
         if s_distance==0:
             print('distance panalty')
             distance_penalty = True
@@ -584,6 +591,8 @@ def core_calculation(email,event,like_or_post):
         #print(user['time_para'],user['distance_para'],user['popularity_para'],user['topic_para'])
         event_vec = vectorize(s_time=s_time,s_distance=s_distance,s_popularity=s_popularity,s_topic=s_topic)
         user_hyper_vec = vectorize(s_time=float(user['time_para']),s_distance=float(user['distance_para']),s_popularity=float(user['popularity_para']),s_topic=float(user['topic_para']))
+        print('event_vec!!!!'+str(event_vec))
+        print('user_vec!!!!'+str(user_hyper_vec))
         default_pop_event_vec = event_vec
         if like_or_post == 'post':
             default_pop_event_vec[2] = 0.4  ### 10 likes
@@ -591,13 +600,14 @@ def core_calculation(email,event,like_or_post):
         final_score = np.dot(default_pop_event_vec,user_hyper_vec)
         print('final_score of dot product '+str(final_score))
         if time_reward:
-            final_score = final_score+ 0.03
+            final_score = final_score+ 0.003
         if distance_reward:
-            final_score = final_score + 0.1
+            final_score = final_score + 0.05
         if time_penalty:
-            final_score = final_score - 0.1
+            final_score = final_score - 0.05
         if distance_penalty:
-            final_score = final_score - 0.1
+            final_score = final_score - 0.05
+        final_score = final_score + popularity_reward
         if event_valid == False:
             final_score =0
         print('final_score after reward '+str(final_score))
@@ -660,7 +670,7 @@ def rec_to_new_user():
         time_penalty = False
         time_reward = False  ### reward if score is 1, menas today, add a value to the total score
         s_time,time_penalty,event_valid =time_score(event['date'],event['time'])
-        s_popularity = popularity_score(len(event['fave']))
+        s_popularity, popularity_reward = popularity_score(len(event['fave']))
         if s_time==0:
             print('time penalty')
         if s_time == 1:
@@ -671,6 +681,7 @@ def rec_to_new_user():
             final_score = final_score+ 0.03
         if time_penalty:
             final_score = final_score - 0.1
+        final_score = final_score + popularity_reward
         if event_valid == False:
             final_score =0
         rec_res[event['EId']] = final_score
@@ -719,104 +730,119 @@ def rec_to_signup(email,zipcode):
 @postpone
 def update_thread():
     while True:
-        result_list = tb_result.scan()['Items']
+        result_list = None
+        try:
+            result_list = tb_result.scan()['Items']
+        except:
+            pass
         time.sleep(1)
-        for result in result_list:
-            if result['email'] == 'new_user':
-                pass
-            else:
-                like_or_not = result['fave']
-                post_or_not = result['post']
-                if post_or_not=='False' and like_or_not=='False':
+        if result_list:
+            for result in result_list:
+                if result['email'] == 'new_user':
                     pass
                 else:
-                    print('update thread start')
-                    print(post_or_not)
-                    print(like_or_not)
-                    if post_or_not != 'False':
-                        print('post is yes')
-                        email = post_or_not[0]
-                        event = post_or_not[1]
-                        tb_result.update_item(
-                            Key={
-                                'email': email
-                            },
-                            UpdateExpression='SET post = :val1',
-                            ExpressionAttributeValues={
-                                ':val1': 'False'
-                            }
-                        )
-                        update_para(email,event,'post')
-                        
+                    like_or_not = result['fave']
+                    post_or_not = result['post']
+                    if post_or_not=='False' and like_or_not=='False':
+                        pass
+                    else:
+                        print('update thread start')
+                        print(post_or_not)
+                        print(like_or_not)
+                        if post_or_not != 'False':
+                            print('post is yes')
+                            email = post_or_not[0]
+                            event = post_or_not[1]
+                            tb_result.update_item(
+                                Key={
+                                    'email': email
+                                },
+                                UpdateExpression='SET post = :val1',
+                                ExpressionAttributeValues={
+                                    ':val1': 'False'
+                                }
+                            )
+                            update_para(email,event,'post')
+                            
 
-                    if like_or_not != 'False':
-                        print('like is yes')
-                        email = like_or_not[0]
-                        event = like_or_not[1]
-                        tb_result.update_item(
-                            Key={
-                                'email': email
-                            },
-                            UpdateExpression='SET fave = :val1',
-                            ExpressionAttributeValues={
-                                ':val1': 'False'
-                            }
-                        )
-                        update_para(email,event,'like')
+                        if like_or_not != 'False':
+                            print('like is yes')
+                            email = like_or_not[0]
+                            event = like_or_not[1]
+                            tb_result.update_item(
+                                Key={
+                                    'email': email
+                                },
+                                UpdateExpression='SET fave = :val1',
+                                ExpressionAttributeValues={
+                                    ':val1': 'False'
+                                }
+                            )
+                            update_para(email,event,'like')
 
 @postpone
 def rec_to_all_thread():
     while True:
-        result_list = tb_result.scan()['Items']
+        result_list = None
+        try:
+            result_list = tb_result.scan()['Items']
+        except:
+            pass
         time.sleep(1)
-        for result in result_list:
-            if result['email'] == 'new_user':
-                pass
-            else:
-                rec_to_all = result['rec_to_all']
-                if rec_to_all != 'False':
-                    print(rec_to_all)
-                    print('rec_to_all thread start')
-                    email = rec_to_all[0]
-                    event = rec_to_all[1]
-                    tb_result.update_item(
-                        Key={
-                            'email': email    
-                        },
-                        UpdateExpression='SET rec_to_all = :val1',
-                        ExpressionAttributeValues={
-                            ':val1': 'False'
-                        }
-                    )
-                    recommend_to_all(event,'post')
+        if result_list:
+            for result in result_list:
+                if result['email'] == 'new_user':
+                    pass
+                else:
+                    rec_to_all = result['rec_to_all']
+                    if rec_to_all != 'False':
+                        print(rec_to_all)
+                        print('rec_to_all thread start')
+                        email = rec_to_all[0]
+                        event = rec_to_all[1]
+                        tb_result.update_item(
+                            Key={
+                                'email': email    
+                            },
+                            UpdateExpression='SET rec_to_all = :val1',
+                            ExpressionAttributeValues={
+                                ':val1': 'False'
+                            }
+                        )
+                        recommend_to_all(event,'post')
 
 @postpone
 def singup_rec_thread():
     while True:
-        result_list = tb_result.scan()['Items']
-        time.sleep(2)
-        for result in result_list:
-            if result['email'] == 'new_user':
-                pass
-            elif result['sign_up_flag'] == 'True':
-                print('a new signup')
-                tb_result.update_item(
-                    Key={
-                        'email': result['email']
-                    },
-                    UpdateExpression='SET sign_up_flag = :val1',
-                    ExpressionAttributeValues={
-                        ':val1': 'False',
-                    }
-                )
-                print(result['email'])
-                zipcode = tb_user.get_item(
-                    Key={
-                        'email':result['email']
-                    }
-                )['Item']['zipcode']
-                rec_to_signup(result['email'],zipcode)
-                print(str(result['email'])+'finished')
+        result_list = None
+        try:
+            result_list = tb_result.scan()['Items']
+        except:
+            pass
+        time.sleep(1)
+        if result_list:
+            for result in result_list:
+                if result['email'] == 'new_user':
+                    pass
+                elif result['sign_up_flag'] == 'True':
+                    print('a new signup')
+                    tb_result.update_item(
+                        Key={
+                            'email': result['email']
+                        },
+                        UpdateExpression='SET sign_up_flag = :val1',
+                        ExpressionAttributeValues={
+                            ':val1': 'False',
+                        }
+                    )
+                    print(result['email'])
+                    zipcode = tb_user.get_item(
+                        Key={
+                            'email':result['email']
+                        }
+                    )['Item']['zipcode']
+                    rec_to_signup(result['email'],zipcode)
+                    print(str(result['email'])+'finished')
 
 @postpone
 def new_user_rec_thread():
