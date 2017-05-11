@@ -59,14 +59,10 @@ def index(request):
 def home(request):
     print(request.user.username)
     event_list = get_recommend_newversion(request.user.username)
-    print('12312321312312312312312')
     email_list, user_name_list, user_picture_list = get_user_info_from_eventlist(event_list)
     zipped_list = zip(event_list, email_list, user_name_list, user_picture_list)
-    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     if request.user.is_authenticated():
-        print "~~~~~~~~~~~~~~~~~~~~~~~~~~"
         fname = Users.get_user_info(request.user.username)['first_name']
-        print('qweqweqweqweqweqweqwqw')
         return render(request, 'homepage.html',{'zipped_list':zipped_list, 'logedin': True,'fname':fname})
     else:
         print "not authenticate"
@@ -136,7 +132,7 @@ def fb_login(request, onsuccess="/availabook/home", onfail="/availabook/"):
 
 
 @csrf_exempt
-def login(request, onsuccess="/availabook/home/", onfail="/availabook/"):
+def login(request, onsuccess="/availabook/temp", onfail="/availabook/"):
     csrf_token = csrf.get_token(request)
     user_id = request.POST.get("id")
     pwd = request.POST.get("psw")
@@ -162,7 +158,7 @@ def login(request, onsuccess="/availabook/home/", onfail="/availabook/"):
 
 
 @csrf_exempt
-def signup(request, onsuccess="/availabook/home", onfail="/availabook/"):
+def signup(request, onsuccess="/availabook/temp", onfail="/availabook/"):
     user_id = request.POST.get("email")
     pwd = request.POST.get("psw")
     pwd_a = request.POST.get("psw_a")
@@ -233,7 +229,11 @@ def logout(request):
     if request.user.is_authenticated():
         print str(request.user.username) + " is logged out!"
         auth_logout(request)
-    return redirect('/availabook/home')
+    return redirect("/availabook/temp")
+
+
+def temp(request):
+    return render(request, 'homepage.html');
 
 
 def profile(request):
@@ -344,7 +344,7 @@ def post_event(request):
         except Exception as e:
             print (e)
         event = {'EId':EId,'content':content,'date':event_date,'time':event_time,'fave':[],'zipcode':zipcode,'timestamp':timestamp,'user_email':email}
-        
+
         update_like_or_post_tag(email,event,'post')
 
         print(EId +' posted')
@@ -359,9 +359,9 @@ def get_fave(request):
         EId = request.POST.get("EId")
         print(EId)
         event = get_event_by_EId(EId)
-        
+
         update_like_or_post_tag(request.user.username,event,'like')
-        
+
         event = Event(event)
         event.add_fave(request.user.username)
         return JsonResponse({"EId" : EId, "fave_num" : event.fave_num})

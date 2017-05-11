@@ -37,7 +37,8 @@ $(document).ready(function() {
             success : function(msg) {
                 //$("body").html(msg);
                 console.log("logout success!");
-                window.location.reload();
+                window.location.href = "/availabook/home";
+                //window.location.reload();
             },
 
             error : function(xhr,errmsg,err) {
@@ -82,13 +83,13 @@ $(document).ready(function() {
                 // remove the value from the input
                 $("#login_id").val("");
                 $("#login_psw").val("");
-                window.location.href = "/availabook/home";
-                //$("body").html(msg);
+
                 if (msg != "Error") {
-                    console.log(msg)
+                    //console.log(msg)
                     console.log("login success!"); // another sanity check
+                    //$("body").html(msg);
                     //window.location.reload();
-                    //window.location.href = "/availabook/home";
+                    window.location.href = "/availabook/home";
                 } else {
                     alert("Password incorrect or not signed up!");
                 }
@@ -133,7 +134,7 @@ $(document).ready(function() {
                 //$("body").html(msg);
                 if (msg != "Error") {
                     console.log("signup success!");
-                    window.location.reload();
+                    //window.location.reload();
                     window.location.href = "/availabook/home";
                 } else {
                     alert("User information already existed or passwords inconsistent or pushing to dynamodb failed!");

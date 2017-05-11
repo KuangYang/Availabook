@@ -17,4 +17,5 @@ urlpatterns = [
     url(r'^upload/',views.upload,name='upload'),
     url(r'^info/',views.info,name='info'),
     url(r'^edit/',views.edit,name='edit'),
+    url(r'^temp/',views.temp,name='temp'),
 ]
