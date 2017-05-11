@@ -17,6 +17,7 @@ from geopy.geocoders import Nominatim
 from django.utils import timezone
 import pytz
 from tzlocal import get_localzone
+from stop_words import get_stop_words
 """reload intepretor, add credential path"""
 reload(sys)
 sys.setdefaultencoding('UTF8')
