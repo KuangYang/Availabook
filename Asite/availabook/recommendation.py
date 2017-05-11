@@ -347,7 +347,7 @@ def get_label(data):
         ["travel", "discuss", "ceremony", "introduction", "closing", "fight", "musician", "live", "theatre", "restaurant"],
         ["tech", "hilarious", "create", "palace", "volunteer", "poster", "design", "hart", "confessional", "league"],
         ["fruit", "guest", "show", "learn", "drama", "summit", "press", "center", "campaign", "fun"]]
-    w2 = [w.lower() for w in data.replace(',', ' ').split(' ')]
+    w2 = [w.lower() for w in data.replace(',', ' ').replace('!', ' ').replace('.', ' ').replace('?', ' ').replace('#', ' ').replace('@', ' ').replace('*', ' ').split(' ')]
     en_stop = get_stop_words('en')
     removelist = ["go", "an", "want", "play", "someone", "like", "together"]
     for word in w2:
