@@ -460,12 +460,12 @@ def update_para(email,event, like_or_post):
     else:
         print('invalid event!!!!!!maybe out of date')
 
-def recommend_to_all(event): #### run when post
+def recommend_to_all(event, whole_or_post): #### run when post
     print('start recommend to all')
     user_list = tb_user.scan()['Items']
     for user in user_list:
         email = user['email']
-        event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event,'post')
+        event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event,whole_or_post)
         if final_score > 0:
             response = tb_result.get_item(
                 Key={
@@ -761,7 +761,7 @@ def update_thread():
                             }
                         )
                         update_para(email,event,'post')
-                        recommend_to_all(event)
+                        recommend_to_all(event,'post')
 
                     if like_or_not != 'False':
                         print('like is yes')
@@ -822,7 +822,7 @@ def whole_recommendation_thread():
         event_list = tb_event.scan()['Items']
         for event in event_list:
             print(event)
-            recommend_to_all(event)
+            recommend_to_all(event,'whole')
         print('whole recommendation finish')
 
 

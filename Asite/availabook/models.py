@@ -370,7 +370,7 @@ def get_recommend_newversion(email):
             try:
                 e = get_event_by_EId(EId)
                 event = Event(e)
-                print(EId +': '+ str(rec_res[EId]))
+                print('get a new event'+EId +': '+ str(rec_res[EId]))
                 event_list.append(event)
             except Exception as x:
                 print(x)
