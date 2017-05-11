@@ -323,7 +323,7 @@ def distance_score(event_zipcode,user_zipcode):
 
 def popularity_score(likes_num):
     likes_num = likes_num
-    return (1-math.exp(-0.05*likes_num))
+    return (1-math.exp(-0.3*likes_num))
 
 def vectorize(s_time,s_distance,s_popularity,s_topic):
     ### think about put it into db to accelate the speed
