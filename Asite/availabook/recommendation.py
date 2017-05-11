@@ -737,8 +737,9 @@ def update_thread():
         try:
             result_list = tb_result.scan()['Items']
         except:
+            time.sleep(1)
             pass
-        time.sleep(1)
+        time.sleep(3)
         if result_list:
             for result in result_list:
                 if result['email'] == 'new_user':
@@ -790,8 +791,9 @@ def rec_to_all_thread():
         try:
             result_list = tb_result.scan()['Items']
         except:
+            time.sleep(1)
             pass
-        time.sleep(1)
+        time.sleep(3)
         if result_list:
             for result in result_list:
                 if result['email'] == 'new_user':
@@ -821,8 +823,9 @@ def singup_rec_thread():
         try:
             result_list = tb_result.scan()['Items']
         except:
+            time.sleep(1)
             pass
-        time.sleep(1)
+        time.sleep(3)
         if result_list:
             for result in result_list:
                 if result['email'] == 'new_user':

@@ -361,8 +361,10 @@ def get_recommend_newversion(email):
                 'email':'new_user'
             }
         )
+    print('visitor get')
     rec_res = rec_res['Item']['rec_res']
     event_list = []
+    print('before get rec_res')
     if rec_res:
         rec_res = json.loads(rec_res)
         rec_res_list = sorted(rec_res.items(),key=lambda x:x[1],reverse=True)
