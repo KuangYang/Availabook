@@ -20,6 +20,7 @@ $(document).ready(function() {
                 if (msg != "Error") {
                     console.log("Post success!");
                     window.location.reload();
+                    //window.location.href = "/availabook/home";
                 } else {
                     alert("Please log in first before post!");
                 }
@@ -40,8 +41,8 @@ $(document).ready(function() {
             success : function(msg) {
                 //$("body").html(msg);
                 console.log("logout success!");
-                window.location.href = "/availabook/home";
-                //window.location.reload();
+                //window.location.href = "/availabook/home";
+                window.location.reload();
             },
 
             error : function(xhr,errmsg,err) {
