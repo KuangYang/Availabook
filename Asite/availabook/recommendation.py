@@ -609,10 +609,11 @@ def core_calculation(email,event,like_or_post):
         print('event_vec!!!!'+str(event_vec))
         print('user_vec!!!!'+str(user_hyper_vec))
         default_pop_event_vec = event_vec
+        post_reward = 0.4
         if like_or_post == 'post':
             default_pop_event_vec[2] = 0.4  ### 10 likes
             event_vec[2] = user_hyper_vec[2] #### if post, popularity keep the same
-        final_score = np.dot(default_pop_event_vec,user_hyper_vec)
+        final_score = np.dot(default_pop_event_vec,user_hyper_vec) + post_reward
         print('final_score of dot product '+str(final_score))
         # if time_reward:
         #     final_score = final_score+ 0.01
