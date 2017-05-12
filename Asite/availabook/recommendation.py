@@ -278,31 +278,31 @@ def time_score(event_date,event_time):
     result = 0
     penalty = False
     valid = True
+    reward = 0
     if event_date == today:
         print(str(loc_dt),str(event_datetime))
         if str(loc_dt)<str(event_datetime):
-            print(loc_dt)
-            print(event_datetime)
             print('valid time and reward')
-            return 1,False,True
+            return 1,False,True,0.12
         else:
             print('invalid time and penalty')
-            return 0,True,False
+            return 0,True,False,0.12
     date_diff = int((str(event_date - today)).split(" ")[0])
+    if date_diff<15 and date_diff>=0:
+        reward = 0.007*(15-date_diff)
     #### set the threshold, if bigger than assign a penalty to discard this result
     try:
-        result = math.exp(-0.16*date_diff) ### scale the result to make it same as distance
+        result = math.exp(-0.1*date_diff) ### scale the result to make it same as distance
     except Exception as x:
         print(x)
-        print('1211212112312123')
-        return 0,True,False  ## result,penalty,valid
+        return 0,True,False,reward  ## result,penalty,valid
     if date_diff<0:
-        return 0, True, False
+        return 0, True, False,reward
         print('invalid time and penalty')
-    if result < 0.1: ### old-of-date or later than 15 days
-        return 0, True,True
+    if result < 0.01: ### old-of-date or later than 15 days
+        return 0, True,True,reward
         print('valid time and penalty')
-    return result, penalty, valid
+    return result, penalty, valid,reward
 
 def distance_score(event_zipcode,user_zipcode):
     try:
@@ -315,28 +315,41 @@ def distance_score(event_zipcode,user_zipcode):
         print(user_zipcode,event_zipcode)
         print(e)
         return 0
-    print(str(location1.longitude)+' '+str(location2.longitude)+' '+str(location1.latitude)+' '+str(str(location2.latitude)))
-    distance = math.sqrt((location1.latitude - location2.latitude)**2 + (location1.longitude-location2.longitude)**2)
-    print(distance)
+    #print(str(location1.longitude)+' '+str(location2.longitude)+' '+str(location1.latitude)+' '+str(str(location2.latitude)))
+    lat_diff = location1.latitude - location2.latitude
+    if abs(lat_diff) > 180:
+        lat_diff = 360 - lat_diff
+    lon_diff = location1.longitude - location2.longitude
+    if abs(lon_diff) > 90:
+        lon_diff = 180 - lon_diff
+    distance = math.sqrt(lat_diff**2 + lon_diff**2)
+    #result = math.exp(-0.58*distance)
     result = math.exp(-0.58*distance)
-    print(result)
-    if result < 0.1:  ### distance farther than penn state to mahattan
+    print('distance score '+str(result))
+    if result < 0.000000000000000000000001: 
         result = 0
     return result
     #### set the threshold, if bigger than assign a penalty to discard this result
 
 def popularity_score(likes_num):
     likes_num = likes_num
-    result = 2*(1-math.exp(-0.05*likes_num))
+    result = 1.2*(1-math.exp(-0.08*likes_num))
     popularity_reward = 0
-    if likes_num > 10:
-        popularity_reward = 0.015*(likes_num-10)
+    popularity_reward = 0.01*likes_num
+    if popularity_reward >= 0.3:
+        popularity_reward = 0.3
     return result, popularity_reward
 
 def vectorize(s_time,s_distance,s_popularity,s_topic):
     ### think about put it into db to accelate the speed
     vec = np.asarray([s_time,s_distance,s_popularity,s_topic])
     return normalize(vec)
+
+def vectorize_without_normalize(s_time,s_distance,s_popularity,s_topic):
+    ### think about put it into db to accelate the speed
+    vec = np.asarray([s_time,s_distance,s_popularity,s_topic])
+    return vec
+
 
 def assign_score(user,event):
     event_vec = event_vec(event)
@@ -412,10 +425,9 @@ def update_para(email,event, like_or_post):
     print('before core_calculation')
     event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score = core_calculation(email,event,like_or_post)
     print(final_score)
-    print('11111111')
     print(event_vec)
     if final_score > 0:
-        print('new event EId'+event['EId'])
+        print('new event EId '+event['content'])
         print('final_score '+str(final_score))
         response = tb_result.get_item(
             Key={
@@ -541,8 +553,9 @@ def core_calculation(email,event,like_or_post):
     )
     if 'Item' not in response:
         print('this should not happen')
-        rating_default = normalize(np.random.rand(10))
-        hyper_para_default = normalize(np.random.rand(4))
+        rating_default = normalize(np.ones(10))
+        hyper_para_default = normalize(np.ones(4))
+        print('random default user hyper vector'+str(hyper_para_default))
         preference_table.put_item(
             Item={
                 'email': email,
@@ -568,9 +581,9 @@ def core_calculation(email,event,like_or_post):
     event_valid = True  ### invalid if time, distance score is zero
     time_penalty = False
     distance_penalty = False
-    time_reward = False  ### reward if score is 1, menas today, add a value to the total score
+    #time_reward = False  ### reward if score is 1, menas today, add a value to the total score
     distance_reward = False  ## reward if score is 1, means add a value to the total score, since it is common sense that same place is important for event attending
-    s_time,time_penalty,event_valid =time_score(event['date'],event['time'])
+    s_time,time_penalty,event_valid,time_reward =time_score(event['date'],event['time'])
     final_score = 0
     if event_valid == True:
         s_distance = distance_score(event_zipcode=str(event['zipcode']),user_zipcode=str(zipcode))
@@ -580,20 +593,19 @@ def core_calculation(email,event,like_or_post):
             distance_penalty = True
         if s_time==0:
             print('time penalty')
-        if s_time == 1:
-            print('time reward')
-            time_reward = True
+        # if s_time == 1:
+        #     print('time reward')
+        #     time_reward = True
         if s_distance == 1:
             print('distance reward')
             distance_reward = True
         event_topic_vec = get_label(event['content'])
-        print('22444444444444')
-        print(event_topic_vec)
+        print('event topic vec'+str(event_topic_vec))
         user_topic_vec = [float(i) for i in user['rating']]
-        s_topic = cosine_similarity(np.asarray(user_topic_vec),np.asarray(event_topic_vec)) ## topicscore
+        s_topic = 0.7*cosine_similarity(np.asarray(user_topic_vec),np.asarray(event_topic_vec)) ## topicscore
         #print(user['time_para'],user['distance_para'],user['popularity_para'],user['topic_para'])
-        event_vec = vectorize(s_time=s_time,s_distance=s_distance,s_popularity=s_popularity,s_topic=s_topic)
-        user_hyper_vec = vectorize(s_time=float(user['time_para']),s_distance=float(user['distance_para']),s_popularity=float(user['popularity_para']),s_topic=float(user['topic_para']))
+        event_vec = vectorize_without_normalize(s_time=s_time,s_distance=s_distance,s_popularity=s_popularity,s_topic=s_topic)
+        user_hyper_vec = vectorize_without_normalize(s_time=float(user['time_para']),s_distance=float(user['distance_para']),s_popularity=float(user['popularity_para']),s_topic=float(user['topic_para']))
         print('event_vec!!!!'+str(event_vec))
         print('user_vec!!!!'+str(user_hyper_vec))
         default_pop_event_vec = event_vec
@@ -602,21 +614,23 @@ def core_calculation(email,event,like_or_post):
             event_vec[2] = user_hyper_vec[2] #### if post, popularity keep the same
         final_score = np.dot(default_pop_event_vec,user_hyper_vec)
         print('final_score of dot product '+str(final_score))
-        if time_reward:
-            final_score = final_score+ 0.003
+        # if time_reward:
+        #     final_score = final_score+ 0.01
         if distance_reward:
-            final_score = final_score + 0.05
+            final_score = final_score + 0.1
         if time_penalty:
             final_score = final_score - 0.05
         if distance_penalty:
             final_score = final_score - 0.05
-        final_score = final_score + popularity_reward
+        if popularity_reward != 0:
+            print('popularity reward')
+        final_score = final_score + popularity_reward+time_reward
         if event_valid == False:
             final_score =0
         print('final_score after reward '+str(final_score))
         return event_vec, event_topic_vec, user_hyper_vec, time_reward,distance_reward,event_valid,final_score
     else:
-        print('55555555')
+        print('invalid event')
         return None,None,None,None,None,None,0
 
 def origin_recommend(email): ### run one time, can offline
@@ -671,20 +685,20 @@ def rec_to_new_user():
         print(event['EId'])
         event_valid = True  ### invalid if time
         time_penalty = False
-        time_reward = False  ### reward if score is 1, menas today, add a value to the total score
-        s_time,time_penalty,event_valid =time_score(event['date'],event['time'])
+        #time_reward = False  ### reward if score is 1, menas today, add a value to the total score
+        s_time,time_penalty,event_valid,time_reward =time_score(event['date'],event['time'])
         s_popularity, popularity_reward = popularity_score(len(event['fave']))
         if s_time==0:
             print('time penalty')
-        if s_time == 1:
-            print('time reward')
-            time_reward = True
+        # if s_time == 1:
+        #     print('time reward')
+        #     time_reward = True
         final_score = s_time+s_popularity
-        if time_reward:
-            final_score = final_score+ 0.03
+        # if time_reward:
+        #     final_score = final_score+ 0.03
         if time_penalty:
             final_score = final_score - 0.1
-        final_score = final_score + popularity_reward
+        final_score = final_score + popularity_reward+time_reward
         if event_valid == False:
             final_score =0
         rec_res[event['EId']] = final_score
@@ -737,7 +751,7 @@ def update_thread():
         try:
             result_list = tb_result.scan()['Items']
         except:
-            time.sleep(1)
+            time.sleep(5)
             pass
         time.sleep(3)
         if result_list:
@@ -791,7 +805,7 @@ def rec_to_all_thread():
         try:
             result_list = tb_result.scan()['Items']
         except:
-            time.sleep(1)
+            time.sleep(5)
             pass
         time.sleep(3)
         if result_list:
@@ -801,7 +815,6 @@ def rec_to_all_thread():
                 else:
                     rec_to_all = result['rec_to_all']
                     if rec_to_all != 'False':
-                        print(rec_to_all)
                         print('rec_to_all thread start')
                         email = rec_to_all[0]
                         event = rec_to_all[1]
@@ -823,7 +836,8 @@ def singup_rec_thread():
         try:
             result_list = tb_result.scan()['Items']
         except:
-            time.sleep(1)
+            print('throughput problem')
+            time.sleep(5)
             pass
         time.sleep(3)
         if result_list:
@@ -876,9 +890,9 @@ new_user_rec_thread()
 update_thread()
 whole_recommendation_thread()
 
-# print(distance_score('10025','16802'))
-# print(distance_score('10025','07701'))
-
+# print distance_score('10025','16802') # not so far
+# print distance_score('10025','11201') # far
+# print distance_score('10025','10452') # bronx, close
 
 
 

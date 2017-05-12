@@ -9,6 +9,7 @@ import nltk
 import operator
 from nltk.corpus import wordnet as wn
 import numpy as np
+import random
 
 
 """reload intepretor, add credential path"""
@@ -165,8 +166,9 @@ class Signup():
                 'sign_up_flag': 'True'
             }
         )
-        rating_default = normalize(np.random.rand(10))
-        hyper_para_default = normalize(np.random.rand(4))
+        rating_default = normalize(np.ones(10))
+        hyper_para_default = normalize(np.ones(4))
+        print('random default user hyper vector'+str(hyper_para_default))
         preference_table.put_item(
             Item={
                 'email': self.id,
@@ -376,7 +378,7 @@ def get_recommend_newversion(email):
                 try:
                     e = get_event_by_EId(EId)
                     event = Event(e)
-                    print('get a new event'+EId +': '+ str(rec_res[EId]))
+                    print('get a new event'+e['content'] +': '+ str(rec_res[EId]))
                     event_list.append(event)
                 except Exception as x:
                     print(x)
