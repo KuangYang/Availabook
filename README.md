@@ -1,10 +1,10 @@
 # Availabook
 
-## Cloud Computing & Big Data final project
+## Cloud Computing & Big Data Final Project
 
 ### Project Group 17
 
-### Kaili Chen (kc3031) & Kuang Yang (ky2342) & Jiamin Huang (jh3768) & Xun Xue (xx2241)
+### Kuang Yang (ky2342) & Kaili Chen (kc3031) & Jiamin Huang (jh3768) & Xun Xue (xx2241)
 
 #### Environment Setup
 
